@@ -16,27 +16,44 @@
 		36BF70D62E55A920007AD5BE /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D52E55A920007AD5BE /* Alamofire */; };
 		36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D82E55A936007AD5BE /* Algorithms */; };
 		36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70DB2E55A94E007AD5BE /* HostingView */; };
+		FED82BD72E55E44400604202 /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = FED82BD62E55E44400604202 /* Dependencies */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FED82BE02E55E4D600604202 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36BF70A32E55A7B2007AD5BE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36BF70AA2E55A7B2007AD5BE;
+			remoteInfo = EventLogger;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		36BF70AB2E55A7B2007AD5BE /* EventLogger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventLogger.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FED82BDC2E55E4D600604202 /* EventLoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EventLoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		36BF70BD2E55A7B3007AD5BE /* Exceptions for "EventLogger" folder in "EventLogger" target */ = {
+		FED82C0D2E55E70D00604202 /* Exceptions for "EventLogger" folder in "EventLogger" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 36BF70AA2E55A7B2007AD5BE /* EventLogger */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		36BF70AD2E55A7B2007AD5BE /* EventLogger */ = {
+		FED82BDD2E55E4D600604202 /* EventLoggerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EventLoggerTests;
+			sourceTree = "<group>";
+		};
+		FED82C072E55E70D00604202 /* EventLogger */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				36BF70BD2E55A7B3007AD5BE /* Exceptions for "EventLogger" folder in "EventLogger" target */,
+				FED82C0D2E55E70D00604202 /* Exceptions for "EventLogger" folder in "EventLogger" target */,
 			);
 			path = EventLogger;
 			sourceTree = "<group>";
@@ -53,10 +70,18 @@
 				36BF70D32E55A90E007AD5BE /* Then in Frameworks */,
 				36BF70C82E55A8C6007AD5BE /* RxFlow in Frameworks */,
 				36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */,
+				FED82BD72E55E44400604202 /* Dependencies in Frameworks */,
 				36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */,
 				36BF70CD2E55A8DC007AD5BE /* RxSwift in Frameworks */,
 				36BF70C52E55A8B6007AD5BE /* ReactorKit in Frameworks */,
 				36BF70D02E55A8FA007AD5BE /* SnapKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FED82BD92E55E4D600604202 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,7 +91,8 @@
 		36BF70A22E55A7B2007AD5BE = {
 			isa = PBXGroup;
 			children = (
-				36BF70AD2E55A7B2007AD5BE /* EventLogger */,
+				FED82C072E55E70D00604202 /* EventLogger */,
+				FED82BDD2E55E4D600604202 /* EventLoggerTests */,
 				36BF70AC2E55A7B2007AD5BE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -75,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				36BF70AB2E55A7B2007AD5BE /* EventLogger.app */,
+				FED82BDC2E55E4D600604202 /* EventLoggerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,7 +122,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				36BF70AD2E55A7B2007AD5BE /* EventLogger */,
+				FED82C072E55E70D00604202 /* EventLogger */,
 			);
 			name = EventLogger;
 			packageProductDependencies = (
@@ -108,10 +135,34 @@
 				36BF70D52E55A920007AD5BE /* Alamofire */,
 				36BF70D82E55A936007AD5BE /* Algorithms */,
 				36BF70DB2E55A94E007AD5BE /* HostingView */,
+				FED82BD62E55E44400604202 /* Dependencies */,
 			);
 			productName = EventLogger;
 			productReference = 36BF70AB2E55A7B2007AD5BE /* EventLogger.app */;
 			productType = "com.apple.product-type.application";
+		};
+		FED82BDB2E55E4D600604202 /* EventLoggerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FED82BE22E55E4D600604202 /* Build configuration list for PBXNativeTarget "EventLoggerTests" */;
+			buildPhases = (
+				FED82BD82E55E4D600604202 /* Sources */,
+				FED82BD92E55E4D600604202 /* Frameworks */,
+				FED82BDA2E55E4D600604202 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FED82BE12E55E4D600604202 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FED82BDD2E55E4D600604202 /* EventLoggerTests */,
+			);
+			name = EventLoggerTests;
+			packageProductDependencies = (
+			);
+			productName = EventLoggerTests;
+			productReference = FED82BDC2E55E4D600604202 /* EventLoggerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -125,6 +176,10 @@
 				TargetAttributes = {
 					36BF70AA2E55A7B2007AD5BE = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					FED82BDB2E55E4D600604202 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 36BF70AA2E55A7B2007AD5BE;
 					};
 				};
 			};
@@ -146,6 +201,7 @@
 				36BF70D42E55A920007AD5BE /* XCRemoteSwiftPackageReference "Alamofire" */,
 				36BF70D72E55A936007AD5BE /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */,
+				FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 36BF70AC2E55A7B2007AD5BE /* Products */;
@@ -153,12 +209,20 @@
 			projectRoot = "";
 			targets = (
 				36BF70AA2E55A7B2007AD5BE /* EventLogger */,
+				FED82BDB2E55E4D600604202 /* EventLoggerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		36BF70A92E55A7B2007AD5BE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FED82BDA2E55E4D600604202 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -175,7 +239,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FED82BD82E55E4D600604202 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FED82BE12E55E4D600604202 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36BF70AA2E55A7B2007AD5BE /* EventLogger */;
+			targetProxy = FED82BE02E55E4D600604202 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		36BF70BF2E55A7B3007AD5BE /* Debug */ = {
@@ -187,7 +266,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LW9AR5U74A;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = EventLogger/Info.plist;
+				INFOPLIST_FILE = EventLogger/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "이벤트 로거";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -222,7 +301,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LW9AR5U74A;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = EventLogger/Info.plist;
+				INFOPLIST_FILE = EventLogger/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "이벤트 로거";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -369,6 +448,40 @@
 			};
 			name = Release;
 		};
+		FED82BE32E55E4D600604202 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoon.EventLoggerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EventLogger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EventLogger";
+			};
+			name = Debug;
+		};
+		FED82BE42E55E4D600604202 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yoon.EventLoggerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EventLogger.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/EventLogger";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -386,6 +499,15 @@
 			buildConfigurations = (
 				36BF70BF2E55A7B3007AD5BE /* Debug */,
 				36BF70C02E55A7B3007AD5BE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FED82BE22E55E4D600604202 /* Build configuration list for PBXNativeTarget "EventLoggerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FED82BE32E55E4D600604202 /* Debug */,
+				FED82BE42E55E4D600604202 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -457,6 +579,14 @@
 				minimumVersion = 1.3.0;
 			};
 		};
+		FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-dependencies";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -504,6 +634,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */;
 			productName = HostingView;
+		};
+		FED82BD62E55E44400604202 /* Dependencies */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */;
+			productName = Dependencies;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
