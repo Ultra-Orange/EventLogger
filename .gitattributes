@@ -1,0 +1,18 @@
+# SwiftPM lockfile 충돌 줄이기 (Xcode에서 생성하는 Package.resolved)
+**/xcshareddata/swiftpm/Package.resolved merge=ours
+
+# Xcode 프로젝트 파일(pbxproj) 머지 충돌 완화
+*.pbxproj merge=union
+
+# 스토리보드/Interface Builder 파일도 union 머지 시도 (완벽하진 않지만 충돌 줄여줌)
+*.storyboard merge=union
+*.xib merge=union
+
+# Swift 소스코드는 항상 LF로 (윈도우 환경 혼합 방지)
+*.swift text eol=lf
+
+# 이미지/에셋은 무조건 바이너리 취급
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
