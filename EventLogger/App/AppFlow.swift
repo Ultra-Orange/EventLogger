@@ -26,17 +26,33 @@ final class AppFlow: Flow {
         switch step {
         case .eventList:
             return navigateToEventList()
+        case .eventDetail:
+            return navigateToEventDetail()
         }
     }
 
-    // 내일 튜터님한테 물어보기
     func navigateToEventList() -> FlowContributors {
         let vc = EventListViewController()
         let reactor = EventListReactor()
         rootNav.pushViewController(vc, animated: false)
-        return .one(flowContributor: .contribute(
-            withNextPresentable: vc,
-            withNextStepper: reactor
-        ))
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
     }
+    
+    func navigateToEventDetail() -> FlowContributors {
+        let vc = EventDetailViewController()
+        let reactor = EventDetailReactor()
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+    }
+    
 }

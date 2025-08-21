@@ -13,7 +13,7 @@ import RxRelay
 import RxSwift
 import Dependencies
 
-final class EventListReactor: BaseReactor {
+final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {}
 
@@ -25,7 +25,6 @@ final class EventListReactor: BaseReactor {
 
     // 생성자에서 초기 상태 설정
     let initialState: State
-    @Dependency(\.modelContext) var modelContext
 
     init() {
         initialState = State()

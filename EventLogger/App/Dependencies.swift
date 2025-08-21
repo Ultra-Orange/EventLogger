@@ -8,6 +8,22 @@
 import Dependencies
 import SwiftData
 
+private enum ModelContextKey: DependencyKey{
+    static var liveValue: ModelContext {
+        ModelContext(Persistence.container)
+    }
+}
+
+extension DependencyValues {
+    var modelContext: ModelContext {
+        get { self[ModelContextKey.self] }
+        set { self[ModelContextKey.self] = newValue }
+    }
+}
+
+extension ModelContext: @unchecked @retroactive Sendable { }
+
+// 사용법
 // struct MyCounter {
 //    var getValue: () -> Int
 // }

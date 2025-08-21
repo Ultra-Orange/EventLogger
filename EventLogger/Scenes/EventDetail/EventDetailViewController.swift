@@ -7,11 +7,11 @@
 
 import UIKit
 
-class EventListViewController: BaseViewController<EventListReactor> {
+class EventDetailViewController: BaseViewController<EventDetailReactor> {
 
     override func setupUI() {
         view.backgroundColor = .systemOrange
     }
 
-    override func bind(reactor: EventListReactor) {}
+    override func bind(reactor: EventDetailReactor) {}
 }
