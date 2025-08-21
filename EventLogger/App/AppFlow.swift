@@ -34,6 +34,7 @@ final class AppFlow: Flow {
     func navigateToEventList() -> FlowContributors {
         let vc = EventListViewController()
         let reactor = EventListReactor()
+        vc.reactor = reactor
         rootNav.pushViewController(vc, animated: false)
         return .one(
             flowContributor: .contribute(
@@ -43,9 +44,10 @@ final class AppFlow: Flow {
         )
     }
 
-    func navigateToEventDetail(_: EventItem) -> FlowContributors {
+    func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
-        let reactor = EventDetailReactor()
+        let reactor = EventDetailReactor(eventItem: eventItem)
+        vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
             flowContributor: .contribute(
