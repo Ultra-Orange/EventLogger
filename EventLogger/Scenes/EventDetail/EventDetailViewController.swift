@@ -9,8 +9,10 @@ import UIKit
 
 class EventDetailViewController: BaseViewController<EventDetailReactor> {
     override func setupUI() {
-        view.backgroundColor = .systemOrange
+        view.backgroundColor = .systemGray4
     }
 
-    override func bind(reactor: EventDetailReactor) {}
+    override func bind(reactor: EventDetailReactor) {
+        print(reactor.currentState.eventItem.title)
+    }
 }

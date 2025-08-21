@@ -21,13 +21,15 @@ final class EventDetailReactor: BaseReactor {
     enum Mutation {}
 
     // View의 상태 정의 (현재 View의 상태값)
-    struct State {}
+    struct State {
+        let eventItem: EventItem
+    }
 
     // 생성자에서 초기 상태 설정
     let initialState: State
 
-    init() {
-        initialState = State()
+    init(eventItem: EventItem) {
+        initialState = State(eventItem: eventItem)
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의

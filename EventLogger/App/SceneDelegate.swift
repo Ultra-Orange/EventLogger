@@ -22,6 +22,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             flow: appFlow,
             with: OneStepper(withSingleStep: AppStep.eventList)
         )
+
+//        @Dependency(\.eventItems) var eventItems
+//        let testItem = eventItems[0]
+//        let appFlow = AppFlow(windowScene: windowScene)
+//        coordinator.coordinate(
+//            flow: appFlow,
+//            with: OneStepper(withSingleStep: AppStep.eventDetail(testItem))
+//        )
     }
 
     func sceneDidDisconnect(_: UIScene) {
