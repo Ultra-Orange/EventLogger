@@ -8,7 +8,7 @@
 import Dependencies
 import SwiftData
 
-private enum ModelContextKey: DependencyKey{
+private enum ModelContextKey: DependencyKey {
     static var liveValue: ModelContext {
         ModelContext(Persistence.container)
     }
@@ -21,7 +21,7 @@ extension DependencyValues {
     }
 }
 
-extension ModelContext: @unchecked @retroactive Sendable { }
+extension ModelContext: @unchecked @retroactive Sendable {}
 
 // 사용법
 // struct MyCounter {

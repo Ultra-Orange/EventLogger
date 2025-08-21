@@ -1,5 +1,5 @@
 //
-//  EventListReactor.swift
+//  EventDetailReactor.swift
 //  EventLogger
 //
 //  Created by Yoon on 8/20/25.
@@ -7,11 +7,11 @@
 
 import SwiftData
 
+import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
 import RxSwift
-import Dependencies
 
 final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)

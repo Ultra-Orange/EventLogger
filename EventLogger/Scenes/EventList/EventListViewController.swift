@@ -8,7 +8,6 @@
 import UIKit
 
 class EventListViewController: BaseViewController<EventListReactor> {
-
     override func setupUI() {
         view.backgroundColor = .systemOrange
     }

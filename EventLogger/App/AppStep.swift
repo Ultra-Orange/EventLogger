@@ -9,5 +9,5 @@ import RxFlow
 
 enum AppStep: Step {
     case eventList
-    case eventDetail
+    case eventDetail(EventItem)
 }

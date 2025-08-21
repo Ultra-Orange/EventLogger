@@ -26,8 +26,8 @@ final class AppFlow: Flow {
         switch step {
         case .eventList:
             return navigateToEventList()
-        case .eventDetail:
-            return navigateToEventDetail()
+        case let .eventDetail(item):
+            return navigateToEventDetail(item)
         }
     }
 
@@ -42,8 +42,8 @@ final class AppFlow: Flow {
             )
         )
     }
-    
-    func navigateToEventDetail() -> FlowContributors {
+
+    func navigateToEventDetail(_: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor()
         rootNav.pushViewController(vc, animated: true)
@@ -54,5 +54,4 @@ final class AppFlow: Flow {
             )
         )
     }
-    
 }
