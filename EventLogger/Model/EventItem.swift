@@ -10,6 +10,7 @@ import UIKit
 struct EventItem: Hashable {
     let id: UUID // 고유 식별자
     var title: String // 제목
+    var category: String // 카테고리
     var image: UIImage? // 이미지
     var startTime: Date // 개연시간
     var endtime: Date // 종연시간
@@ -23,7 +24,7 @@ struct EventItem: Hashable {
 
     var artists: [String] // 아티스트
     var expense: Double // TODO: 토털은 원화변환
-    var currency: Currency
+    var currency: String
     var memo: String // 메모
 
     func hash(into hasher: inout Hasher) {
