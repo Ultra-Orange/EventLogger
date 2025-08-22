@@ -2,7 +2,7 @@
 //  EventDetailReactor.swift
 //  EventLogger
 //
-//  Created by Yoon on 8/20/25.
+//  Created by Yoon on 8/21/25.
 //
 
 import SwiftData

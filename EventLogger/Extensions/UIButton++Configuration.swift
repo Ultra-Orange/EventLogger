@@ -9,10 +9,10 @@ extension UIButton.Configuration {
     // 기본 버튼
     static var defaultButton: UIButton.Configuration {
         var config = filled()
-        config.baseBackgroundColor = .systemGray2
+        config.baseBackgroundColor = .systemBlue
         config.titleTextAttributesTransformer = .init { attr in
             var newAttr = attr
-            newAttr.font = UIFont.systemFont(ofSize: 16)
+            newAttr.font = UIFont.preferredFont(forTextStyle: .callout)
             newAttr.foregroundColor = .systemBackground
             return newAttr
         }
@@ -25,7 +25,7 @@ extension UIButton.Configuration {
         config.baseBackgroundColor = .systemGray2
         config.titleTextAttributesTransformer = .init { attr in
             var newAttr = attr
-            newAttr.font = UIFont.systemFont(ofSize: 20)
+            newAttr.font = UIFont.preferredFont(forTextStyle: .title3)
             newAttr.foregroundColor = .systemBackground
             return newAttr
         }
