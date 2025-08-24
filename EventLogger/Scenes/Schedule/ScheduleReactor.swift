@@ -18,8 +18,9 @@ final class ScheduleReactor: BaseReactor {
 
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
-        let navTitle: String
         let eventItem: EventItem?
+        let navTitle: String
+        let buttonTitle: String
     }
     
     enum Mode {
@@ -35,13 +36,15 @@ final class ScheduleReactor: BaseReactor {
         switch mode {
         case .create:
             self.initialState = State(
+                eventItem: nil,
                 navTitle: "이벤트 등록",
-                eventItem: nil
+                buttonTitle: "등록하기"
             )
         case let .update(item):
             self.initialState = State(
+                eventItem: item,
                 navTitle: "이벤트 추가",
-                eventItem: item
+                buttonTitle: "수정하기",
             )
         }
     }
