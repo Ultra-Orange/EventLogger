@@ -14,6 +14,7 @@ import RxRelay
 import RxSwift
 
 final class EventListReactor: BaseReactor {
+    
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case reloadEventItems
@@ -26,7 +27,7 @@ final class EventListReactor: BaseReactor {
 
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
-        var eventItmes: [EventItem]
+        var eventItems: [EventItem]
     }
 
     // 생성자에서 초기 상태 설정
@@ -34,8 +35,8 @@ final class EventListReactor: BaseReactor {
     @Dependency(\.modelContext) var modelContext
 
     init() {
-        @Dependency(\.eventItems) var fetchItmes
-        initialState = State(eventItmes: fetchItmes)
+        @Dependency(\.eventItems) var fetchItems
+        initialState = State(eventItems: fetchItems)
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
@@ -43,8 +44,8 @@ final class EventListReactor: BaseReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .reloadEventItems:
-            @Dependency(\.eventItems) var fetchItmes
-            let eventItems = fetchItmes
+            @Dependency(\.eventItems) var fetchItems
+            let eventItems = fetchItems
             return .just(.setEventItems(eventItems))
         }
     }
@@ -55,7 +56,7 @@ final class EventListReactor: BaseReactor {
         var newState = state
         switch mutation {
         case let .setEventItems(eventItems):
-            newState.eventItmes = eventItems
+            newState.eventItems = eventItems
         }
         return newState
     }
