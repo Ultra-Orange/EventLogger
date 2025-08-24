@@ -15,12 +15,6 @@ struct EventCategory {
 struct EventCell: View { // EventItem 통으로 받자
     let item: EventItem
     
-//    let title: String
-//    let image: UIImage?
-//    let startTime: Date
-//    let location: String
-//    let category: EventCategory
-    
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
@@ -46,6 +40,7 @@ struct EventCell: View { // EventItem 통으로 받자
                     .foregroundStyle(.white)
                     .padding(.bottom, 4)
                 
+                // 여기 로케이션 나중에 넣어줘야 됨
 //                Text(location)
 //                    .font(.footnote)
 //                    .foregroundStyle(.white)
@@ -76,8 +71,6 @@ struct EventCell: View { // EventItem 통으로 받자
 }
 
 #Preview {
-//    EventCell(title: "2025 HAN SEON HWA FANMEETING 〈어트랙티브 선화log〉", image: nil, startTime: DateFormatter.toDate("2025년 8월 23일 19:00")!, location: "잠실종합운동장", category: EventCategory(name: "팬미팅", color: .orange))
-//        .padding(20)
     EventCell(
         item: EventItem(
             id: UUID(),
