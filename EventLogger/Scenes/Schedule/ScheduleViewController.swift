@@ -24,6 +24,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let inputTitleView = TextFieldContainerView()
     private let categoryFieldView = CateogryContainerView()
     private let dateFieldView = DateFieldContainerView()
+    private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
     private let expnsesFieldView = ExpenseFieldContainerView()
     private let memoFieldview = MemoFieldContainerView()
@@ -55,6 +56,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
         contentView.addSubview(dateFieldView)
+        contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expnsesFieldView)
         contentView.addSubview(memoFieldview)
@@ -81,8 +83,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
         
-        artistsFieldView.snp.makeConstraints {
+        locationFieldView.snp.makeConstraints {
             $0.top.equalTo(dateFieldView.snp.bottom).offset(30)
+            $0.leading.trailing.equalToSuperview()
+        }
+        artistsFieldView.snp.makeConstraints {
+            $0.top.equalTo(locationFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
         
