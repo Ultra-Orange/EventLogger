@@ -12,4 +12,12 @@ struct Category: Hashable {
     var name: String
     var position: Int
     var color: UIColor
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: Category, rhs: Category) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
