@@ -37,13 +37,13 @@ final class ScheduleReactor: BaseReactor {
         case .create:
             self.initialState = State(
                 eventItem: nil,
-                navTitle: "이벤트 등록",
+                navTitle: "새 일정 등록",
                 buttonTitle: "등록하기"
             )
         case let .update(item):
             self.initialState = State(
                 eventItem: item,
-                navTitle: "이벤트 추가",
+                navTitle: "일정 수정",
                 buttonTitle: "수정하기",
             )
         }
