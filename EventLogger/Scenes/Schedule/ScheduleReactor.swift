@@ -22,33 +22,33 @@ final class ScheduleReactor: BaseReactor {
         let navTitle: String
         let buttonTitle: String
     }
-    
+
     enum Mode {
         case create
         case update(EventItem)
     }
-    
+
     let initialState: State
     private let mode: Mode
-    
+
     init(mode: Mode) {
         self.mode = mode
         switch mode {
         case .create:
-            self.initialState = State(
+            initialState = State(
                 eventItem: nil,
                 navTitle: "새 일정 등록",
                 buttonTitle: "등록하기"
             )
         case let .update(item):
-            self.initialState = State(
+            initialState = State(
                 eventItem: item,
                 navTitle: "일정 수정",
                 buttonTitle: "수정하기",
             )
         }
     }
-    
+
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {

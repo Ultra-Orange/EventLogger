@@ -14,31 +14,33 @@ final class AppTextField: UITextField {
     override func textRect(forBounds bounds: CGRect) -> CGRect {
         bounds.inset(by: padding)
     }
+
     override func editingRect(forBounds bounds: CGRect) -> CGRect {
         bounds.inset(by: padding)
     }
+
     override func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         bounds.inset(by: padding)
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureDefault()
     }
-    
+
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func configureDefault() {
-        self.font = .font16Regular
-        self.borderStyle = .roundedRect
-        self.layer.borderColor = UIColor.white.cgColor
-        self.layer.borderWidth = 1
-        self.layer.cornerRadius = 10
-        self.autocapitalizationType = .none // 자동 대문자 변환 무시
-        self.autocorrectionType = .no // 자동 수정 무시
-        self.smartQuotesType = .no // 스마트 구두점 무시
+        font = .font16Regular
+        borderStyle = .roundedRect
+        layer.borderColor = UIColor.white.cgColor
+        layer.borderWidth = 1
+        layer.cornerRadius = 10
+        autocapitalizationType = .none // 자동 대문자 변환 무시
+        autocorrectionType = .no // 자동 수정 무시
+        smartQuotesType = .no // 스마트 구두점 무시
     }
 }
