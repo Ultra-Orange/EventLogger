@@ -27,7 +27,7 @@ final class MemoFieldContainerView: UIView {
         $0.backgroundColor = .systemBackground
         $0.layer.cornerRadius = 10
         $0.layer.borderWidth = 1.0
-        $0.layer.borderColor = UIColor.systemGray6.cgColor
+        $0.layer.borderColor = UIColor.white.cgColor
         $0.font = UIFont.preferredFont(forTextStyle: .footnote)
     }
     
