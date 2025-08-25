@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftUI
+import SnapKit
 
 /// Diffable DataSource & 헤더 등록 담당
 final class EventListDataSource {
@@ -81,7 +82,8 @@ final class EventListDataSource {
             collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
         dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-            collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+            guard kind == UICollectionView.elementKindSectionHeader else { return nil } // kind 나중에 사용? 하려나?
+            return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
     }
 }

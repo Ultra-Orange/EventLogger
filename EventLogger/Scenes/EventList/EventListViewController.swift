@@ -18,11 +18,11 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
         $0.font = UIFont.preferredFont(forTextStyle: .body)
         $0.capsuleBackgroundColor = .black
-        $0.capsuleBorderColor = .gray.withAlphaComponent(0.6)
+        $0.capsuleBorderColor = .white.withAlphaComponent(0.6)
         $0.capsuleBorderWidth = 1
         $0.normalTextColor = .white
         $0.selectedTextColor = .white
-        $0.borderColor = .gray.withAlphaComponent(0.6)
+        $0.borderColor = .white.withAlphaComponent(0.6)
         $0.borderWidth = 1
         $0.segmentSpacing = 6
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3 )
@@ -120,8 +120,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .distinctUntilChanged()
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] order in
-                let symbol = (order == .newestFirst) ? "arrow.down" : "arrow.up"
-                self?.sortButton.image = UIImage(systemName: "arrow.up.arrow.down.circle") ?? UIImage(systemName: symbol)
+                self?.sortButton.image = UIImage(systemName: order == .newestFirst ? "arrow.up" : "arrow.down")
             })
             .disposed(by: disposeBag)
     }

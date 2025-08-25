@@ -18,22 +18,22 @@ final class EventListReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case reloadEventItems
-        case setFilter(EventFilter)
+        case setFilter(EventListFilter)
         case toggleSort
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setEventItems([EventItem])
-        case setFilter(EventFilter)
-        case setSortOrder(SortOrder)
+        case setFilter(EventListFilter)
+        case setSortOrder(EventListSortOrder)
     }
 
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         var eventItems: [EventItem]
-        var filter: EventFilter
-        var sortOrder: SortOrder
+        var filter: EventListFilter
+        var sortOrder: EventListSortOrder
     }
 
     // 생성자에서 초기 상태 설정

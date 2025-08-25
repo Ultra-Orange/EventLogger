@@ -12,8 +12,8 @@ struct EventListSnapshotBuilder {
     
     struct Input {
         let allItems: [EventItem]
-        let sortOrder: SortOrder
-        let filter: EventFilter
+        let sortOrder: EventListSortOrder
+        let filter: EventListFilter
         let calendar: Calendar
         let today: Date
     }

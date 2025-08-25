@@ -8,7 +8,7 @@
 import Foundation
 
 /// EventList에 사용되는 공통 타입과 유틸
-public enum SortOrder: Equatable {
+enum EventListSortOrder: Equatable {
     case newestFirst
     case oldestFirst
     
@@ -17,37 +17,37 @@ public enum SortOrder: Equatable {
     }
 }
 
-public enum EventFilter: Equatable {
+enum EventListFilter: Equatable {
     case all        // 전체
     case upcoming   // 참여예정
     case completed  // 참여완료
 }
 
 // oooo년 oo월 섹션 정렬용
-public struct YearMonth: Hashable, Comparable {
+struct EventListYearMonth: Hashable, Comparable {
     public let year: Int
     public let month: Int
     
-    public static func < (lhs: YearMonth, rhs: YearMonth) -> Bool {
+    public static func < (lhs: EventListYearMonth, rhs: EventListYearMonth) -> Bool {
         if lhs.year != rhs.year { return lhs.year < rhs.year }
         return lhs.month < rhs.month
     }
 }
 
-public enum EventListSection: Hashable {
+enum EventListSection: Hashable {
     case nextUp             // '다음 일정' 섹션
-    case month(YearMonth)   // 전체 섹션
+    case month(EventListYearMonth)   // 전체 섹션
 }
 
 // Diffable에서 동일 아이템을 섹션별로 중복 추가하기 위한 래퍼
-public enum EventListDSItem: Hashable {
+enum EventListDSItem: Hashable {
     case nextUp(UUID)
     case monthEvent(UUID)
 }
 
-public extension Calendar {
-    func yearMonth(for date: Date) -> YearMonth {
+extension Calendar {
+    func yearMonth(for date: Date) -> EventListYearMonth {
         let components = dateComponents([.year, .month], from: date)
-        return YearMonth(year: components.year ?? 0, month: components.month ?? 0)
+        return EventListYearMonth(year: components.year ?? 0, month: components.month ?? 0)
     }
 }
