@@ -182,9 +182,12 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
                 guard let self, let uiImage = image as? UIImage else { return }
                 DispatchQueue.main.async {
                     self.imageView.image = uiImage
+                    
                 }
             }
         }
+        
+        print("사진 선택 완료, 결과: \(results)")
     }
     
     
