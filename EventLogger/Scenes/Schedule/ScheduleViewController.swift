@@ -14,6 +14,7 @@ import SnapKit
 import SwiftUI
 import Then
 import Dependencies
+import PhotosUI
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     
@@ -22,7 +23,11 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let contentView = UIView()
     
     private let addImageView = AddImageView()
-    private let imageView = UIImageView() // TODO: 업로드한 이미지 표시
+    private let imageView = UIImageView().then {
+        $0.clipsToBounds = true
+        $0.backgroundColor = .clear
+        $0.contentMode = .scaleAspectFit
+    }
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CateogryContainerView()
     private let dateFieldView = DateFieldContainerView()
@@ -57,6 +62,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         }
         
         contentView.addSubview(addImageView)
+        contentView.addSubview(imageView)
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
         contentView.addSubview(dateFieldView)
@@ -68,10 +74,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(memoFieldview)
         contentView.addSubview(bottomButton)
         
+        
         // 오토 레이아웃
         addImageView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
             $0.leading.trailing.equalToSuperview()
+        }
+        
+        imageView.snp.makeConstraints{
+            $0.top.equalTo(addImageView.snp.top)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(addImageView.snp.height)
         }
         
         inputTitleView.snp.makeConstraints {
@@ -134,8 +147,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         
         addImageView.rx.tapGesture()
             .when(.recognized)
-            .bind {_ in
-                print("Add Image")
+            .bind { [weak self] _ in
+                self?.presentImagePicker()
             }
             .disposed(by: disposeBag)
         
@@ -146,6 +159,35 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         inputTitleView.textField.text = item.title
         
     }
+}
+
+extension ScheduleViewController: PHPickerViewControllerDelegate {
+    
+    private func presentImagePicker() {
+        var config = PHPickerConfiguration(photoLibrary: .shared())
+        config.selectionLimit = 1
+        config.filter = .images
+        
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let provider = results.first?.itemProvider else { return }
+        
+        if provider.canLoadObject(ofClass: UIImage.self) {
+            provider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+                guard let self, let uiImage = image as? UIImage else { return }
+                DispatchQueue.main.async {
+                    self.imageView.image = uiImage
+                }
+            }
+        }
+    }
+    
+    
 }
 
 
