@@ -22,28 +22,32 @@ final class AddImageView: UIView {
         $0.font = UIFont.preferredFont(forTextStyle: .callout)
     }
     
+    private let iconAndLabelContainer = UIImageView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(imageContainerView)
-        imageContainerView.addSubview(photoBadgeIcon)
-        imageContainerView.addSubview(textLabel)
+        imageContainerView.addSubview(iconAndLabelContainer)
+        iconAndLabelContainer.addSubview(photoBadgeIcon)
+        iconAndLabelContainer.addSubview(textLabel)
         
         imageContainerView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
             $0.height.equalTo(self.snp.width)
         }
         
-        // TODO: SF Symbol 넣으면서 레이아웃 숫자 구체화 필요
+        iconAndLabelContainer.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+        
         photoBadgeIcon.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(119)
-            $0.centerX.equalToSuperview()
+            $0.top.centerX.equalToSuperview()
         }
         
         textLabel.snp.makeConstraints {
             $0.top.equalTo(photoBadgeIcon.snp.bottom).offset(16)
-            $0.centerX.equalToSuperview()
+            $0.centerX.bottom.equalToSuperview()
         }
     }
     
