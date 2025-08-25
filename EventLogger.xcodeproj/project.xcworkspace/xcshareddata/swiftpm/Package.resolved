@@ -1,5 +1,5 @@
 {
-  "originHash" : "6f73d903a3acd38d0fc8863de98dc62597dc14ccc4cc66c702c2f87710cc5fbe",
+  "originHash" : "d2a7b40f394853712f3745409023f29f155b9646818a3203592533874291b1a0",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "26b3e8137c6d7a1dbd98a599b3ccb1e4314293c5",
         "version" : "2.13.2"
+      }
+    },
+    {
+      "identity" : "rxgesture",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RxSwiftCommunity/RxGesture.git",
+      "state" : {
+        "revision" : "1b137c576b4aaaab949235752278956697c9e4a0",
+        "version" : "4.0.4"
       }
     },
     {
@@ -134,6 +143,15 @@
       "state" : {
         "revision" : "cb05d64cef2bbf51e85c53adee937df46540a74e",
         "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "wstagsfield",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/whitesmith/WSTagsField",
+      "state" : {
+        "revision" : "4a3f36d1903554bb6b65df0e7936df9bb95d7525",
+        "version" : "5.4.0"
       }
     },
     {
