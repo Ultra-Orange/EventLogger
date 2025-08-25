@@ -18,16 +18,22 @@ final class EventListReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case reloadEventItems
+        case setFilter(EventFilter)
+        case toggleSort
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setEventItems([EventItem])
+        case setFilter(EventFilter)
+        case setSortOrder(SortOrder)
     }
 
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         var eventItems: [EventItem]
+        var filter: EventFilter
+        var sortOrder: SortOrder
     }
 
     // 생성자에서 초기 상태 설정
@@ -36,7 +42,11 @@ final class EventListReactor: BaseReactor {
 
     init() {
         @Dependency(\.eventItems) var fetchItems
-        initialState = State(eventItems: fetchItems)
+        initialState = State(
+            eventItems: fetchItems,
+            filter: .all,
+            sortOrder: .newestFirst
+        )
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
@@ -45,8 +55,17 @@ final class EventListReactor: BaseReactor {
         switch action {
         case .reloadEventItems:
             @Dependency(\.eventItems) var fetchItems
-            let eventItems = fetchItems
-            return .just(.setEventItems(eventItems))
+            return .just(.setEventItems(fetchItems))
+            
+        case .setFilter(let filter):
+            return .just(.setFilter(filter))
+            
+        case .toggleSort:
+            return .just(
+                .setSortOrder(
+                    currentState.sortOrder == .newestFirst ? .oldestFirst : .newestFirst
+                )
+            )
         }
     }
 
@@ -57,7 +76,13 @@ final class EventListReactor: BaseReactor {
         switch mutation {
         case let .setEventItems(eventItems):
             newState.eventItems = eventItems
+            
+        case .setFilter(let filter):
+            newState.filter = filter
+        case .setSortOrder(let order):
+            newState.sortOrder = order
         }
+        
         return newState
     }
 }
