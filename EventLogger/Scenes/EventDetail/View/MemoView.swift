@@ -18,12 +18,12 @@ class MemoView: UIView {
 
     // 라벨
     private let memoTitleLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
         $0.text = "메모"
     }
 
     private let memoTextLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
         $0.numberOfLines = 0
     }
 
