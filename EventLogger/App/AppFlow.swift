@@ -28,6 +28,10 @@ final class AppFlow: Flow {
             return navigateToEventList()
         case let .eventDetail(item):
             return navigateToEventDetail(item)
+        case .createSchedule:
+            return navigateToSchedule(mode: .create)
+        case let .updateSchedule(item):
+            return navigateToSchedule(mode: .update(item))
         }
     }
 
@@ -47,6 +51,19 @@ final class AppFlow: Flow {
     func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor(eventItem: eventItem)
+        vc.reactor = reactor
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+    }
+    
+    func navigateToSchedule(mode: ScheduleReactor.Mode) -> FlowContributors {
+        let vc = ScheduleViewController()
+        let reactor = ScheduleReactor(mode: mode)
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(

@@ -86,7 +86,6 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         memoView.snp.makeConstraints {
             $0.top.equalTo(infoItemView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
-            $0.width.equalTo(335)
             $0.bottom.equalToSuperview()
         }
     }

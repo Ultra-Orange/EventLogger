@@ -17,19 +17,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        prepareDependencies{
 //        }
 
-        let appFlow = AppFlow(windowScene: windowScene)
-        coordinator.coordinate(
-            flow: appFlow,
-            with: OneStepper(withSingleStep: AppStep.eventList)
-        )
-
-//        @Dependency(\.eventItems) var eventItems
-//        let testItem = eventItems[0]
 //        let appFlow = AppFlow(windowScene: windowScene)
 //        coordinator.coordinate(
 //            flow: appFlow,
-//            with: OneStepper(withSingleStep: AppStep.eventDetail(testItem))
+//            with: OneStepper(withSingleStep: AppStep.eventList)
 //        )
+
+        @Dependency(\.eventItems) var eventItems
+        let testItem = eventItems[0]
+        let appFlow = AppFlow(windowScene: windowScene)
+        coordinator.coordinate(
+            flow: appFlow,
+//            with: OneStepper(withSingleStep: AppStep.createSchedule)
+            with: OneStepper(withSingleStep: AppStep.updateSchedule(testItem))
+        )
     }
 
     func sceneDidDisconnect(_: UIScene) {
