@@ -12,7 +12,11 @@ import UIKit
 final class DateFieldContainerView: UIView {
     let label = UILabel().then {
         $0.text = "날짜"
+<<<<<<< Updated upstream
         $0.font = .font13Regular
+=======
+        $0.font = .font16Regular
+>>>>>>> Stashed changes
     }
 
     // TODO: UIControll 상속으로 입력필드 변경

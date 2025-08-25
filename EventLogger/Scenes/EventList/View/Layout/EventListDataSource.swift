@@ -5,13 +5,12 @@
 //  Created by 김우성 on 8/25/25.
 //
 
-import UIKit
-import SwiftUI
 import SnapKit
+import SwiftUI
+import UIKit
 
 /// Diffable DataSource & 헤더 등록 담당
 final class EventListDataSource {
-    
     // typealias: 이미 존재하는 타입에 대한 별칭(alias)을 만드는 데 사용하는 키워드
     typealias DS = UICollectionViewDiffableDataSource<EventListSection, EventListDSItem>
     private(set) var dataSource: DS!
@@ -25,7 +24,7 @@ final class EventListDataSource {
     }
     
     func updateItemsMap(_ map: [UUID: EventItem]) {
-        self.itemsByID = map
+        itemsByID = map
     }
     
     func apply(_ snapshot: NSDiffableDataSourceSnapshot<EventListSection, EventListDSItem>, animated: Bool) {
@@ -60,7 +59,7 @@ final class EventListDataSource {
                 label = UILabel()
                 label.tag = tag
                 label.textColor = .white
-                label.font = UIFont.preferredFont(forTextStyle: .headline)
+                label.font = .font17Bold
                 header.addSubview(label)
                 label.snp.makeConstraints {
                     $0.top.equalToSuperview().inset(25)

@@ -9,11 +9,10 @@ import SwiftUI
 
 struct CategoryBadgeView: View {
     let category: Category
-    
+
     var body: some View {
         Text(category.name)
-            .font(.caption)
-            .fontWeight(.medium)
+            .font(Font(UIFont.font12Medium))
             .foregroundStyle(.white) // 지정 흰색으로 바꿔야 함
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
@@ -31,16 +30,15 @@ struct CategoryBadgeView: View {
                 RoundedRectangle(cornerRadius: 999)
                     .stroke(Color.gray.opacity(0.70), lineWidth: 1)
             )
-        
     }
 }
 
 #Preview {
     HStack(spacing: 16) {
-        CategoryBadgeView(category: Category(id: UUID.init(), name: "팬미팅", position: 0, color: .green))
-        CategoryBadgeView(category: Category(id: UUID.init(), name: "뮤지컬", position: 1, color: .purple))
-        CategoryBadgeView(category: Category(id: UUID.init(), name: "연극", position: 2, color: .yellow))
-        CategoryBadgeView(category: Category(id: UUID.init(), name: "페스티벌", position: 3, color: .blue))
-        CategoryBadgeView(category: Category(id: UUID.init(), name: "콘서트", position: 4, color: .cyan))
+        CategoryBadgeView(category: Category(id: UUID(), name: "팬미팅", position: 0, color: .green))
+        CategoryBadgeView(category: Category(id: UUID(), name: "뮤지컬", position: 1, color: .purple))
+        CategoryBadgeView(category: Category(id: UUID(), name: "연극", position: 2, color: .yellow))
+        CategoryBadgeView(category: Category(id: UUID(), name: "페스티벌", position: 3, color: .blue))
+        CategoryBadgeView(category: Category(id: UUID(), name: "콘서트", position: 4, color: .cyan))
     }
 }
