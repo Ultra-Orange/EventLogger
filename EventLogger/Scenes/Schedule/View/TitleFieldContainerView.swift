@@ -15,7 +15,7 @@ final class TitleFieldContainerView: UIView {
         $0.font = .font13Regular
     }
 
-    private let textField = AppTextField().then {
+    let textField = AppTextField().then {
         $0.placeholder = "이벤트 제목을 입력하세요"
     }
 
