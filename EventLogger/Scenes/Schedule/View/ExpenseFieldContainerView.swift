@@ -13,7 +13,7 @@ final class ExpenseFieldContainerView: UIView {
     
     let label = UILabel().then {
         $0.text = "비용"
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font13Regular
     }
     
     let textField = AppTextField().then {

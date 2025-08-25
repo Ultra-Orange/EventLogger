@@ -13,6 +13,7 @@ final class MemoFieldContainerView: UIView {
     
     let label = UILabel().then {
         $0.text = "메모"
+        $0.font = .font13Regular
     }
     
     // TODO: PlaceHolder 처리?

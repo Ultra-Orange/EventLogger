@@ -15,11 +15,11 @@ final class AddImageView: UIView {
         $0.layer.cornerRadius = 12
     }
     
-    private let photoBadgeIcon = UIImageView(image: UIImage(systemName: "photo.badge.plus", withConfiguration: .addImageIcon))
+    private let photoBadgeIcon = UIImageView(image: UIImage(systemName: "photo.badge.plus", withConfiguration: .font32Regular))
     
     private let textLabel = UILabel().then {
         $0.text = "클릭하여 이미지 업로드"
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
     
     private let iconAndLabelContainer = UIImageView()

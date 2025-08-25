@@ -32,7 +32,7 @@ final class AppTextField: UITextField {
     }
     
     private func configureDefault() {
-        self.font = UIFont.preferredFont(forTextStyle: .footnote) // TODO: 폰트사이즈 14가 없음
+        self.font = .font16Regular
         self.borderStyle = .roundedRect
         self.layer.borderColor = UIColor.systemGray6.cgColor
         self.layer.cornerRadius = 10

@@ -28,7 +28,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     private let imageView = UIImageView()
 
     private let titleLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .title3)
+        $0.font = .font20Semibold
         $0.numberOfLines = 2
         $0.lineBreakMode = .byTruncatingTail
         $0.textAlignment = .left

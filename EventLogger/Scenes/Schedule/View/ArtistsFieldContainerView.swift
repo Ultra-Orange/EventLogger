@@ -13,7 +13,7 @@ final class ArtistsFieldContainerView: UIView {
     
     let label = UILabel().then {
         $0.text = "출연자"
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font13Regular
     }
     
     // TODO: WSTag라이브러리

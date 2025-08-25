@@ -7,9 +7,8 @@
 
 import UIKit
 
+// SF Symbol Config용 폰트 사이즈
 extension UIImage.Configuration {
-    // SF Symbol Callout에 맞추기
-    static let callout = UIImage.SymbolConfiguration(font: .preferredFont(forTextStyle: .callout))
-    static let footnote = UIImage.SymbolConfiguration(font: .preferredFont(forTextStyle: .footnote))
-    static let addImageIcon = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 32))
+    static let font16Regular = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 16))
+    static let font32Regular = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 32))
 }

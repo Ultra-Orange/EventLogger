@@ -12,7 +12,7 @@ extension UIButton.Configuration {
         config.baseBackgroundColor = .systemBlue
         config.titleTextAttributesTransformer = .init { attr in
             var newAttr = attr
-            newAttr.font = UIFont.preferredFont(forTextStyle: .callout)
+            newAttr.font = UIFont.font16Regular
             newAttr.foregroundColor = .systemBackground
             return newAttr
         }
@@ -25,7 +25,7 @@ extension UIButton.Configuration {
         config.baseBackgroundColor = .systemGray2
         config.titleTextAttributesTransformer = .init { attr in
             var newAttr = attr
-            newAttr.font = UIFont.preferredFont(forTextStyle: .title3)
+            newAttr.font = UIFont.font17Regular
             newAttr.foregroundColor = .systemBackground
             return newAttr
         }

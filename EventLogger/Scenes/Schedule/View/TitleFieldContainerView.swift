@@ -13,7 +13,7 @@ final class TitleFieldContainerView: UIView {
     
     let label = UILabel().then {
         $0.text = "제목"
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font13Regular
     }
     let textField = AppTextField().then {
         $0.placeholder = "이벤트 제목을 입력하세요"

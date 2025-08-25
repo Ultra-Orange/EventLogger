@@ -20,37 +20,37 @@ class InfoItemView: UIView {
     // MARK: Label
 
     private let dateLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     private let categoryLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     private let timelabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     private let locationLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     private let artistsLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     private let expenseLabel = UILabel().then {
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.font = .font16Regular
     }
 
     // MARK: SF Symbol
 
-    private let calendarIcon = UIImageView(image: UIImage(systemName: "calendar", withConfiguration: .callout))
-    private let tagIcon = UIImageView(image: UIImage(systemName: "tag", withConfiguration: .callout))
-    private let clockIcon = UIImageView(image: UIImage(systemName: "clock", withConfiguration: .callout))
-    private let mapPinIcon = UIImageView(image: UIImage(systemName: "mappin.and.ellipse", withConfiguration: .callout))
-    private let personIcon = UIImageView(image: UIImage(systemName: "person", withConfiguration: .callout))
-    private let moneysignIcon = UIImageView(image: UIImage(systemName: "wonsign.circle", withConfiguration: .callout))
+    private let calendarIcon = UIImageView(image: UIImage(systemName: "calendar", withConfiguration: .font16Regular))
+    private let tagIcon = UIImageView(image: UIImage(systemName: "tag", withConfiguration: .font16Regular))
+    private let clockIcon = UIImageView(image: UIImage(systemName: "clock", withConfiguration: .font16Regular))
+    private let mapPinIcon = UIImageView(image: UIImage(systemName: "mappin.and.ellipse", withConfiguration: .font16Regular))
+    private let personIcon = UIImageView(image: UIImage(systemName: "person", withConfiguration: .font16Regular))
+    private let moneysignIcon = UIImageView(image: UIImage(systemName: "wonsign.circle", withConfiguration: .font16Regular))
 
     // MARK: Button
 
