@@ -16,6 +16,8 @@
 		36BF70D62E55A920007AD5BE /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D52E55A920007AD5BE /* Alamofire */; };
 		36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D82E55A936007AD5BE /* Algorithms */; };
 		36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70DB2E55A94E007AD5BE /* HostingView */; };
+		FE37A3A42E5C04D0006AD6C2 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = FE37A3A32E5C04D0006AD6C2 /* RxGesture */; };
+		FE37A3A72E5C054C006AD6C2 /* WSTagsField in Frameworks */ = {isa = PBXBuildFile; productRef = FE37A3A62E5C054C006AD6C2 /* WSTagsField */; };
 		FED82BD72E55E44400604202 /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = FED82BD62E55E44400604202 /* Dependencies */; };
 /* End PBXBuildFile section */
 
@@ -69,10 +71,12 @@
 				36BF70D62E55A920007AD5BE /* Alamofire in Frameworks */,
 				36BF70D32E55A90E007AD5BE /* Then in Frameworks */,
 				36BF70C82E55A8C6007AD5BE /* RxFlow in Frameworks */,
+				FE37A3A72E5C054C006AD6C2 /* WSTagsField in Frameworks */,
 				36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */,
 				FED82BD72E55E44400604202 /* Dependencies in Frameworks */,
 				36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */,
 				36BF70CD2E55A8DC007AD5BE /* RxSwift in Frameworks */,
+				FE37A3A42E5C04D0006AD6C2 /* RxGesture in Frameworks */,
 				36BF70C52E55A8B6007AD5BE /* ReactorKit in Frameworks */,
 				36BF70D02E55A8FA007AD5BE /* SnapKit in Frameworks */,
 			);
@@ -136,6 +140,8 @@
 				36BF70D82E55A936007AD5BE /* Algorithms */,
 				36BF70DB2E55A94E007AD5BE /* HostingView */,
 				FED82BD62E55E44400604202 /* Dependencies */,
+				FE37A3A32E5C04D0006AD6C2 /* RxGesture */,
+				FE37A3A62E5C054C006AD6C2 /* WSTagsField */,
 			);
 			productName = EventLogger;
 			productReference = 36BF70AB2E55A7B2007AD5BE /* EventLogger.app */;
@@ -202,6 +208,8 @@
 				36BF70D72E55A936007AD5BE /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */,
 				FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */,
+				FE37A3A22E5C04D0006AD6C2 /* XCRemoteSwiftPackageReference "RxGesture" */,
+				FE37A3A52E5C054C006AD6C2 /* XCRemoteSwiftPackageReference "WSTagsField" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 36BF70AC2E55A7B2007AD5BE /* Products */;
@@ -579,6 +587,22 @@
 				minimumVersion = 1.3.0;
 			};
 		};
+		FE37A3A22E5C04D0006AD6C2 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.4;
+			};
+		};
+		FE37A3A52E5C054C006AD6C2 /* XCRemoteSwiftPackageReference "WSTagsField" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/whitesmith/WSTagsField";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.4.0;
+			};
+		};
 		FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-dependencies";
@@ -634,6 +658,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */;
 			productName = HostingView;
+		};
+		FE37A3A32E5C04D0006AD6C2 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE37A3A22E5C04D0006AD6C2 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
+		};
+		FE37A3A62E5C054C006AD6C2 /* WSTagsField */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE37A3A52E5C054C006AD6C2 /* XCRemoteSwiftPackageReference "WSTagsField" */;
+			productName = WSTagsField;
 		};
 		FED82BD62E55E44400604202 /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;
