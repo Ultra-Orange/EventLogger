@@ -28,6 +28,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
+    
+    private let deleteLabel = UILabel().then {
+        $0.text = "이미지 삭제"
+        $0.font = .font12Regular
+    }
+    
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CateogryContainerView()
     private let dateFieldView = DateFieldContainerView()
@@ -63,6 +69,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
+        contentView.addSubview(deleteLabel)
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
         contentView.addSubview(dateFieldView)
@@ -74,6 +81,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(memoFieldview)
         contentView.addSubview(bottomButton)
         
+        // 삭제 라벨 히든/사용불가 처리
+        deleteLabel.isHidden = true
+        deleteLabel.isUserInteractionEnabled = true
         
         // 오토 레이아웃
         addImageView.snp.makeConstraints {
@@ -87,8 +97,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.height.equalTo(addImageView.snp.height)
         }
         
+        deleteLabel.snp.makeConstraints {
+            $0.top.equalTo(addImageView.snp.bottom).offset(10)
+            $0.trailing.equalToSuperview()
+        }
+        
         inputTitleView.snp.makeConstraints {
-            $0.top.equalTo(addImageView.snp.bottom).offset(25)
+            $0.top.equalTo(addImageView.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview()
         }
         
@@ -145,10 +160,19 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
         
+        // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
             .when(.recognized)
             .bind { [weak self] _ in
                 self?.presentImagePicker()
+            }
+            .disposed(by: disposeBag)
+        
+        deleteLabel.rx.tapGesture()
+            .when(.recognized)
+            .bind { [weak self] _ in
+                self?.imageView.image = nil
+                self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
         
@@ -161,6 +185,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 }
 
+// 이미지피커 Delegate
 extension ScheduleViewController: PHPickerViewControllerDelegate {
     
     private func presentImagePicker() {
@@ -182,17 +207,15 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
                 guard let self, let uiImage = image as? UIImage else { return }
                 DispatchQueue.main.async {
                     self.imageView.image = uiImage
+                    self.deleteLabel.isHidden = false
                     
                 }
             }
         }
-        
         print("사진 선택 완료, 결과: \(results)")
     }
-    
-    
-}
 
+}
 
 #Preview {
     @Dependency(\.eventItems) var eventItems
