@@ -9,6 +9,7 @@ import UIKit
 import ReactorKit
 import RxCocoa
 import RxSwift
+import RxGesture
 import SnapKit
 import SwiftUI
 import Then
@@ -21,6 +22,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let contentView = UIView()
     
     private let addImageView = AddImageView()
+    private let imageView = UIImageView() // TODO: 업로드한 이미지 표시
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CateogryContainerView()
     private let dateFieldView = DateFieldContainerView()
@@ -129,7 +131,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
-                
+        
+        addImageView.rx.tapGesture()
+            .when(.recognized)
+            .bind {_ in
+                print("Add Image")
+            }
+            .disposed(by: disposeBag)
+        
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
         guard let item else { return }
