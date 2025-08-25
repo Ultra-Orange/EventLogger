@@ -9,37 +9,38 @@ import UIKit
 
 extension UIFont {
     
-    static var caption1Medium: UIFont {
-        let baseSize = UIFont.preferredFont(forTextStyle: .caption1).pointSize
-        let systemFont = UIFont.systemFont(ofSize: baseSize, weight: .medium)
-        return UIFontMetrics(forTextStyle: .caption1).scaledFont(for: systemFont)
-    }
-    
-    static var title3Bold: UIFont {
-        let baseSize = UIFont.preferredFont(forTextStyle: .title3).pointSize
-        let systemFont = UIFont.systemFont(ofSize: baseSize, weight: .bold)
-        return UIFontMetrics(forTextStyle: .caption1).scaledFont(for: systemFont)
-    }
-    
     /*  사용법
     let label = UILabel()
-    label.font = .caption1Medium
-    label.adjustsFontForContentSizeCategory = true
+    label.font = .font16Regular
     */
     
-    /* 다이나믹 타입쓰면 안씀
-    // 타이틀 1, 2, 3
-    static let largeTitle = UIFont.systemFont(ofSize: 28, weight: .regular)
-    static let mediumTitle = UIFont.systemFont(ofSize: 22, weight: .regular)
-    static let smallTitle = UIFont.systemFont(ofSize: 20, weight: .regular)
+    static let font20Bold = UIFont.systemFont(ofSize: 20, weight: .bold)
+    static let font20Semibold = UIFont.systemFont(ofSize: 20, weight: .semibold)
     
-    // 본문 등 용도
-    static let headline = UIFont.systemFont(ofSize: 17, weight: .semibold)
-    static let body = UIFont.systemFont(ofSize: 17, weight: .regular)
-    static let callout = UIFont.systemFont(ofSize: 16, weight: .regular)
-    static let subhead = UIFont.systemFont(ofSize: 15, weight: .regular)
-    static let footnote = UIFont.systemFont(ofSize: 13, weight: .regular)
-    */
+    static let font17Semibold = UIFont.systemFont(ofSize: 17, weight: .semibold)
+    static let font17Regular = UIFont.systemFont(ofSize: 17, weight: .regular)
+    
+    static let font16Regular = UIFont.systemFont(ofSize: 16, weight: .regular)
+    
+    static let font13Regular = UIFont.systemFont(ofSize: 13, weight: .regular)
+    
+    static let font12Medium = UIFont.systemFont(ofSize: 12, weight: .medium)
+    static let font12Regular = UIFont.systemFont(ofSize: 12, weight: .regular)
+    
+    
+
+
+
+    
+    // 이벤트 셀 타이틀, 20 bold
+    // 상세화면 타이틀 제목 20, semibold
+    // 등록하기 버튼 17, semibold
+    // 알약 세그먼트컨트롤 : 17
+    // 입력 필드 안 글씨, 상세화면에 보이는 버튼에 쓰는 거 16
+    // 등록할 때 종류 라벨, 이벤트 셀 그 외 13
+    // 카테고리 뱃지 : 12 medium
+    // smallLabel 이미지 삭제 라벨 12
+    
 }
 
 
