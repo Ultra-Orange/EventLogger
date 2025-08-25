@@ -15,6 +15,7 @@ final class MemoFieldContainerView: UIView {
         $0.text = "메모"
     }
     
+    // TODO: PlaceHolder 처리?
 //    private let placeholderLabel = UILabel().then {
 //        $0.text = "메모를 입력하세요"
 //        $0.textColor = .placeholderText

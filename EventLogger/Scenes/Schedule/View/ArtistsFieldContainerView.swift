@@ -15,6 +15,8 @@ final class ArtistsFieldContainerView: UIView {
         $0.text = "출연자"
         $0.font = UIFont.preferredFont(forTextStyle: .callout)
     }
+    
+    // TODO: WSTag라이브러리
     let textField = AppTextField().then {
         $0.placeholder = "출연자를 입력하세요"
     }

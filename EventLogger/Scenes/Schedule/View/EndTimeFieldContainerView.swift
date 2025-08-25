@@ -1,5 +1,5 @@
 //
-//  CateogryContainerView.swift
+//  EndTimeFieldContainerView.swift
 //  EventLogger
 //
 //  Created by Yoon on 8/24/25.
@@ -9,18 +9,18 @@ import UIKit
 import Then
 import SnapKit
 
-final class CateogryContainerView: UIView {
+final class EndTimeFieldContainerView: UIView {
     
     let label = UILabel().then {
-        $0.text = "카테고리"
-        $0.font = UIFont.preferredFont(forTextStyle: .callout)
+        $0.text = "종료시간"
     }
     
-    // TODO: UIControll 상속으로 입력필드 변경
+    // TODO: UIControll 상속으로 입력필드 변경?
     let textField = AppTextField()
+    private let datePicker = UIDatePicker()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init() {
+        super.init(frame: .zero)
 
         addSubview(label)
         addSubview(textField)
@@ -36,8 +36,8 @@ final class CateogryContainerView: UIView {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }

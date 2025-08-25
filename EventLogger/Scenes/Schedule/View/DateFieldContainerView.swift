@@ -14,6 +14,8 @@ final class DateFieldContainerView: UIView {
     let label = UILabel().then {
         $0.text = "날짜"
     }
+    
+    // TODO: UIControll 상속으로 입력필드 변경
     let textField = AppTextField()
     private let datePicker = UIDatePicker()
     

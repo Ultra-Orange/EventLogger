@@ -15,6 +15,7 @@ final class ExpenseFieldContainerView: UIView {
         $0.text = "비용"
         $0.font = UIFont.preferredFont(forTextStyle: .callout)
     }
+    
     let textField = AppTextField().then {
         $0.placeholder = "비용을 입력하세요"
     }
