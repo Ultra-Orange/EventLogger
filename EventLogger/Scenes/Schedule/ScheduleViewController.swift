@@ -36,9 +36,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CateogryContainerView()
-    private let dateFieldView = DateFieldContainerView()
-    private let startTimeFiedlView = StartTimeFieldContainerView()
-    private let endTimeFieldView = EndTimeFieldContainerView()
+    private let dateFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
     private let expnsesFieldView = ExpenseFieldContainerView()
@@ -72,8 +70,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
         contentView.addSubview(dateFieldView)
-        contentView.addSubview(startTimeFiedlView)
-        contentView.addSubview(endTimeFieldView)
         contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expnsesFieldView)
@@ -116,18 +112,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        startTimeFiedlView.snp.makeConstraints {
-            $0.top.equalTo(dateFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
-        }
-
-        endTimeFieldView.snp.makeConstraints {
-            $0.top.equalTo(startTimeFiedlView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
-        }
-
         locationFieldView.snp.makeConstraints {
-            $0.top.equalTo(endTimeFieldView.snp.bottom).offset(30)
+            $0.top.equalTo(dateFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
