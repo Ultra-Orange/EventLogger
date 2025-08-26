@@ -92,7 +92,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview() // 왜 너만? 보라돌이경고?
             $0.height.equalTo(addImageView.snp.height)
         }
 
@@ -173,7 +173,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
-
+        
+        locationFieldView.inputField.rx.tapGesture()
+            .when(.recognized)
+            .map { _ in AppStep.locationSearch }
+            .bind(to: reactor.steps)
+            .disposed(by: disposeBag)
+        
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
         guard let item else { return }
