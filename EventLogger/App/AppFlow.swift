@@ -13,6 +13,8 @@ import UIKit
 final class AppFlow: Flow {
     private let window: UIWindow
     private let rootNav = UINavigationController()
+    private let selectedLocationRelay = PublishRelay<String>()
+    
     var root: Presentable { rootNav }
 
     init(windowScene: UIWindowScene) {
@@ -32,7 +34,7 @@ final class AppFlow: Flow {
             return navigateToSchedule(mode: .create)
         case let .updateSchedule(item):
             return navigateToSchedule(mode: .update(item))
-        case .locationSearch:
+        case let .locationSearch:
             return navigateToLocationSearch()
         }
     }
@@ -64,8 +66,8 @@ final class AppFlow: Flow {
     }
     
     func navigateToSchedule(mode: ScheduleReactor.Mode) -> FlowContributors {
-        let vc = ScheduleViewController()
         let reactor = ScheduleReactor(mode: mode)
+        let vc = ScheduleViewController(selectedLocationRelay: selectedLocationRelay)
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
@@ -77,10 +79,12 @@ final class AppFlow: Flow {
     }
     
     private func navigateToLocationSearch() -> FlowContributors {
-        let vc = LocationSearchViewController()
+        let vc = LocationSearchViewController(
+            selectedLocationRelay: selectedLocationRelay
+        )
         vc.modalPresentationStyle = .pageSheet
         if let sheet = vc.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
+            sheet.detents = [.large()]
             sheet.prefersGrabberVisible = true
         }
         rootNav.present(vc, animated: true)

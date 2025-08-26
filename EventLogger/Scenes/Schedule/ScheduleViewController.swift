@@ -45,7 +45,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let memoFieldview = MemoFieldContainerView()
 
     private let bottomButton = UIButton(configuration: .bottomButton)
-
+    
+    private let selectedLocationRelay: PublishRelay<String>
+    
+    // MARK: LifeCycle
+    init(selectedLocationRelay: PublishRelay<String>) {
+        self.selectedLocationRelay = selectedLocationRelay
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func setupUI() {
         view.backgroundColor = .systemBackground
 
@@ -180,6 +193,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
+        selectedLocationRelay
+            .bind { [weak self] title in
+                self?.locationFieldView.textLabel.text = title
+            }
+            .disposed(by: disposeBag)
+        
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
         guard let item else { return }
@@ -220,9 +239,11 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
 #Preview {
     @Dependency(\.eventItems) var eventItems
     let testItem = eventItems[2]
+    
+    let relay = PublishRelay<String>()
 //    let reactor = ScheduleReactor(mode: .create)
     let reactor = ScheduleReactor(mode: .update(testItem))
-    UINavigationController(rootViewController: ScheduleViewController().then {
+    UINavigationController(rootViewController: ScheduleViewController(selectedLocationRelay: relay).then {
         $0.reactor = reactor
     })
 }
