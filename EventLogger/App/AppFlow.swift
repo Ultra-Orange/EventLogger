@@ -32,6 +32,8 @@ final class AppFlow: Flow {
             return navigateToSchedule(mode: .create)
         case let .updateSchedule(item):
             return navigateToSchedule(mode: .update(item))
+        case .locationSearch:
+            return navigateToLocationSearch()
         }
     }
 
@@ -72,5 +74,16 @@ final class AppFlow: Flow {
                 withNextStepper: reactor
             )
         )
+    }
+    
+    private func navigateToLocationSearch() -> FlowContributors {
+        let vc = LocationSearchViewController()
+        vc.modalPresentationStyle = .pageSheet
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+        rootNav.present(vc, animated: true)
+        return .none
     }
 }
