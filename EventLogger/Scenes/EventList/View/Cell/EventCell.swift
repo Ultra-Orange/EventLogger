@@ -23,8 +23,7 @@ struct EventCell: View { // EventItem 통으로 받자
                 
                 VStack {
                     Text(item.title)
-                        .font(.title3)
-                        .fontWeight(.bold)
+                        .font(Font(UIFont.font20Bold))
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .truncationMode(.tail)
@@ -36,7 +35,7 @@ struct EventCell: View { // EventItem 통으로 받자
                 .frame(height: 61)
                 
                 Text("\(DateFormatter.toDateString(item.startTime)) ∙ 시작 \(DateFormatter.toTimeString(item.startTime))")
-                    .font(.footnote)
+                    .font(Font(UIFont.font13Regular))
                     .foregroundStyle(.white)
                     .padding(.bottom, 4)
                 
@@ -76,13 +75,13 @@ struct EventCell: View { // EventItem 통으로 받자
             id: UUID(),
             title: "YOASOBI ZEPP TOUR 2024 POP OUT 東京公演 2日目",
             category: Category(
-                id: UUID.init(),
+                id: UUID(),
                 name: "콘서트",
                 position: 0,
                 color: .blue
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
             artists:
             ["YOASOBI"],
             expense: 75000,

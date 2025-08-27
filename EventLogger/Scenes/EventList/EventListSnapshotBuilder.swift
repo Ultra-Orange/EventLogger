@@ -8,8 +8,7 @@
 import UIKit
 
 /// 정렬/필터/그룹핑 로직을 순수 함수로. (기존 rebuildSnapshot)
-struct EventListSnapshotBuilder {
-    
+enum EventListSnapshotBuilder {
     struct Input {
         let allItems: [EventItem]
         let sortOrder: EventListSortOrder
@@ -41,7 +40,7 @@ struct EventListSnapshotBuilder {
             }
         }()
         
-        let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0)})
+        let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0) })
         
         // 2) 다음 일정: 현재 필터링 결과에서 "가장 가까운 미래 1개" (일반 전체 그룹과 중복 허용)
         let nextUp: EventItem? = filtered
@@ -51,7 +50,7 @@ struct EventListSnapshotBuilder {
         // 3) 월 그룹
         let grouped = Dictionary(grouping: filtered, by: { calendar.yearMonth(for: $0.startTime) })
         let monthKeysSorted = (input.sortOrder == .newestFirst)
-        ? grouped.keys.sorted().reversed() : grouped.keys.sorted()
+            ? grouped.keys.sorted().reversed() : grouped.keys.sorted()
         
         // 4) 섹션/아이템
         var sections: [EventListSection] = []

@@ -35,10 +35,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     private let inputTitleView = TitleFieldContainerView()
-    private let categoryFieldView = CateogryContainerView()
-    private let dateFieldView = DateFieldContainerView()
-    private let startTimeFiedlView = StartTimeFieldContainerView()
-    private let endTimeFieldView = EndTimeFieldContainerView()
+    private let categoryFieldView = CategoryContainerView()
+    private let dateRangeFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
     private let expnsesFieldView = ExpenseFieldContainerView()
@@ -75,9 +73,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
-            $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalTo(scrollView.contentLayoutGuide)
-            $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
+            $0.edges.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalToSuperview()
         }
 
         contentView.addSubview(addImageView)
@@ -85,9 +82,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(deleteLabel)
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
-        contentView.addSubview(dateFieldView)
-        contentView.addSubview(startTimeFiedlView)
-        contentView.addSubview(endTimeFieldView)
+        contentView.addSubview(dateRangeFieldView)
         contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expnsesFieldView)
@@ -106,7 +101,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
-            $0.leading.trailing.equalToSuperview() // 왜 너만? 보라돌이경고?
+            $0.leading.trailing.equalToSuperview() 
             $0.height.equalTo(addImageView.snp.height)
         }
 
@@ -125,23 +120,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        dateFieldView.snp.makeConstraints {
+        dateRangeFieldView.snp.makeConstraints {
             $0.top.equalTo(categoryFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
-        startTimeFiedlView.snp.makeConstraints {
-            $0.top.equalTo(dateFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
-        }
-
-        endTimeFieldView.snp.makeConstraints {
-            $0.top.equalTo(startTimeFiedlView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
-        }
-
         locationFieldView.snp.makeConstraints {
-            $0.top.equalTo(endTimeFieldView.snp.bottom).offset(30)
+            $0.top.equalTo(dateRangeFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
@@ -224,11 +209,35 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
+        dateRangeFieldView.startDateChanged
+            .bind(onNext: { date in
+                print("시작 변경:", date)
+            })
+            .disposed(by: disposeBag)
+
+        dateRangeFieldView.endDateChanged
+            .bind(onNext: { date in
+                print("종료 변경:", date)
+            })
+            .disposed(by: disposeBag)
+
+        // 임시
+        bottomButton.rx.tapGesture()
+            .bind { [weak self] _ in
+                guard let self else { return }
+                let start = self.dateRangeFieldView.startDate
+                let end = self.dateRangeFieldView.endDate
+                print("저장할 시작/종료 날짜:", start, end)
+            }
+            .disposed(by: disposeBag)
+
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
         guard let item else { return }
 
         inputTitleView.textField.text = item.title
+        dateRangeFieldView.startDate = item.startTime
+        dateRangeFieldView.endDate = item.endTime
     }
 }
 

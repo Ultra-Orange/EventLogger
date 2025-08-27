@@ -5,12 +5,11 @@
 //  Created by 김우성 on 8/25/25.
 //
 
-import UIKit
-import RxSwift
 import RxCocoa
+import RxSwift
+import UIKit
 
 public extension Reactive where Base: PillSegmentedControl {
-
     /// VC에서 사용: segmentedControl.rx.selectedSegmentIndex
     var selectedSegmentIndex: ControlProperty<Int> {
         selectedIndex
@@ -18,7 +17,7 @@ public extension Reactive where Base: PillSegmentedControl {
 
     /// 내부 구현(별칭): 선택 인덱스를 양방향 바인딩
     var selectedIndex: ControlProperty<Int> {
-        let control = self.base
+        let control = base
 
         // 값 스트림: .valueChanged 발생 시 현재 선택 인덱스 방출 (+ 초기값)
         let values = control.rx.controlEvent(.valueChanged)

@@ -14,7 +14,6 @@ import RxRelay
 import RxSwift
 
 final class EventListReactor: BaseReactor {
-    
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case reloadEventItems
@@ -56,10 +55,10 @@ final class EventListReactor: BaseReactor {
         case .reloadEventItems:
             @Dependency(\.eventItems) var fetchItems
             return .just(.setEventItems(fetchItems))
-            
+
         case .setFilter(let filter):
             return .just(.setFilter(filter))
-            
+
         case .toggleSort:
             return .just(
                 .setSortOrder(
@@ -74,15 +73,16 @@ final class EventListReactor: BaseReactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case let .setEventItems(eventItems):
+        case .setEventItems(let eventItems):
             newState.eventItems = eventItems
-            
+
         case .setFilter(let filter):
             newState.filter = filter
+
         case .setSortOrder(let order):
             newState.sortOrder = order
         }
-        
+
         return newState
     }
 }
