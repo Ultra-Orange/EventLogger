@@ -30,6 +30,9 @@ class LocationSearchViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let selectedLocationRelay: PublishRelay<String>
     
+    // MARK: MapKit
+    private let completer = MKLocalSearchCompleter()
+    private let completerResults = BehaviorRelay<[MKLocalSearchCompletion]>(value: [])
     
     // MARK: LifeCycle
     init(selectedLocationRelay: PublishRelay<String>) {
@@ -45,6 +48,9 @@ class LocationSearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        
+        completer.delegate = self
+        completer.resultTypes = [.pointOfInterest, .address] // 자동완성 강화
         
         setupUI()
         bind()
@@ -67,26 +73,30 @@ class LocationSearchViewController: UIViewController {
     
     // Rx 바인딩
     private func bind() {
+        // 입력 → completer.queryFragment 업데이트
         searchBar.rx.text.orEmpty
-            .skip(1) // 첫 빈 문자열 무시
+            .skip(1)
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
-            .withUnretained(self)
-            .flatMap { `self`, query in
-                self.searhLocations(query: query)
-            }
-            .bind { [dataSource] mapItems in
-                var snapshot = NSDiffableDataSourceSnapshot<LocationSection, LocationItem>()
-                snapshot.appendSections([.main])
-                
-                let locationItems = mapItems.map { LocationItem(mapItem: $0) }
-                
-                snapshot.appendItems(locationItems)
-                dataSource.apply(snapshot, animatingDifferences: false)
-                
+            .bind { [weak self] text in
+                self?.completer.queryFragment = text
             }
             .disposed(by: disposeBag)
         
+        // completerResults → collectionView 반영
+        completerResults
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] completions in
+                guard let self = self else { return }
+                var snapshot = NSDiffableDataSourceSnapshot<LocationSection, LocationItem>()
+                snapshot.appendSections([.main])
+                let items = completions.map { LocationItem(completion: $0) }
+                snapshot.appendItems(items)
+                self.dataSource.apply(snapshot, animatingDifferences: false)
+            }
+            .disposed(by: disposeBag)
+        
+        // 선택 시  Relay 전달
         collectionView.rx.itemSelected
             .withUnretained(self)
             .bind { `self`, indexPath in
@@ -96,8 +106,8 @@ class LocationSearchViewController: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
-        
     }
+    
     
     // MARK: CollectionView DataSource & Layout
     func makeDataSource(_ collectionView: UICollectionView) -> UICollectionViewDiffableDataSource<LocationSection, LocationItem> {
@@ -113,9 +123,9 @@ class LocationSearchViewController: UIViewController {
         }
         //데이터 소스 정의
         let dataSource = UICollectionViewDiffableDataSource<LocationSection, LocationItem>(
-          collectionView: collectionView
+            collectionView: collectionView
         ) { collectionView, indexPath, item in
-          collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
+            collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
         return dataSource
     }
@@ -128,42 +138,19 @@ class LocationSearchViewController: UIViewController {
         
     }
     
-    private func searhLocations(query: String) -> Observable<[MKMapItem]> {
-        return Observable.create { observer in
-            
-            let request = MKLocalSearch.Request()
-            request.naturalLanguageQuery = query
-            request.region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 37.2636, longitude: 127.0286), // 수원 중심 좌표
-                span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
-            )
-            
-            
-            let search = MKLocalSearch(request: request)
-            search.start { response, error in
-                if let error = error {
-                    print("검색 오류:", error.localizedDescription)
-                    observer.onError(error)
-                    return
-                }
-                
-                guard let items = response?.mapItems else {
-                    print("검색 결과 없음")
-                    observer.onNext([])
-                    observer.onCompleted()
-                    return
-                }
-                observer.onNext(items)
-                observer.onCompleted()
-            }
-            
-            return Disposables.create()
-        }
-        .catchAndReturn([])
-    }
-    
 }
 
+// MARK: MKLocalSearchCompleterDelegate
+extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        completerResults.accept(completer.results)
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print("자동완성 오류: \(error.localizedDescription)")
+        completerResults.accept([])
+    }
+}
 
 // MARK: CollectionView Section & Item
 enum LocationSection {
@@ -176,18 +163,15 @@ struct LocationItem: Hashable {
     let id = UUID()
     let title: String
     let subtitle: String?   // 주소 표시용
-    let coordinate: CLLocationCoordinate2D?
-    
-    init(mapItem: MKMapItem) {
-        self.title = mapItem.name ?? "이름 없음"
-        self.coordinate = mapItem.placemark.coordinate
-        self.subtitle = mapItem.placemark.title // 주소 문자열
-    }
     
     init(customTitle: String) {
         self.title = customTitle
-        self.coordinate = nil
         self.subtitle = nil
+    }
+    
+    init(completion: MKLocalSearchCompletion) {
+        self.title = completion.title
+        self.subtitle = completion.subtitle
     }
     
     func hash(into hasher: inout Hasher) {
