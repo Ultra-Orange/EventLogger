@@ -6,17 +6,16 @@
 //
 
 import ReactorKit
-import RxSwift
 import RxCocoa
-import UIKit
+import RxSwift
+import SnapKit
 import SwiftUI
 import Then
-import SnapKit
+import UIKit
 
 final class EventListViewController: BaseViewController<EventListReactor> {
-    
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
-        $0.font = UIFont.preferredFont(forTextStyle: .body)
+        $0.font = .font17Regular
         $0.capsuleBackgroundColor = .black
         $0.capsuleBorderColor = .white.withAlphaComponent(0.6)
         $0.capsuleBorderWidth = 1
@@ -25,7 +24,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.borderColor = .white.withAlphaComponent(0.6)
         $0.borderWidth = 1
         $0.segmentSpacing = 6
-        $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3 )
+        $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: EventListLayout.makeLayout()).then {
@@ -44,7 +43,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     )
     
     override func setupUI() {
-        self.title = "Event Logger"
+        title = "Event Logger"
         view.backgroundColor = .black
         
         view.addSubview(segmentedControl)

@@ -9,7 +9,6 @@ import UIKit
 
 /// 알약(캡슐) 모양의 슬라이딩 선택 배경을 가진 세그먼트 컨트롤 (Auto Layout 기반)
 public final class PillSegmentedControl: UIControl {
-
     // MARK: - Public API
 
     /// 표시할 항목 텍스트 배열
@@ -52,12 +51,12 @@ public final class PillSegmentedControl: UIControl {
     public var capsuleBackgroundColor: UIColor = .systemBlue {
         didSet { selectionCapsuleView.backgroundColor = capsuleBackgroundColor }
     }
-    
+
     /// 선택 캡슐 외곽선 색
-    public var capsuleBorderColor: UIColor = UIColor.systemBlue {
+    public var capsuleBorderColor: UIColor = .systemBlue {
         didSet { selectionCapsuleView.layer.borderColor = capsuleBorderColor.cgColor }
     }
-    
+
     /// 선택 캡슐 외곽선 두께
     public var capsuleBorderWidth: CGFloat = 0 {
         didSet { selectionCapsuleView.layer.borderWidth = capsuleBorderWidth }
@@ -209,7 +208,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     public required init?(coder: NSCoder) {
-        self.items = []
+        items = []
         super.init(coder: coder)
         isSettingUp = true
         configureOnce()
@@ -259,7 +258,7 @@ public final class PillSegmentedControl: UIControl {
 
         NSLayoutConstraint.activate([
             top, leading, trailing, bottom,
-            heightAnchor.constraint(greaterThanOrEqualToConstant: 36)
+            heightAnchor.constraint(greaterThanOrEqualToConstant: 36),
         ])
 
         stackTop = top
@@ -273,10 +272,10 @@ public final class PillSegmentedControl: UIControl {
     private func rebuildButtons() {
         buttons.forEach { $0.removeFromSuperview() }
         buttons.removeAll()
-        
+
         for (index, title) in items.enumerated() {
             let button = UIButton(type: .system)
-            
+
             // 최신 API: UIButton.Configuration
             var configuration = UIButton.Configuration.plain()
             configuration.contentInsets = .init(top: 6, leading: 12, bottom: 6, trailing: 12)
@@ -284,7 +283,7 @@ public final class PillSegmentedControl: UIControl {
             configuration.attributedTitle = AttributedString(title, attributes: .init([.font: font]))
             configuration.baseForegroundColor = (index == selectedIndex) ? selectedTextColor : normalTextColor
             button.configuration = configuration
-            
+
             // 상태 업데이트 핸들러
             button.configurationUpdateHandler = { [weak self] button in
                 guard let self = self,
@@ -296,16 +295,16 @@ public final class PillSegmentedControl: UIControl {
                 button.configuration = updated
                 button.accessibilityTraits = (buttonIndex == self.selectedIndex) ? [.button, .selected] : [.button]
             }
-            
+
             // 탭 처리
             button.addAction(UIAction { [weak self] _ in
                 self?.handleTap(on: button)
             }, for: .touchUpInside)
-            
+
             buttons.append(button)
             stackView.addArrangedSubview(button)
         }
-        
+
         // 초기 선택 위치 적용
         // 👉 아직 bounds가 0일 수 있으므로 여기서 바로 attachCapsule 금지
         needsInitialAttach = true
@@ -351,24 +350,24 @@ public final class PillSegmentedControl: UIControl {
             return
         }
         selectionCapsuleView.isHidden = false
-        
+
         // 아직 실제 레이아웃이 안 잡혔다면 캡슐 부착을 나중으로 미룸
         if bounds.width == 0 || bounds.height == 0 || window == nil {
             needsInitialAttach = true
             return
         }
-        
+
         let targetButton = buttons[selectedIndex]
         attachCapsule(to: targetButton, animated: animated)
     }
 
     // MARK: - Layout
 
-    public override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = bounds.height / 2
         selectionCapsuleView.layer.cornerRadius = selectionCapsuleView.bounds.height / 2
-        
+
         // 최초 1회, 실제 프레임이 생긴 뒤 캡슐 제약 부착
         if needsInitialAttach, buttons.indices.contains(selectedIndex) {
             needsInitialAttach = false
@@ -376,7 +375,7 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    public override var intrinsicContentSize: CGSize {
+    override public var intrinsicContentSize: CGSize {
         // 버튼들의 intrinsic 크기에 컨테이너 여백과 간격을 더해 정확한 사이즈 계산
         let buttonHeights = buttons.map { $0.intrinsicContentSize.height }
         let height = (buttonHeights.max() ?? 28) + contentInsets.top + contentInsets.bottom
@@ -400,7 +399,7 @@ public final class PillSegmentedControl: UIControl {
     /// 항목과 선택 인덱스를 한 번에 갱신
     public func setItems(_ newItems: [String], selectedIndex: Int = 0) {
         isSettingUp = true
-        self.items = newItems
+        items = newItems
         self.selectedIndex = max(0, min(selectedIndex, max(0, newItems.count - 1)))
         isSettingUp = false
         needsInitialAttach = true
