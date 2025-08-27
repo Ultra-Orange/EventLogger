@@ -1,6 +1,31 @@
 
 import UIKit
 
+extension UIButton {
+    /// DateRangeField 버튼들 생김새 통합 설정
+    static func makeDateButton() -> UIButton {
+        let button = UIButton(type: .system)
+        var config = UIButton.Configuration.bordered()
+        config.contentInsets = .init(top: 2, leading: 8, bottom: 2, trailing: 8)
+        config.background.cornerRadius = 6
+        config.baseForegroundColor = .white
+        config.background.backgroundColor = .systemGray3
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = .font17Regular
+            return outgoing
+        }
+        button.configuration = config
+        button.configurationUpdateHandler = { button in
+            var config = button.configuration ?? .bordered()
+            let isOn = button.isSelected
+            config.baseForegroundColor = isOn ? .systemOrange : .white
+            button.configuration = config
+        }
+        return button
+    }
+}
+
 extension UIButton.Configuration {
    
     //     사용부
@@ -31,5 +56,4 @@ extension UIButton.Configuration {
         }
         return config
     }
-
 }
