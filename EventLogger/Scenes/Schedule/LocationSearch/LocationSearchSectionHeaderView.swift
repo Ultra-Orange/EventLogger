@@ -28,9 +28,9 @@ final class LocationSearchSectionHeaderView: UICollectionReusableView {
 
     private func setupLayout() {
         addSubview(titleLabel)
-        
         titleLabel.snp.makeConstraints {
-            $0.leading.top.bottom.equalToSuperview()
+            $0.leading.equalToSuperview().inset(20)
+            $0.top.bottom.equalToSuperview()
         }
     }
 }

@@ -26,6 +26,10 @@ class LocationSearchViewController: UIViewController {
         $0.placeholder = "장소를 입력하세요"
     }
     
+    private let cancelButton = UIButton(configuration: .navCancel).then {
+        $0.configuration?.title = "취소"
+    }
+    
     // MARK: Rx
     private let disposeBag = DisposeBag()
     private let selectedLocationRelay: PublishRelay<String>
@@ -53,6 +57,9 @@ class LocationSearchViewController: UIViewController {
         completer.delegate = self
         completer.resultTypes = [.pointOfInterest, .address] // 자동완성 강화
         
+        navigationItem.title = "장소 검색"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cancelButton)
+        
         setupUI()
         bind()
     }
@@ -66,8 +73,8 @@ class LocationSearchViewController: UIViewController {
                                 withReuseIdentifier: "HeaderView")
         
         searchBar.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
         }
         
         collectionView.snp.makeConstraints {
@@ -125,6 +132,12 @@ class LocationSearchViewController: UIViewController {
                 }
             }
             .disposed(by: disposeBag)
+        
+        cancelButton.rx.tap
+            .bind { [weak self] in
+                self?.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
     
     // MARK: CollectionView DataSource & Layout
@@ -179,7 +192,7 @@ class LocationSearchViewController: UIViewController {
                 using: config,
                 layoutEnvironment: environment
             )
-//            section.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 20, bottom: 5, trailing: 20)
+            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
             
             // 헤더
             let header = NSCollectionLayoutBoundarySupplementaryItem(
@@ -187,7 +200,7 @@ class LocationSearchViewController: UIViewController {
                 elementKind: UICollectionView.elementKindSectionHeader,
                 alignment: .top
             )
-            header.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20)
+            header.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
             
             // 조건: .searchResults 섹션에만 헤더 표시
             let currentSection = self.dataSource.snapshot().sectionIdentifiers[sectionIndex]

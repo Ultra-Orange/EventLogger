@@ -34,7 +34,7 @@ final class AppFlow: Flow {
             return navigateToSchedule(mode: .create)
         case let .updateSchedule(item):
             return navigateToSchedule(mode: .update(item))
-        case let .locationSearch:
+        case .locationSearch:
             return navigateToLocationSearch()
         }
     }
@@ -82,12 +82,15 @@ final class AppFlow: Flow {
         let vc = LocationSearchViewController(
             selectedLocationRelay: selectedLocationRelay
         )
-        vc.modalPresentationStyle = .pageSheet
-        if let sheet = vc.sheetPresentationController {
+        
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .pageSheet
+        
+        if let sheet = nav.sheetPresentationController {
             sheet.detents = [.large()]
-            sheet.prefersGrabberVisible = true
+            sheet.prefersGrabberVisible = false
         }
-        rootNav.present(vc, animated: true)
+        rootNav.present(nav, animated: true)
         return .none
     }
 }
