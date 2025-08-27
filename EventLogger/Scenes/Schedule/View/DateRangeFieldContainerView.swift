@@ -203,28 +203,23 @@ final class DateRangeFieldContainerView: UIView {
     private func bind() {
         // 버튼 탭 처리
         startDateButton.rx.tap
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .startDate) }
             .disposed(by: disposeBag)
         
         startTimeButton.rx.tap
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .startTime) }
             .disposed(by: disposeBag)
         
         endDateButton.rx.tap
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .endDate) }
             .disposed(by: disposeBag)
         
         endTimeButton.rx.tap
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .endTime) }
             .disposed(by: disposeBag)
         
         // 피커 값 변경
         startDatePicker.rx.controlEvent(.valueChanged)
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in
                 guard let self else { return }
                 let newDate = merge(date: startDatePicker.date, timeFrom: startDate)
@@ -232,7 +227,6 @@ final class DateRangeFieldContainerView: UIView {
             }.disposed(by: disposeBag)
         
         startTimePicker.rx.controlEvent(.valueChanged)
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in
                 guard let self else { return }
                 let newDate = merge(date: startDate, timeFrom: startTimePicker.date)
@@ -240,7 +234,6 @@ final class DateRangeFieldContainerView: UIView {
             }.disposed(by: disposeBag)
         
         endDatePicker.rx.controlEvent(.valueChanged)
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in
                 guard let self else { return }
                 let newDate = merge(date: endDatePicker.date, timeFrom: endDate)
@@ -248,7 +241,6 @@ final class DateRangeFieldContainerView: UIView {
             }.disposed(by: disposeBag)
         
         endTimePicker.rx.controlEvent(.valueChanged)
-            .observe(on: MainScheduler.instance)
             .bind { [weak self] in
                 guard let self else { return }
                 let newDate = merge(date: endDate, timeFrom: endTimePicker.date)
