@@ -77,10 +77,10 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
-
+        
+        contentView.addSubview(deleteLabel)
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
-        contentView.addSubview(deleteLabel)
         contentView.addSubview(inputTitleView)
         contentView.addSubview(categoryFieldView)
         contentView.addSubview(dateRangeFieldView)
@@ -95,8 +95,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         deleteLabel.isUserInteractionEnabled = true
 
         // 오토 레이아웃
-        addImageView.snp.makeConstraints {
+        deleteLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
+            $0.trailing.equalToSuperview()
+        }
+        
+        addImageView.snp.makeConstraints {
+            $0.top.equalTo(deleteLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
         }
 
@@ -104,11 +109,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.top.equalTo(addImageView.snp.top)
             $0.leading.trailing.equalToSuperview() 
             $0.height.equalTo(addImageView.snp.height)
-        }
-
-        deleteLabel.snp.makeConstraints {
-            $0.top.equalTo(addImageView.snp.bottom).offset(10)
-            $0.trailing.equalToSuperview()
         }
 
         inputTitleView.snp.makeConstraints {
