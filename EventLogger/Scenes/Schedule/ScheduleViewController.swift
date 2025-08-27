@@ -171,10 +171,19 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
-
+        
+        // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
             .bind(to: locationFieldView.textLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        // 장소 선택 empty면 버튼 히든
+        reactor.state
+            .map(\.selectedLocation)
+            .distinctUntilChanged()
+            .map { $0.isEmpty }
+            .bind(to: locationFieldView.closeIcon.rx.isHidden)
             .disposed(by: disposeBag)
 
         // 이미지 뷰 탭 제스쳐
