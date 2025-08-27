@@ -79,10 +79,7 @@ class LocationSearchViewController: UIViewController {
                 var snapshot = NSDiffableDataSourceSnapshot<LocationSection, LocationItem>()
                 snapshot.appendSections([.main])
                 
-                let locationItems = mapItems.compactMap(\.name)
-                    .map {
-                        LocationItem(customTitle: $0)
-                    }
+                let locationItems = mapItems.map { LocationItem(mapItem: $0) }
                 
                 snapshot.appendItems(locationItems)
                 dataSource.apply(snapshot, animatingDifferences: false)
@@ -109,6 +106,9 @@ class LocationSearchViewController: UIViewController {
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LocationItem> { cell, _, item in
             var content = UIListContentConfiguration.valueCell()
             content.text = item.title
+            content.secondaryText = item.subtitle
+            content.secondaryTextProperties.color = .secondaryLabel
+            content.secondaryTextProperties.numberOfLines = 1
             cell.contentConfiguration = content
         }
         //데이터 소스 정의
@@ -133,6 +133,11 @@ class LocationSearchViewController: UIViewController {
             
             let request = MKLocalSearch.Request()
             request.naturalLanguageQuery = query
+            request.region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 37.2636, longitude: 127.0286), // 수원 중심 좌표
+                span: MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
+            )
+            
             
             let search = MKLocalSearch(request: request)
             search.start { response, error in
@@ -170,16 +175,19 @@ struct LocationItem: Hashable {
     
     let id = UUID()
     let title: String
+    let subtitle: String?   // 주소 표시용
     let coordinate: CLLocationCoordinate2D?
     
     init(mapItem: MKMapItem) {
         self.title = mapItem.name ?? "이름 없음"
         self.coordinate = mapItem.placemark.coordinate
+        self.subtitle = mapItem.placemark.title // 주소 문자열
     }
     
     init(customTitle: String) {
         self.title = customTitle
         self.coordinate = nil
+        self.subtitle = nil
     }
     
     func hash(into hasher: inout Hasher) {
