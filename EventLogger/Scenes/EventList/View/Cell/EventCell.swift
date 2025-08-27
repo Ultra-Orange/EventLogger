@@ -81,7 +81,7 @@ struct EventCell: View { // EventItem 통으로 받자
                 color: .blue
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
             artists:
             ["YOASOBI"],
             expense: 75000,

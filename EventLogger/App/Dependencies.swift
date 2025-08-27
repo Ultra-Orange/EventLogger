@@ -46,7 +46,7 @@ private enum eventItemsKey: DependencyKey {
                 color: .blue
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
             artists:
             ["YOASOBI"],
             expense: 75000,
@@ -78,7 +78,7 @@ private enum eventItemsKey: DependencyKey {
                 color: .blue
             ),
             startTime: DateFormatter.toDate("2024년 06월 1일 14:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2024년 6월 1일 16:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2024년 6월 1일 16:00") ?? Date.now,
             artists:
             ["アイドルマスターシンデレラガールズ", "原紗友里", "赤﨑千夏", "金子有希", "M・A・O(市道真央)", "森下来奈", "梅澤めぐ", "富田美憂", "星希成奏"],
             expense: 90000,
@@ -100,7 +100,7 @@ private enum eventItemsKey: DependencyKey {
                 color: .red
             ),
             startTime: DateFormatter.toDate("2025년 09월 20일 14:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2025년 09월 20일 15:30") ?? Date.now,
+            endTime: DateFormatter.toDate("2025년 09월 20일 15:30") ?? Date.now,
             artists:
             ["한선화"],
             expense: 88000,
@@ -134,7 +134,7 @@ private enum eventItemsKey: DependencyKey {
                 ),
 
             startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
-            endtime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,
             artists:
             ["SUEDETHE", "SMASHING", "PUMPKINSBABYMETALMIKAPORTER", "ROBINSON", "자우림", "국카스텐"],
             expense: 110_000,

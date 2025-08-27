@@ -5,31 +5,34 @@
 //  Created by 김우성 on 8/26/25.
 //
 
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 import UIKit
-import RxSwift
-import RxCocoa
 
 final class DateRangeFieldContainerView: UIView {
-    
     // MARK: API
+
     /// 외부에서 읽기/설정 가능한 시작/종료 날짜 (설정 시 UI 동기화)
-    var startDate: Date {
-        didSet { applyStart(date: startDate, propagate: false) }
-    }
-    var endDate: Date {
-        didSet { applyEnd(date: endDate, propagate: false) }
-    }
+    var startDate: Date { didSet { syncStartUI() } }
+    var endDate: Date { didSet { syncEndUI() } }
     
     /// 값 변경을 외부로 내보내기
     let startDateChanged = PublishRelay<Date>()
     let endDateChanged = PublishRelay<Date>()
     
     // MARK: UI
+
     private let titleLabel = UILabel().then {
-        $0.text = "날짜"
+        $0.text = "날짜 및 시간"
         $0.font = .font13Regular
+        $0.textColor = .white // Neutral/50으로 수정예정
+    }
+    
+    private let cardView = UIView().then {
+        $0.backgroundColor = .systemGray5 // Neutral/800 으로 수정예정
+        $0.layer.cornerRadius = 10
     }
     
     private let container = UIStackView().then {
@@ -42,70 +45,87 @@ final class DateRangeFieldContainerView: UIView {
     // Row: 시작
     private let startRow = UIStackView().then {
         $0.axis = .horizontal
-        $0.spacing = 8
         $0.alignment = .center
+        $0.spacing = 4
         $0.distribution = .fill
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.layoutMargins = .zero
     }
-    
+
     private let startLabel = UILabel().then {
-        $0.text = "시작"
-        $0.font = .font13Regular
-        $0.textColor = .secondaryLabel
+        $0.text = "시작 시간"
+        $0.font = .font17Regular
+        $0.textColor = .white
         $0.setContentHuggingPriority(.required, for: .horizontal)
     }
-    private let startDateButton = UIButton(type: .system).then {
-        $0.configuration = .bordered()
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-    }
-    private let startTimeButton = UIButton(type: .system).then {
-        $0.configuration = .bordered()
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-    }
     
-    // Row: 종료
-    private let endRow = UIStackView().then {
-        $0.axis = .horizontal
-        $0.spacing = 8
-        $0.alignment = .center
-        $0.distribution = .fill
-    }
+    private let startRowSpacer = UIView()
+    private let startDateButton = UIButton.makeDateButton()
+    private let startTimeButton = UIButton.makeDateButton()
     
-    private let endLabel = UILabel().then {
-        $0.text = "종료"
-        $0.font = .font13Regular
-        $0.textColor = .secondaryLabel
-        $0.setContentHuggingPriority(.required, for: .horizontal)
-    }
-    private let endDateButton = UIButton(type: .system).then {
-        $0.configuration = .bordered()
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-    }
-    private let endTimeButton = UIButton(type: .system).then {
-        $0.configuration = .bordered()
-        $0.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-    }
-    
-    // 펼침 영역 (한 번에 하나만 보이게)
-    private let pickerContainer = UIView().then {
-        $0.clipsToBounds = true
-    }
-    private let datePicker = UIDatePicker().then {
+    private let startDatePicker = UIDatePicker().then {
         $0.datePickerMode = .date
         $0.preferredDatePickerStyle = .inline
         $0.locale = Locale(identifier: "ko_KR")
         $0.calendar = Calendar(identifier: .gregorian)
+        $0.applyYearRange(minYear: 1900, maxYear: 2500)
+        $0.isHidden = true
     }
-    private let timePicker = UIDatePicker().then {
+    private let startTimePicker = UIDatePicker().then {
         $0.datePickerMode = .time
         $0.preferredDatePickerStyle = .wheels
         $0.minuteInterval = 5
         $0.locale = Locale(identifier: "ko_KR")
         $0.calendar = Calendar(identifier: .gregorian)
+        $0.isHidden = true
+    }
+    
+    private let containerSpacer = UIView().then {
+        $0.backgroundColor = .systemGray3
+    }
+    
+    // Row: 종료
+    private let endRow = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .center
+        $0.spacing = 4
+        $0.distribution = .fill
+        $0.isLayoutMarginsRelativeArrangement = true
+        $0.layoutMargins = .zero
+    }
+
+    private let endLabel = UILabel().then {
+        $0.text = "종료 시간"
+        $0.font = .font17Regular
+        $0.textColor = .white
+        $0.setContentHuggingPriority(.required, for: .horizontal)
+    }
+    private let endRowSpacer = UIView()
+    private let endDateButton = UIButton.makeDateButton()
+    private let endTimeButton = UIButton.makeDateButton()
+    
+    private let endDatePicker = UIDatePicker().then {
+        $0.datePickerMode = .date
+        $0.preferredDatePickerStyle = .inline
+        $0.locale = Locale(identifier: "ko_KR")
+        $0.calendar = Calendar(identifier: .gregorian)
+        $0.applyYearRange(minYear: 1900, maxYear: 2500)
+        $0.isHidden = true
+    }
+
+    private let endTimePicker = UIDatePicker().then {
+        $0.datePickerMode = .time
+        $0.preferredDatePickerStyle = .wheels
+        $0.minuteInterval = 5
+        $0.locale = Locale(identifier: "ko_KR")
+        $0.calendar = Calendar(identifier: .gregorian)
+        $0.isHidden = true
     }
     
     private enum ActivePanel {
         case none, startDate, startTime, endDate, endTime
     }
+
     private var activePanel: ActivePanel = .none {
         didSet { updatePanelVisibility(animated: true) }
     }
@@ -113,6 +133,7 @@ final class DateRangeFieldContainerView: UIView {
     private let disposeBag = DisposeBag()
     
     // MARK: 초기화
+
     override init(frame: CGRect) {
         // 기본값: 시작=지금(분,초 0으로), 종료=시작+1시간
         let now = DateRangeFieldContainerView.roundToHour(Date())
@@ -122,159 +143,257 @@ final class DateRangeFieldContainerView: UIView {
         super.init(frame: frame)
         setupUI()
         bind()
-        
-        applyStart(date: startDate, propagate: false)
-        applyEnd(date: endDate, propagate: false)
+        syncStartUI()
+        syncEndUI()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     private func setupUI() {
         addSubview(titleLabel)
-        addSubview(container)
-        addSubview(pickerContainer)
+        titleLabel.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+        }
         
+        addSubview(cardView)
+        cardView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        cardView.addSubview(container)
+        container.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(10)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        
+        // 상단 행 (시작 시간)
         container.addArrangedSubview(startRow)
-        container.addArrangedSubview(endRow)
-        
+        startRow.snp.makeConstraints { $0.height.equalTo(26) }
         startRow.addArrangedSubview(startLabel)
+        startRow.addArrangedSubview(startRowSpacer)
         startRow.addArrangedSubview(startDateButton)
         startRow.addArrangedSubview(startTimeButton)
         
+        container.addArrangedSubview(startDatePicker)
+        container.addArrangedSubview(startTimePicker)
+        
+        // 중간 스페이서
+        container.addArrangedSubview(containerSpacer)
+        containerSpacer.snp.makeConstraints { $0.height.equalTo(1) }
+        
+        // 하단 행 (종료 시간)
+        container.addArrangedSubview(endRow)
+        endRow.snp.makeConstraints { $0.height.equalTo(26) }
         endRow.addArrangedSubview(endLabel)
+        endRow.addArrangedSubview(endRowSpacer)
         endRow.addArrangedSubview(endDateButton)
         endRow.addArrangedSubview(endTimeButton)
         
-        // 버튼 라벨 폰트 통일
-        [startDateButton, startTimeButton, endDateButton, endTimeButton].forEach {
-            $0.configuration?.background.backgroundColor = .clear
-            $0.configuration?.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var out = incoming
-                out.font = .font16Regular
-                return out
-            }
-        }
-        
-        pickerContainer.addSubview(datePicker)
-        pickerContainer.addSubview(timePicker)
-        
-        titleLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
-        }
-        container.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview()
-        }
-        startRow.snp.makeConstraints {
-            $0.height.equalTo(44)
-        }
-        endRow.snp.makeConstraints {
-            $0.height.equalTo(44)
-        }
-        // label 고정폭 최소화
-        startLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
-        endLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
-        
-        pickerContainer.snp.makeConstraints {
-            $0.top.equalTo(container.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview()
-        }
-        datePicker.snp.makeConstraints { $0.edges.equalToSuperview() }
-        timePicker.snp.makeConstraints { $0.edges.equalToSuperview() }
-        
-        // 시작 시에는 안보이게
-        datePicker.isHidden = true
-        timePicker.isHidden = true
-        pickerContainer.isHidden = true
+        container.addArrangedSubview(endDatePicker)
+        container.addArrangedSubview(endTimePicker)
     }
     
     private func bind() {
         // 버튼 탭 처리
         startDateButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .startDate) }
             .disposed(by: disposeBag)
         
         startTimeButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .startTime) }
             .disposed(by: disposeBag)
         
         endDateButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .endDate) }
             .disposed(by: disposeBag)
         
         endTimeButton.rx.tap
+            .observe(on: MainScheduler.instance)
             .bind { [weak self] in self?.toggle(panel: .endTime) }
             .disposed(by: disposeBag)
         
         // 피커 값 변경
-        datePicker.rx.controlEvent(.valueChanged)
-            .bind { [weak self] in self?.handleDatePicked() }
-            .disposed(by: disposeBag)
+        startDatePicker.rx.controlEvent(.valueChanged)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] in
+                guard let self else { return }
+                let newDate = merge(date: startDatePicker.date, timeFrom: startDate)
+                self.setStart(newDate, propagate: true)
+            }.disposed(by: disposeBag)
         
-        timePicker.rx.controlEvent(.valueChanged)
-            .bind { [weak self] in self?.handleTimePicked() }
-            .disposed(by: disposeBag)
+        startTimePicker.rx.controlEvent(.valueChanged)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] in
+                guard let self else { return }
+                let newDate = merge(date: startDate, timeFrom: startTimePicker.date)
+                self.setStart(newDate, propagate: true)
+            }.disposed(by: disposeBag)
+        
+        endDatePicker.rx.controlEvent(.valueChanged)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] in
+                guard let self else { return }
+                let newDate = merge(date: endDatePicker.date, timeFrom: endDate)
+                self.setEnd(newDate, propagate: true)
+            }.disposed(by: disposeBag)
+        
+        endTimePicker.rx.controlEvent(.valueChanged)
+            .observe(on: MainScheduler.instance)
+            .bind { [weak self] in
+                guard let self else { return }
+                let newDate = merge(date: endDate, timeFrom: endTimePicker.date)
+                self.setEnd(newDate, propagate: true)
+            }.disposed(by: disposeBag)
     }
     
     // MARK: 액션들
     
     /// 날짜 패널 <-> 시간 패널 토글 하는 함수
+    /// 현재 활성화된 패널이 새로 토글하려는 패널과 동일하면 현재 열려 있는 패널을 닫음, 아니면 새로운 패널을 활성화하고 표시함
     private func toggle(panel: ActivePanel) {
-        
+        activePanel = (activePanel == panel) ? .none : panel
     }
     
     /// 날짜 패널 <-> 시간 패널 보여지는 것 업데이트하는 함수
     private func updatePanelVisibility(animated: Bool) {
+        let showStartDate = (activePanel == .startDate)
+        let showStartTime = (activePanel == .startTime)
+        let showEndDate   = (activePanel == .endDate)
+        let showEndTime   = (activePanel == .endTime)
         
+        startDateButton.isSelected = showStartDate
+        startTimeButton.isSelected = showStartTime
+        endDateButton.isSelected   = showEndDate
+        endTimeButton.isSelected   = showEndTime
+        [startDateButton, startTimeButton, endDateButton, endTimeButton]
+            .forEach { $0.setNeedsUpdateConfiguration() }
+        
+        let changes = {
+            self.startDatePicker.isHidden = !showStartDate
+            self.startTimePicker.isHidden = !showStartTime
+            self.endDatePicker.isHidden   = !showEndDate
+            self.endTimePicker.isHidden   = !showEndTime
+            self.layoutIfNeeded()
+        }
+        guard animated else { changes(); return }
+        UIView.animate(withDuration: 0.25, animations: changes)
     }
     
-    /// 날짜 고른 거 다루는 함수
-    private func handleDatePicked() {
-        
+    // MARK: 외부/내부 값 세터
+
+    func setStart(_ date: Date, propagate: Bool) {
+        startDate = date
+        if endDate < startDate {
+            endDate = Calendar.current.date(byAdding: .hour, value: 1, to: startDate) ?? startDate.addingTimeInterval(3600)
+        }
+        if propagate { startDateChanged.accept(startDate) }
     }
     
-    /// 시간 고른 거 다루는 함수
-    private func handleTimePicked() {
-        
+    func setEnd(_ date: Date, propagate: Bool) {
+        let final = max(date, startDate)
+        endDate = final
+        if propagate { endDateChanged.accept(endDate) }
     }
     
-    // MARK: 적용하고 동기화
-    private func applyStart(date: Date, propagate: Bool) {
-        
+    // MARK: UI 동기화
+
+    private func syncStartUI() {
+        update(button: startDateButton, with: DateFormatter.toDateString(startDate))
+        update(button: startTimeButton, with: DateFormatter.toTimeString(startDate))
+        startDatePicker.setDate(startDate, animated: false)
+        startTimePicker.setDate(startDate, animated: false)
+        // 시작 시간이 바뀌면 종료 시간도 갱신하도록
+        endDatePicker.minimumDate = startOfDay(for: startDate)
+    }
+
+    private func syncEndUI() {
+        update(button: endDateButton, with: DateFormatter.toDateString(endDate))
+        update(button: endTimeButton, with: DateFormatter.toTimeString(endDate))
+        endDatePicker.minimumDate = startOfDay(for: startDate)
+        endDatePicker.setDate(endDate, animated: false)
+        endTimePicker.setDate(endDate, animated: false)
     }
     
-    private func applyEnd(date: Date, propagate: Bool) {
-        
-    }
-    
-    private func update(button: UIButton, withDateText text: String) {
-        
-    }
-    private func update(button: UIButton, withTimeText text: String) {
-        
+    // MARK: 유틸
+
+    // 버튼 업데이트
+    private func update(button: UIButton, with text: String) {
+        var config = button.configuration ?? .bordered()
+        config.title = text
+        button.configuration = config
     }
     
     /// 따로 받은 날짜와 시간을 합쳐주는 함수
     private func merge(date: Date, timeFrom ref: Date) -> Date {
-        
-        return Date()
+        let calendar = Calendar.current
+        let day = calendar.dateComponents([.year, .month, .day], from: date)
+        let time = calendar.dateComponents([.hour, .minute, .second], from: ref)
+        var components = DateComponents()
+        components.year = day.year
+        components.month = day.month
+        components.day = day.day
+        components.hour = time.hour
+        components.minute = time.minute
+        components.second = 0
+        return calendar.date(from: components) ?? date
     }
     
     private func startOfDay(for date: Date) -> Date {
-        
-        return Date()
+        Calendar.current.startOfDay(for: date)
     }
     
     /// 시간을 받고 분, 초 날려주는 함수
     static func roundToHour(_ date: Date) -> Date {
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        var new = components
-        new.minute = 0
-        new.second = 0
-        return calendar.date(from: new) ?? date
+        var components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        components.minute = 0
+        components.second = 0
+        return calendar.date(from: components) ?? date
     }
+}
+
+extension UIButton {
+    /// 버튼들 생김새 통합 설정
+    static func makeDateButton() -> UIButton {
+        let button = UIButton(type: .system)
+        var config = UIButton.Configuration.bordered()
+        config.contentInsets = .init(top: 2, leading: 8, bottom: 2, trailing: 8)
+        config.background.cornerRadius = 6
+        config.baseForegroundColor = .white
+        config.background.backgroundColor = .systemGray3
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+                var outgoing = incoming
+            outgoing.font = .font17Regular
+            return outgoing
+        }
+        button.configuration = config
+        button.configurationUpdateHandler = { button in
+            var config = button.configuration ?? .bordered()
+            let isOn = button.isSelected
+            config.baseForegroundColor = isOn ? .systemOrange : .white
+            button.configuration = config
+        }
+        return button
+    }
+}
+
+extension UIDatePicker {
+    func applyYearRange(minYear: Int, maxYear: Int) {
+        let calendar = Calendar(identifier: .gregorian)
+        var min = DateComponents(); min.year = minYear; min.month = 1; min.day = 1
+        var max = DateComponents(); max.year = maxYear; max.month = 1; max.day = 1
+        minimumDate = calendar.date(from: min)
+        maximumDate = calendar.date(from: max)
+    }
+}
+
+#Preview {
+    DateRangeFieldContainerView()
 }

@@ -13,7 +13,7 @@ struct EventItem: Hashable {
     var category: Category // 카테고리
     var image: UIImage? // 이미지
     var startTime: Date // 개연시간
-    var endtime: Date // 종연시간
+    var endTime: Date // 종연시간
 
     // TODO: Location 캘린더랑 연동할때 조사 필요
     var location: Location? // 장소
