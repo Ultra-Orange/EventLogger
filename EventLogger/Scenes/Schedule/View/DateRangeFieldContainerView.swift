@@ -71,6 +71,7 @@ final class DateRangeFieldContainerView: UIView {
         $0.applyYearRange(minYear: 1900, maxYear: 2500)
         $0.isHidden = true
     }
+
     private let startTimePicker = UIDatePicker().then {
         $0.datePickerMode = .time
         $0.preferredDatePickerStyle = .wheels
@@ -100,6 +101,7 @@ final class DateRangeFieldContainerView: UIView {
         $0.textColor = .white
         $0.setContentHuggingPriority(.required, for: .horizontal)
     }
+
     private let endRowSpacer = UIView()
     private let endDateButton = UIButton.makeDateButton()
     private let endTimeButton = UIButton.makeDateButton()
@@ -264,7 +266,6 @@ final class DateRangeFieldContainerView: UIView {
     
     /// 날짜/시간 패널의 보여짐/숨겨짐을 업데이트하는 함수
     private func updatePanelVisibility(animated: Bool) {
-
         // 버튼과 피커, 패널 하나로 묶어 관리
         let panelItems: [(button: UIButton, picker: UIView, panel: ActivePanel)] = [
             (startDateButton, startDatePicker, .startDate),
@@ -374,7 +375,7 @@ extension UIButton {
         config.baseForegroundColor = .white
         config.background.backgroundColor = .systemGray3
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-                var outgoing = incoming
+            var outgoing = incoming
             outgoing.font = .font17Regular
             return outgoing
         }

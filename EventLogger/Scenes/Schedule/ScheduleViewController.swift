@@ -158,19 +158,19 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
-        
+
         dateRangeFieldView.startDateChanged
             .bind(onNext: { date in
                 print("시작 변경:", date)
             })
             .disposed(by: disposeBag)
-        
+
         dateRangeFieldView.endDateChanged
             .bind(onNext: { date in
                 print("종료 변경:", date)
             })
             .disposed(by: disposeBag)
-        
+
         // 임시
         bottomButton.rx.tapGesture()
             .bind { [weak self] _ in
@@ -180,7 +180,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 print("저장할 시작/종료 날짜:", start, end)
             }
             .disposed(by: disposeBag)
-        
 
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
