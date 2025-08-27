@@ -24,7 +24,7 @@ final class DateRangeFieldContainerView: UIView {
     
     // MARK: UI
 
-    private let titleLabel = UILabel().then {
+    private let sectionHeader = UILabel().then {
         $0.text = "날짜 및 시간"
         $0.font = .font13Regular
         $0.textColor = .white // Neutral/50으로 수정예정
@@ -155,15 +155,15 @@ final class DateRangeFieldContainerView: UIView {
     }
     
     private func setupUI() {
-        addSubview(titleLabel)
-        titleLabel.snp.makeConstraints {
+        addSubview(sectionHeader)
+        sectionHeader.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         addSubview(cardView)
         cardView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.top.equalTo(sectionHeader.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
