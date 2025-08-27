@@ -28,7 +28,8 @@ final class TitleFieldContainerView: UIView {
         addSubview(textField)
 
         nameLabel.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         textField.snp.makeConstraints {

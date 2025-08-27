@@ -71,10 +71,11 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         scrollView.addSubview(contentView)
 
-        // 컨텐츠 뷰
+        // 컨텐츠 뷰       
         contentView.snp.makeConstraints {
-            $0.edges.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalToSuperview()
+            $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalTo(scrollView.contentLayoutGuide)
+            $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
 
         contentView.addSubview(addImageView)
