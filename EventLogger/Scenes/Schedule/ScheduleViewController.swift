@@ -45,20 +45,21 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let memoFieldview = MemoFieldContainerView()
 
     private let bottomButton = UIButton(configuration: .bottomButton)
-    
+
     private let selectedLocationRelay: PublishRelay<String>
-    
+
     // MARK: LifeCycle
+
     init(selectedLocationRelay: PublishRelay<String>) {
         self.selectedLocationRelay = selectedLocationRelay
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func setupUI() {
         view.backgroundColor = .systemBackground
 
@@ -175,7 +176,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
             .bind(to: locationFieldView.textLabel.rx.text)
             .disposed(by: disposeBag)
-            
+
         // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
             .when(.recognized)
@@ -183,7 +184,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.presentImagePicker()
             }
             .disposed(by: disposeBag)
-        
+
         // 이미지 삭제 라벨
         deleteLabel.rx.tapGesture()
             .when(.recognized)
@@ -192,7 +193,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
-        
+
         // 장소 입력 필드 탭 제스처
         locationFieldView.inputField.rx.tapGesture()
             .when(.recognized)
@@ -200,20 +201,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { AppStep.locationSearch($0) }
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
-        
+
         // 장소 입력 취소 탭 제스처
         locationFieldView.closeIcon.rx.tapGesture()
             .when(.recognized)
-            .map { _ in .selectLocation("")}
+            .map { _ in .selectLocation("") }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         // 장소 선택 릴레이
         selectedLocationRelay
-            .map { title in .selectLocation(title)}
+            .map { title in .selectLocation(title) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         // 수정의 경우 데이터 주입
         let item = reactor.currentState.eventItem
         guard let item else { return }
@@ -254,7 +255,7 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
 #Preview {
     @Dependency(\.eventItems) var eventItems
     let testItem = eventItems[2]
-    
+
     let relay = PublishRelay<String>()
 //    let reactor = ScheduleReactor(mode: .create)
     let reactor = ScheduleReactor(mode: .update(testItem))

@@ -5,12 +5,11 @@
 //  Created by Yoon on 8/27/25.
 //
 
-import UIKit
 import SnapKit
 import Then
+import UIKit
 
 final class LocationSearchSectionHeaderView: UICollectionReusableView {
-    
     let titleLabel = UILabel().then {
         $0.font = .font13Regular
         $0.textColor = .secondaryLabel
