@@ -33,6 +33,7 @@ class LocationSearchViewController: UIViewController {
     // MARK: MapKit
     private let completer = MKLocalSearchCompleter()
     private let completerResults = BehaviorRelay<[MKLocalSearchCompletion]>(value: [])
+    private let currentQuery = BehaviorRelay<String>(value: "")
     
     // MARK: LifeCycle
     init(selectedLocationRelay: PublishRelay<String>) {
@@ -60,6 +61,10 @@ class LocationSearchViewController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(searchBar)
         
+        collectionView.register(LocationSearchSectionHeaderView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "HeaderView")
+        
         searchBar.snp.makeConstraints {
             $0.top.equalToSuperview().offset(8)
             $0.leading.trailing.equalToSuperview().inset(16)
@@ -75,21 +80,35 @@ class LocationSearchViewController: UIViewController {
     private func bind() {
         // 입력 → completer.queryFragment 업데이트
         searchBar.rx.text.orEmpty
-            .skip(1)
+            .skip(1) // 최초 1회 스킵(입력 전)
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
+            .do(onNext: { [weak self] query in
+                guard let self else { return }
+                self.currentQuery.accept(query)
+            })
             .bind { [weak self] text in
-                self?.completer.queryFragment = text
+                guard let self else { return }
+                self.completer.queryFragment = text
             }
             .disposed(by: disposeBag)
         
         // completerResults → collectionView 반영
         completerResults
+            .withLatestFrom(currentQuery) { ($0, $1) }
             .observe(on: MainScheduler.instance)
-            .bind { [weak self] completions in
+            .bind { [weak self] (completions,query) in
                 guard let self = self else { return }
                 var snapshot = NSDiffableDataSourceSnapshot<LocationSection, LocationItem>()
-                snapshot.appendSections([.main])
+                
+                // 사용자 입력 섹션
+                if !query.trimmingCharacters(in: .whitespaces).isEmpty { // 쿼리가 있다면
+                    snapshot.appendSections([.custom])
+                    snapshot.appendItems([LocationItem(customTitle: query)], toSection: .custom)
+                }
+                
+                // 검색 결과 섹션
+                snapshot.appendSections([.searchResults])
                 let items = completions.map { LocationItem(completion: $0) }
                 snapshot.appendItems(items)
                 self.dataSource.apply(snapshot, animatingDifferences: false)
@@ -108,32 +127,74 @@ class LocationSearchViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    
     // MARK: CollectionView DataSource & Layout
     func makeDataSource(_ collectionView: UICollectionView) -> UICollectionViewDiffableDataSource<LocationSection, LocationItem> {
         
         // 셀 정의
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, LocationItem> { cell, _, item in
-            var content = UIListContentConfiguration.valueCell()
+            var content = cell.defaultContentConfiguration()
+            content.textProperties.font = .font17Regular
+            content.secondaryTextProperties.font = .font12Regular
             content.text = item.title
             content.secondaryText = item.subtitle
             content.secondaryTextProperties.color = .secondaryLabel
             content.secondaryTextProperties.numberOfLines = 1
             cell.contentConfiguration = content
         }
+        
         //데이터 소스 정의
         let dataSource = UICollectionViewDiffableDataSource<LocationSection, LocationItem>(
             collectionView: collectionView
         ) { collectionView, indexPath, item in
             collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
+        
+        dataSource.supplementaryViewProvider = { [weak dataSource] collectionView, kind, indexPath in
+            guard let section = dataSource?.sectionIdentifier(for: indexPath.section) else { return nil }
+            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderView", for: indexPath) as! LocationSearchSectionHeaderView
+            
+            switch section {
+            case .custom:
+                headerView.titleLabel.text = nil
+            case .searchResults:
+                headerView.titleLabel.text = "지도 위치"
+            }
+            return headerView
+            
+        }
+        
+        
         return dataSource
     }
     
     func makeLayout() -> UICollectionViewLayout {
-        let configuration = UICollectionLayoutListConfiguration(appearance: .plain) // 리스트형 레이아웃
-        return UICollectionViewCompositionalLayout { _, environment in
-            NSCollectionLayoutSection.list(using: configuration, layoutEnvironment: environment)
+        return UICollectionViewCompositionalLayout { sectionIndex, environment in
+            // config
+            var config = UICollectionLayoutListConfiguration(appearance: .plain)
+            config.showsSeparators = true
+            config.separatorConfiguration.topSeparatorVisibility = .visible
+            
+            // 섹션
+            let section = NSCollectionLayoutSection.list(
+                using: config,
+                layoutEnvironment: environment
+            )
+//            section.contentInsets = NSDirectionalEdgeInsets(top: 5, leading: 20, bottom: 5, trailing: 20)
+            
+            // 헤더
+            let header = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(30)),
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            header.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20)
+            
+            // 조건: .searchResults 섹션에만 헤더 표시
+            let currentSection = self.dataSource.snapshot().sectionIdentifiers[sectionIndex]
+            if currentSection == .searchResults {
+                section.boundarySupplementaryItems = [header]
+            }
+            return section
         }
         
     }
@@ -141,6 +202,7 @@ class LocationSearchViewController: UIViewController {
 }
 
 // MARK: MKLocalSearchCompleterDelegate
+// TODO: DelegateProxy로 변경
 extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         completerResults.accept(completer.results)
@@ -154,7 +216,8 @@ extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
 
 // MARK: CollectionView Section & Item
 enum LocationSection {
-    case main
+    case custom
+    case searchResults
 }
 
 // Item 정의 (MKMapItem + 직접 입력 문자열 모두 수용)
