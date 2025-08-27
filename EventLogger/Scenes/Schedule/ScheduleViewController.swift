@@ -171,6 +171,11 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 
+        reactor.state.map { $0.selectedLocation }
+            .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
+            .bind(to: locationFieldView.textLabel.rx.text)
+            .disposed(by: disposeBag)
+            
         // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
             .when(.recognized)
@@ -178,7 +183,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.presentImagePicker()
             }
             .disposed(by: disposeBag)
-
+        
+        // 이미지 삭제 라벨
         deleteLabel.rx.tapGesture()
             .when(.recognized)
             .bind { [weak self] _ in
@@ -187,16 +193,25 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
         
+        // 장소 입력 필드 탭 제스처
         locationFieldView.inputField.rx.tapGesture()
             .when(.recognized)
-            .map { _ in AppStep.locationSearch }
+            .withLatestFrom(reactor.state.map(\.selectedLocation))
+            .map { AppStep.locationSearch($0) }
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
+        // 장소 입력 취소 탭 제스처
+        locationFieldView.closeIcon.rx.tapGesture()
+            .when(.recognized)
+            .map { _ in .selectLocation("")}
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        // 장소 선택 릴레이
         selectedLocationRelay
-            .bind { [weak self] title in
-                self?.locationFieldView.textLabel.text = title
-            }
+            .map { title in .selectLocation(title)}
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         // 수정의 경우 데이터 주입

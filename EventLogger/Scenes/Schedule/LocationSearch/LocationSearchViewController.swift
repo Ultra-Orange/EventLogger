@@ -37,26 +37,24 @@ class LocationSearchViewController: UIViewController {
     // MARK: MapKit
     private let completer = MKLocalSearchCompleter()
     private let completerResults = BehaviorRelay<[MKLocalSearchCompletion]>(value: [])
-    private let currentQuery = BehaviorRelay<String>(value: "")
+    private let currentQuery: BehaviorRelay<String>
     
     // MARK: LifeCycle
-    init(selectedLocationRelay: PublishRelay<String>) {
+    init(selectedLocationRelay: PublishRelay<String>, initialQuery: String) {
         self.selectedLocationRelay = selectedLocationRelay
+        self.currentQuery = BehaviorRelay<String>(value: initialQuery)
         super.init(nibName: nil, bundle: nil)
     }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
+        // MKLocalSearchCompletion 세팅
         completer.delegate = self
         completer.resultTypes = [.pointOfInterest, .address] // 자동완성 강화
         
+        // 네비게이션 세팅
         navigationItem.title = "장소 검색"
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: cancelButton)
         
@@ -64,14 +62,18 @@ class LocationSearchViewController: UIViewController {
         bind()
     }
     
+    // MARK: SetupUI
     private func setupUI() {
+        // 뷰에 주입
         view.addSubview(collectionView)
         view.addSubview(searchBar)
         
+        // 헤더뷰 등록
         collectionView.register(LocationSearchSectionHeaderView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "HeaderView")
         
+        // 오토 레이아웃
         searchBar.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.leading.trailing.equalToSuperview()
@@ -85,17 +87,19 @@ class LocationSearchViewController: UIViewController {
     
     // Rx 바인딩
     private func bind() {
+        // 최초 값 바인딩
+        currentQuery.take(1).bind(to: completer.rx.queryFragment).disposed(by: disposeBag)
+        currentQuery.take(1).bind(to: searchBar.rx.text).disposed(by: disposeBag)
+        
         // 입력 → completer.queryFragment 업데이트
         searchBar.rx.text.orEmpty
             .skip(1) // 최초 1회 스킵(입력 전)
             .debounce(.milliseconds(300), scheduler: MainScheduler.instance)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
             .distinctUntilChanged()
-            .do(onNext: { [weak self] query in
-                guard let self else { return }
-                self.currentQuery.accept(query)
-            })
             .bind { [weak self] text in
                 guard let self else { return }
+                self.currentQuery.accept(text)
                 self.completer.queryFragment = text
             }
             .disposed(by: disposeBag)
@@ -122,7 +126,7 @@ class LocationSearchViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        // 선택 시  Relay 전달
+        // 선택 시 Relay 전달
         collectionView.rx.itemSelected
             .withUnretained(self)
             .bind { `self`, indexPath in
@@ -162,6 +166,7 @@ class LocationSearchViewController: UIViewController {
             collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
         
+        // 섹션 헤더 정의
         dataSource.supplementaryViewProvider = { [weak dataSource] collectionView, kind, indexPath in
             guard let section = dataSource?.sectionIdentifier(for: indexPath.section) else { return nil }
             let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "HeaderView", for: indexPath) as! LocationSearchSectionHeaderView
@@ -175,11 +180,9 @@ class LocationSearchViewController: UIViewController {
             return headerView
             
         }
-        
-        
         return dataSource
     }
-    
+
     func makeLayout() -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, environment in
             // config
@@ -210,6 +213,11 @@ class LocationSearchViewController: UIViewController {
             return section
         }
         
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
 }

@@ -34,8 +34,8 @@ final class AppFlow: Flow {
             return navigateToSchedule(mode: .create)
         case let .updateSchedule(item):
             return navigateToSchedule(mode: .update(item))
-        case .locationSearch:
-            return navigateToLocationSearch()
+        case let .locationSearch(string):
+            return navigateToLocationSearch(query: string)
         }
     }
 
@@ -78,9 +78,10 @@ final class AppFlow: Flow {
         )
     }
     
-    private func navigateToLocationSearch() -> FlowContributors {
+    private func navigateToLocationSearch(query: String) -> FlowContributors {
         let vc = LocationSearchViewController(
-            selectedLocationRelay: selectedLocationRelay
+            selectedLocationRelay: selectedLocationRelay,
+            initialQuery: query
         )
         
         let nav = UINavigationController(rootViewController: vc)
