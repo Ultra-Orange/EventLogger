@@ -11,21 +11,37 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class CategoryContainerView: UIView {
+final class CategoryFieldContainerView: UIView {
+    
+    // 외부 주입
+    var categories: [Category] = [] {
+        didSet {
+            dropdown.categories = categories
+        }
+    }
+    
+    // 현재 선택
+    var selectedCategory: Category? {
+        get { dropdown.selectedCategory }
+        set { dropdown.selectedCategory = newValue }
+    }
+    
+    // 선택 이벤트 (외부 구독용)
+    var selectionChanged: Observable<Category> {
+        dropdown.selectionRelay.asObservable()
+    }
     
     let sectionHeader = UILabel().then {
         $0.text = "카테고리"
         $0.font = .font13Regular
         $0.textColor = .white
     }
-
-    // TODO: UIControl 상속으로 입력필드 변경
-    let textField = AppTextField()
+    
+    private let dropdown = CategoryDropDownButton()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        
     }
 
     @available(*, unavailable)
@@ -35,20 +51,21 @@ final class CategoryContainerView: UIView {
     
     private func setupUI() {
         addSubview(sectionHeader)
-        addSubview(textField)
+        addSubview(dropdown)
 
         sectionHeader.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(16)
         }
 
-        textField.snp.makeConstraints {
+        dropdown.snp.makeConstraints {
             $0.top.equalTo(sectionHeader.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(44)
         }
     }
 }
 
 #Preview {
-    CategoryContainerView()
+    CategoryFieldContainerView()
 }
