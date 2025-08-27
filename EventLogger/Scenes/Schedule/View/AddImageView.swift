@@ -21,32 +21,32 @@ final class AddImageView: UIView {
         $0.font = .font16Regular
     }
 
-    private let iconAndLabelContainer = UIImageView()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         addSubview(imageContainerView)
-        imageContainerView.addSubview(iconAndLabelContainer)
-        iconAndLabelContainer.addSubview(photoBadgeIcon)
-        iconAndLabelContainer.addSubview(textLabel)
+        imageContainerView.addSubview(photoBadgeIcon)
+        imageContainerView.addSubview(textLabel)
 
         imageContainerView.snp.makeConstraints {
             $0.directionalEdges.equalToSuperview()
             $0.height.equalTo(self.snp.width)
         }
-
-        iconAndLabelContainer.snp.makeConstraints {
+        
+        let layoutGuide = UILayoutGuide()
+        addLayoutGuide(layoutGuide)
+        
+        layoutGuide.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
-
+        
         photoBadgeIcon.snp.makeConstraints {
-            $0.top.centerX.equalToSuperview()
+            $0.top.centerX.equalTo(layoutGuide)
         }
 
         textLabel.snp.makeConstraints {
             $0.top.equalTo(photoBadgeIcon.snp.bottom).offset(16)
-            $0.centerX.bottom.equalToSuperview()
+            $0.leading.trailing.bottom.equalTo(layoutGuide)
         }
     }
 

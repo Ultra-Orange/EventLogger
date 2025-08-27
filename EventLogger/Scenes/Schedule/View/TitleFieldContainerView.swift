@@ -10,7 +10,7 @@ import Then
 import UIKit
 
 final class TitleFieldContainerView: UIView {
-    let label = UILabel().then {
+    private let nameLabel = UILabel().then {
         $0.text = "제목"
         $0.font = .font13Regular
     }
@@ -24,15 +24,16 @@ final class TitleFieldContainerView: UIView {
 
         textField.rightViewMode = .always
 
-        addSubview(label)
+        addSubview(nameLabel)
         addSubview(textField)
 
-        label.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+        nameLabel.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         textField.snp.makeConstraints {
-            $0.top.equalTo(label.snp.bottom).offset(8)
+            $0.top.equalTo(nameLabel.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
             $0.height.equalTo(45)
         }

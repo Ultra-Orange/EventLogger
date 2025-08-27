@@ -56,4 +56,16 @@ extension UIButton.Configuration {
         }
         return config
     }
+    
+    // 네비게이션 닫기 버튼
+    static var navCancel: UIButton.Configuration {
+        var config = plain()
+        config.titleTextAttributesTransformer = .init { attr in
+            var newAttr = attr
+            newAttr.font = UIFont.font16Regular
+            newAttr.foregroundColor = .systemRed
+            return newAttr
+        }
+        return config
+    }
 }

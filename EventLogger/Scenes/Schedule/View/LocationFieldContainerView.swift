@@ -10,28 +10,58 @@ import Then
 import UIKit
 
 final class LocationFieldContainerView: UIView {
-    let label = UILabel().then {
+    private let nameLabel = UILabel().then {
         $0.text = "장소"
         $0.font = .font13Regular
     }
 
-    // TODO: UIControll 상속으로 입력필드 변경
-    let textField = AppTextField()
+    var textLabel = UILabel().then {
+        $0.font = .font17Regular
+        $0.textColor = .label
+        $0.text = "장소를 입력하세요"
+        $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+    }
+
+    let inputField = UIView().then {
+        $0.layer.borderColor = UIColor.white.cgColor
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 10
+    }
+
+    let closeIcon = UIImageView(image: UIImage.symbolXCircleFill(config: .font16Regular)).then {
+        $0.contentMode = .center
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
 
     init() {
         super.init(frame: .zero)
 
-        addSubview(label)
-        addSubview(textField)
+        addSubview(nameLabel)
+        addSubview(inputField)
 
-        label.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+        nameLabel.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
-        textField.snp.makeConstraints {
-            $0.top.equalTo(label.snp.bottom).offset(8)
+        inputField.snp.makeConstraints {
+            $0.top.equalTo(nameLabel.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
-            $0.height.equalTo(40)
+            $0.height.equalTo(44)
+        }
+
+        inputField.addSubview(textLabel)
+        addSubview(closeIcon)
+
+        textLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.trailing.equalTo(closeIcon.snp.leading)
+            $0.top.bottom.equalToSuperview().inset(10)
+        }
+
+        closeIcon.snp.makeConstraints {
+            $0.trailing.top.bottom.equalTo(inputField)
+            $0.width.equalTo(40)
         }
     }
 

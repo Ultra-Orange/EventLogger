@@ -44,6 +44,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     private let bottomButton = UIButton(configuration: .bottomButton)
 
+    private let selectedLocationRelay: PublishRelay<String>
+
+    // MARK: LifeCycle
+
+    init(selectedLocationRelay: PublishRelay<String>) {
+        self.selectedLocationRelay = selectedLocationRelay
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func setupUI() {
         view.backgroundColor = .systemBackground
 
@@ -57,10 +71,11 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         scrollView.addSubview(contentView)
 
-        // 컨텐츠 뷰
+        // 컨텐츠 뷰       
         contentView.snp.makeConstraints {
-            $0.edges.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalToSuperview()
+            $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalTo(scrollView.contentLayoutGuide)
+            $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
 
         contentView.addSubview(addImageView)
@@ -87,7 +102,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.equalToSuperview() 
             $0.height.equalTo(addImageView.snp.height)
         }
 
@@ -142,6 +157,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
+        
+        // 장소 선택 바인딩
+        reactor.state.map { $0.selectedLocation }
+            .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
+            .bind(to: locationFieldView.textLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        // 장소 선택 empty면 버튼 히든
+        reactor.state
+            .map(\.selectedLocation)
+            .distinctUntilChanged()
+            .map { $0.isEmpty }
+            .bind(to: locationFieldView.closeIcon.rx.isHidden)
+            .disposed(by: disposeBag)
 
         // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
@@ -151,12 +180,34 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+        // 이미지 삭제 라벨
         deleteLabel.rx.tapGesture()
             .when(.recognized)
             .bind { [weak self] _ in
                 self?.imageView.image = nil
                 self?.deleteLabel.isHidden = true
             }
+            .disposed(by: disposeBag)
+
+        // 장소 입력 필드 탭 제스처
+        locationFieldView.inputField.rx.tapGesture()
+            .when(.recognized)
+            .withLatestFrom(reactor.state.map(\.selectedLocation))
+            .map { AppStep.locationSearch($0) }
+            .bind(to: reactor.steps)
+            .disposed(by: disposeBag)
+
+        // 장소 입력 취소 탭 제스처
+        locationFieldView.closeIcon.rx.tapGesture()
+            .when(.recognized)
+            .map { _ in .selectLocation("") }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // 장소 선택 릴레이
+        selectedLocationRelay
+            .map { title in .selectLocation(title) }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
         dateRangeFieldView.startDateChanged
@@ -223,9 +274,11 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
 #Preview {
     @Dependency(\.eventItems) var eventItems
     let testItem = eventItems[2]
+
+    let relay = PublishRelay<String>()
 //    let reactor = ScheduleReactor(mode: .create)
     let reactor = ScheduleReactor(mode: .update(testItem))
-    UINavigationController(rootViewController: ScheduleViewController().then {
+    UINavigationController(rootViewController: ScheduleViewController(selectedLocationRelay: relay).then {
         $0.reactor = reactor
     })
 }
