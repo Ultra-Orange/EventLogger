@@ -155,7 +155,8 @@ final class DateRangeFieldContainerView: UIView {
     private func setupUI() {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         addSubview(cardView)
@@ -261,27 +262,33 @@ final class DateRangeFieldContainerView: UIView {
         activePanel = (activePanel == panel) ? .none : panel
     }
     
-    /// 날짜 패널 <-> 시간 패널 보여지는 것 업데이트하는 함수
+    /// 날짜/시간 패널의 보여짐/숨겨짐을 업데이트하는 함수
     private func updatePanelVisibility(animated: Bool) {
-        let showStartDate = (activePanel == .startDate)
-        let showStartTime = (activePanel == .startTime)
-        let showEndDate   = (activePanel == .endDate)
-        let showEndTime   = (activePanel == .endTime)
-        
-        startDateButton.isSelected = showStartDate
-        startTimeButton.isSelected = showStartTime
-        endDateButton.isSelected   = showEndDate
-        endTimeButton.isSelected   = showEndTime
-        [startDateButton, startTimeButton, endDateButton, endTimeButton]
-            .forEach { $0.setNeedsUpdateConfiguration() }
-        
+
+        // 버튼과 피커, 패널 하나로 묶어 관리
+        let panelItems: [(button: UIButton, picker: UIView, panel: ActivePanel)] = [
+            (startDateButton, startDatePicker, .startDate),
+            (startTimeButton, startTimePicker, .startTime),
+            (endDateButton, endDatePicker, .endDate),
+            (endTimeButton, endTimePicker, .endTime)
+        ]
+
         let changes = {
-            self.startDatePicker.isHidden = !showStartDate
-            self.startTimePicker.isHidden = !showStartTime
-            self.endDatePicker.isHidden   = !showEndDate
-            self.endTimePicker.isHidden   = !showEndTime
+            for item in panelItems {
+                let shouldBeHidden = (self.activePanel != item.panel)
+                
+                item.button.isSelected = !shouldBeHidden // 버튼의 선택 상태를 활성 패널과 일치시킴
+                
+                // `isHidden` 상태가 변경될 때만 값을 할당하여 레이아웃 혼란을 방지
+                if item.picker.isHidden != shouldBeHidden {
+                    item.picker.isHidden = shouldBeHidden
+                }
+            }
+            
             self.layoutIfNeeded()
         }
+
+        // 애니메이션 여부에 따라 UI 업데이트 실행
         guard animated else { changes(); return }
         UIView.animate(withDuration: 0.25, animations: changes)
     }
@@ -290,6 +297,7 @@ final class DateRangeFieldContainerView: UIView {
 
     func setStart(_ date: Date, propagate: Bool) {
         startDate = date
+        // 종료 시간을 시작 시간보다 앞으로 두려고 하면 시작 시간 한시간 뒤로 강제함
         if endDate < startDate {
             endDate = Calendar.current.date(byAdding: .hour, value: 1, to: startDate) ?? startDate.addingTimeInterval(3600)
         }
@@ -336,11 +344,8 @@ final class DateRangeFieldContainerView: UIView {
         let day = calendar.dateComponents([.year, .month, .day], from: date)
         let time = calendar.dateComponents([.hour, .minute, .second], from: ref)
         var components = DateComponents()
-        components.year = day.year
-        components.month = day.month
-        components.day = day.day
-        components.hour = time.hour
-        components.minute = time.minute
+        components.year = day.year; components.month = day.month; components.day = day.day
+        components.hour = time.hour; components.minute = time.minute
         components.second = 0
         return calendar.date(from: components) ?? date
     }
