@@ -18,7 +18,7 @@ struct SwiftDataManager {
         do {
             try modelContext.save()
         } catch {
-            assertionFailure("🚨 SwiftData 저장 실패: \(error.localizedDescription)")
+            assertionFailure("SwiftData 저장 실패: \(error.localizedDescription)")
         }
     }
 
