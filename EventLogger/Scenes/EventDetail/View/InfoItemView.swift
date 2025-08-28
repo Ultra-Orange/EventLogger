@@ -177,6 +177,7 @@ class InfoItemView: UIView {
         locationLabel.text = "TODO: 추후구현"
         artistsLabel.text = makeArtistsLabel(eventItem.artists)
         expenseLabel.text = "\(eventItem.expense.formatted(.number))원"
+        
     }
 
     // 시간 라벨 String 리턴
