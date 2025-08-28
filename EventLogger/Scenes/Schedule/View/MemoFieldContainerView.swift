@@ -2,7 +2,7 @@
 //  MemoFieldContainerView.swift
 //  EventLogger
 //
-//  Created by Yoon on 8/24/25.
+//  Created by 김우성 on 8/28/25.
 //
 
 import SnapKit
@@ -26,11 +26,23 @@ final class MemoFieldContainerView: UIView {
         $0.backgroundColor = .systemGray5
         $0.font = .font17Regular
         $0.layer.cornerRadius = 10
+        $0.textContainerInset = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
     }
+    
+    private var textViewHeightConstraint: Constraint?
 
     init() {
         super.init(frame: .zero)
+        setupUI()
+        textView.inputAccessoryView = makeDoneToolbar(target: self, action: #selector(dismissKeyboard))
+    }
 
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private func setupUI() {
         addSubview(label)
         addSubview(textView)
 
@@ -46,8 +58,7 @@ final class MemoFieldContainerView: UIView {
         }
     }
 
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    @objc private func dismissKeyboard() {
+        textView.endEditing(true)
     }
 }

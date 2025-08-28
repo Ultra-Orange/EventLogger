@@ -2,7 +2,7 @@
 //  ExpenseFieldContainerView.swift
 //  EventLogger
 //
-//  Created by Yoon on 8/24/25.
+//  Created by 김우성 on 8/28/25.
 //
 
 import SnapKit
@@ -29,16 +29,16 @@ final class ExpenseFieldContainerView: UIView {
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupUI() {
         addSubview(label)
         label.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(16)
         }
-        
+
         textField.delegate = self
-        
+
         addSubview(textField)
         textField.snp.makeConstraints {
             $0.top.equalTo(label.snp.bottom).offset(8)
@@ -53,9 +53,9 @@ extension ExpenseFieldContainerView: UITextFieldDelegate {
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-        
+
         if updatedText.isEmpty { return true } // 백스페이스 허용
-        
+
         if Int(updatedText) != nil {
             return true // 정수
         } else if Double(updatedText) != nil {

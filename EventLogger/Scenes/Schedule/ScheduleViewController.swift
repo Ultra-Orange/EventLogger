@@ -19,7 +19,9 @@ import UIKit
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
 
-    private let scrollView = UIScrollView()
+    private let scrollView = UIScrollView().then {
+        $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
+    }
     private let contentView = UIView()
 
     private let addImageView = AddImageView()
@@ -39,8 +41,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let dateRangeFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
-    private let expnsesFieldView = ExpenseFieldContainerView()
-    private let memoFieldview = MemoFieldContainerView()
+    private let expensesFieldView = ExpenseFieldContainerView()
+    private let memoFieldView = MemoFieldContainerView()
 
     private let bottomButton = UIButton(configuration: .bottomButton)
 
@@ -86,8 +88,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(dateRangeFieldView)
         contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
-        contentView.addSubview(expnsesFieldView)
-        contentView.addSubview(memoFieldview)
+        contentView.addSubview(expensesFieldView)
+        contentView.addSubview(memoFieldView)
         contentView.addSubview(bottomButton)
 
         // 삭제 라벨 히든/사용불가 처리
@@ -136,18 +138,18 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        expnsesFieldView.snp.makeConstraints {
+        expensesFieldView.snp.makeConstraints {
             $0.top.equalTo(artistsFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
-        memoFieldview.snp.makeConstraints {
-            $0.top.equalTo(expnsesFieldView.snp.bottom).offset(30)
+        memoFieldView.snp.makeConstraints {
+            $0.top.equalTo(expensesFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(memoFieldview.snp.bottom).offset(30)
+            $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(48)
             $0.bottom.equalToSuperview()
