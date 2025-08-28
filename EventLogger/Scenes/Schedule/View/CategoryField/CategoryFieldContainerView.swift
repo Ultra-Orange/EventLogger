@@ -5,14 +5,13 @@
 //  Created by 김우성 on 8/27/25.
 //
 
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 import UIKit
-import RxSwift
-import RxCocoa
 
 final class CategoryFieldContainerView: UIView {
-    
     // 선택 이벤트 (외부 구독용)
     var selectionChanged: Observable<Category> {
         categoryMenuButton.selectionRelay.asObservable()

@@ -40,4 +40,16 @@ extension UIImage {
             .withConfiguration(config)
             .withTintColor(color, renderingMode: .alwaysOriginal)
     }
+    
+    // 카테고리 색 점 아이콘 생성 유틸
+    static func circle(diameter: CGFloat, color: UIColor) -> UIImage {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(size: .init(width: diameter, height: diameter), format: format)
+        return renderer.image { _ in
+            let rect = CGRect(origin: .zero, size: .init(width: diameter, height: diameter))
+            color.setFill()
+            UIBezierPath(ovalIn: rect).fill()
+        }.withRenderingMode(.alwaysOriginal)
+    }
 }
