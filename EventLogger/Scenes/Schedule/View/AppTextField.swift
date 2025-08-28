@@ -54,8 +54,9 @@ final class AppTextField: UITextField {
         
         toolbar.items = [flexible, done]
         toolbar.sizeToFit()
+        toolbar.backgroundColor = .secondarySystemBackground
         
-//        textField.inputAccessoryView = toolbar
+        self.inputAccessoryView = toolbar
     }
     
     @objc private func doneTapped() {
