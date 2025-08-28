@@ -11,8 +11,8 @@ import RxCocoa
 
 final class CategoryDropDownButton: UIView {
     
-    var categories: [Category] = []
-    var selectedCategory: Category?
+    private(set) var categories: [Category] = [] // private(set) var: 읽기는 퍼블릭, 쓰기는 private
+    private(set) var selectedCategory: Category?
     
     let selectionRelay = PublishRelay<Category>()
     
@@ -45,6 +45,7 @@ final class CategoryDropDownButton: UIView {
         button.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
+    // 카테고리/초기값 구성
     func configure(categories: [Category], initial: Category? = nil) {
         self.categories = categories
         self.selectedCategory = initial ?? categories.first
@@ -63,6 +64,12 @@ final class CategoryDropDownButton: UIView {
         
         // 버튼에 초기 선택사항 반영 (PublishRelay이므로 초기 방출은 X)
         applySelectionToButton()
+    }
+    
+    /// 외부에서 선택을 프로그램적으로 변경하고 싶을 때 사용
+    func select(category: Category) {
+        guard categories.contains(category) else { return }
+        updateSelection(to: category)
     }
     
     private func updateSelection(to category: Category) {

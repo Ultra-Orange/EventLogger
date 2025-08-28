@@ -13,19 +13,6 @@ import RxCocoa
 
 final class CategoryFieldContainerView: UIView {
     
-    // 외부 주입
-    var categories: [Category] = [] {
-        didSet {
-            categoryMenuButton.categories = categories
-        }
-    }
-    
-    // 현재 선택
-    var selectedCategory: Category? {
-        get { categoryMenuButton.selectedCategory }
-        set { categoryMenuButton.selectedCategory = newValue }
-    }
-    
     // 선택 이벤트 (외부 구독용)
     var selectionChanged: Observable<Category> {
         categoryMenuButton.selectionRelay.asObservable()
@@ -77,8 +64,30 @@ final class CategoryFieldContainerView: UIView {
             $0.height.equalTo(44)
         }
     }
+    
+    func configure(categories: [Category], initial: Category? = nil) {
+        categoryMenuButton.configure(categories: categories, initial: initial)
+    }
+    
+    var selecatedCategory: Category? {
+        return categoryMenuButton.selectedCategory
+    }
+    
+    func select(category: Category) {
+        categoryMenuButton.select(category: category)
+    }
 }
 
 #Preview {
-    CategoryFieldContainerView()
+    let view = CategoryFieldContainerView()
+    // Preview에서는 임시로 샘플 주입
+    let categories: [Category] = [
+        Category(id: UUID(), name: "팬미팅", position: 0, color: .green),
+        Category(id: UUID(), name: "뮤지컬", position: 1, color: .purple),
+        Category(id: UUID(), name: "연극", position: 2, color: .yellow),
+        Category(id: UUID(), name: "페스티벌", position: 3, color: .blue),
+        Category(id: UUID(), name: "콘서트", position: 4, color: .cyan),
+    ]
+    view.configure(categories: categories, initial: categories.first)
+    return view
 }
