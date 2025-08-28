@@ -16,9 +16,9 @@ struct EventItem: Hashable {
     var endTime: Date // 종연시간
     var location: String? // 장소
     var artists: [String] // 아티스트
-    var expense: Double? // TODO: 토털은 원화변환
-    var currency: String? // TODO: MVP까지는 KRW단일
-    var memo: String? // 메모
+    var expense: Double // TODO: 토털은 원화변환
+    var currency: String // TODO: MVP까지는 KRW단일
+    var memo: String // 메모
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
