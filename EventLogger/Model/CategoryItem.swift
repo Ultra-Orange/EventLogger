@@ -9,21 +9,20 @@ import UIKit
 
 // 앱에서 사용하는 카테고리용 도메인 모델
 struct CategoryItem: Hashable {
-    let id: UUID
     var name: String
     var position: Int
     var colorId: Int
-    
-    var color: UIColor{
+
+    var color: UIColor {
         CategoryColor(rawValue: colorId)?.uiColor ?? .systemGray
     }
-    
+
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(name)
     }
 
     static func == (lhs: CategoryItem, rhs: CategoryItem) -> Bool {
-        return lhs.id == rhs.id
+        return lhs.name == rhs.name
     }
 }
 
@@ -31,7 +30,6 @@ struct CategoryItem: Hashable {
 extension CategoryItem {
     func toPersistent() -> CategoryStore {
         CategoryStore(
-            id: id,
             name: name,
             position: position,
             colorId: colorId
@@ -46,7 +44,7 @@ enum CategoryColor: Int, CaseIterable {
     case yellow = 2
     case purple = 3
     case green = 4
-    
+
     var uiColor: UIColor {
         switch self {
         case .red: return UIColor.systemRed

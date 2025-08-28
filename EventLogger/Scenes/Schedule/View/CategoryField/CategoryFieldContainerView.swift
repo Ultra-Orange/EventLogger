@@ -33,11 +33,11 @@ final class CategoryFieldContainerView: UIView {
         setupUI()
         
         let categories: [CategoryItem] = [
-            CategoryItem(id: UUID(), name: "팬미팅", position: 0, colorId: 0),
-            CategoryItem(id: UUID(), name: "뮤지컬", position: 1, colorId: 1),
-            CategoryItem(id: UUID(), name: "연극", position: 2, colorId: 2),
-            CategoryItem(id: UUID(), name: "페스티벌", position: 3, colorId: 3),
-            CategoryItem(id: UUID(), name: "콘서트", position: 4, colorId: 4),
+            CategoryItem(name: "팬미팅", position: 0, colorId: 0),
+            CategoryItem(name: "뮤지컬", position: 1, colorId: 1),
+            CategoryItem(name: "연극", position: 2, colorId: 2),
+            CategoryItem(name: "페스티벌", position: 3, colorId: 3),
+            CategoryItem(name: "콘서트", position: 4, colorId: 4),
         ]
         
         categoryMenuButton.configure(categories: categories)

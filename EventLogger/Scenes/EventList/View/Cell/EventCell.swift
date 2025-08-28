@@ -75,7 +75,6 @@ struct EventCell: View { // EventItem 통으로 받자
             id: UUID(),
             title: "YOASOBI ZEPP TOUR 2024 POP OUT 東京公演 2日目",
             category: CategoryItem(
-                id: UUID(),
                 name: "콘서트",
                 position: 0,
                 colorId: 0
