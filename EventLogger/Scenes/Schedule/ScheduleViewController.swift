@@ -35,7 +35,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     private let inputTitleView = TitleFieldContainerView()
-    private let categoryFieldView = CategoryContainerView()
+    private let categoryFieldView = CategoryFieldContainerView()
     private let dateRangeFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
