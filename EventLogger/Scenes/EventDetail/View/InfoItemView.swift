@@ -176,11 +176,8 @@ class InfoItemView: UIView {
         timelabel.text = makeTimeLabel(startTime: eventItem.startTime, endTime: eventItem.endTime)
         locationLabel.text = "TODO: 추후구현"
         artistsLabel.text = makeArtistsLabel(eventItem.artists)
-        if let expense = eventItem.expense {
-            expenseLabel.text = "\(expense.formatted(.number))원"
-        } else {
-            expenseLabel.text = "0원"
-        }
+        expenseLabel.text = "\(eventItem.expense.formatted(.number))원"
+        
     }
 
     // 시간 라벨 String 리턴
