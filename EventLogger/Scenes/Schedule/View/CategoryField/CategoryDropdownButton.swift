@@ -9,18 +9,30 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class CategoryDropDownButton: UIButton {
+final class CategoryDropDownButton: UIView {
     
-    var categories: [Category] = [] { didSet { rebuildMenu() } }
-    var selectedCategory: Category? { didSet { applySelection(animated: true) } }
-    var placeholder: String = "선택하세요" { didSet { applySelection(animated: false) } }
+    var categories: [Category] = []
+    var selectedCategory: Category?
     
     let selectionRelay = PublishRelay<Category>()
+    
+    private let button = UIButton(type: .system).then {
+        var config = UIButton.Configuration.filled()
+        config.title = "선택하세요" // 항상 카테고리 맨 첫번째 것으로 선택되어있도록 바꿔야 할 필요
+        config.baseBackgroundColor = .systemGray5
+        config.titleAlignment = .leading
+        config.imagePlacement = .trailing
+        config.imagePadding = 8
+        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+        $0.configuration = config
+        $0.contentHorizontalAlignment = .leading
+        $0.showsMenuAsPrimaryAction = true
+        $0.changesSelectionAsPrimaryAction = true
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        setupBehavior()
     }
     
     @available(*, unavailable)
@@ -29,74 +41,58 @@ final class CategoryDropDownButton: UIButton {
     }
     
     private func setupUI() {
-        var config = UIButton.Configuration.filled()
-        config.baseBackgroundColor = .systemGray5
-        config.baseForegroundColor = .white
-        config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
-        config.cornerStyle = .large
-        config.imagePlacement = .trailing
-        config.imagePadding = 8
-        config.image = UIImage(systemName: "chevron.up.chevron.down")
-        self.configuration = config
-        
-        layer.cornerRadius = 10
-        clipsToBounds = true
-        
-        // 초기 텍스트
-        applySelection(animated: false)
-        setNeedsUpdateConfiguration()
+        addSubview(button)
+        button.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
-    private func setupBehavior() {
-        showsMenuAsPrimaryAction = true // 탭하면 메뉴 바로 표시
-    }
-    
-    private func rebuildMenu() {
-        let items = categories.sorted { $0.position < $1.position }
+    func configure(categories: [Category], initial: Category? = nil) {
+        self.categories = categories
+        self.selectedCategory = initial ?? categories.first
         
-        let actions: [UIAction] = items.map { [weak self] category in
-            guard let self else { return UIAction(title: category.name, handler: { _ in }) }
-            
-            let checked = (category == self.selectedCategory)
-            let colorDot = UIImage.circle(diameter: 10, color: category.color)
-            
-            return UIAction(title: category.name, image: colorDot, state: checked ? .on : .off) { _ in
-                self.selectedCategory = category
-                self.selectionRelay.accept(category)
+        // UIAction 생성
+        let actions: [UIAction] = categories.map { category in
+            let image = UIImage.circle(diameter: 16, color: category.color)
+            let state: UIMenuElement.State = (category == selectedCategory) ? .on : .off
+            return UIAction(title: category.name, image: image, state: state) { [weak self] _ in
+                self?.updateSelection(to: category)
             }
         }
         
-        self.menu = UIMenu(
+        // 단일 선택 메뉴
+        button.menu = UIMenu(title: "", options: [.singleSelection], children: actions)
+        
+        // 버튼에 초기 선택사항 반영 (PublishRelay이므로 초기 방출은 X)
+        applySelectionToButton()
+    }
+    
+    private func updateSelection(to category: Category) {
+        selectedCategory = category
+        
+        // 메뉴 state 업데이트
+        button.menu = UIMenu(
             title: "",
-            options: .displayInline,
-            children: actions.isEmpty ? [UIAction(title: "항목 없음", attributes: [.disabled], handler: { _ in })] : actions
-        )
-    }
-    
-    private func applySelection(animated: Bool) {
-        var config = self.configuration ?? .filled()
-        let title = selectedCategory?.name ?? placeholder
-        config.title = title
-        config.attributedTitle = AttributedString(title, attributes: .init([
-            .font: UIFont.font17Regular,
-            .foregroundColor: UIColor.white
-        ]))
-        config.image = UIImage(systemName: "chevron.up.chevron.down")
-        self.configuration = config
-        
-        // 살짝 탭 피드백 애니메이션 (?)
-        if animated {
-            UIView.animate(withDuration: 0.08, animations: { self.alpha = 0.85 }) { _ in
-                UIView.animate(withDuration: 0.12) { self.alpha = 1 }
+            options: [.singleSelection],
+            children: categories.map { choice in
+                let image = UIImage.circle(diameter: 16, color: choice.color)
+                let state: UIMenuElement.State = (choice == category) ? .on : .off
+                return UIAction(title: choice.name, image: image, state: state) { [weak self] _ in
+                    self?.updateSelection(to: choice)
+                }
             }
-        }
+        )
         
-        // 선택이 바뀌면 체크 상태 반영을 위해 메뉴 재생성
-        rebuildMenu()
+        applySelectionToButton()
+        
+        selectionRelay.accept(category)
     }
     
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: UIView.noIntrinsicMetric, height: 44) // 텍스트필드처럼 44 고정 높이
+    private func applySelectionToButton() {
+        guard var config = button.configuration else { return }
+        if let selectedCategory {
+            config.title = selectedCategory.name
+            config.image = UIImage.circle(diameter: 16, color: selectedCategory.color)
+        }
+        button.configuration = config
     }
 }
 
