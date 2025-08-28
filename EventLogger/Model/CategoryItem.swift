@@ -1,5 +1,5 @@
 //
-//  Category.swift
+//  CategoryItem.swift
 //  EventLogger
 //
 //  Created by Yoon on 8/21/25.
@@ -7,7 +7,8 @@
 
 import UIKit
 
-struct Category: Hashable {
+// 앱에서 사용하는 카테고리용 도메인 모델
+struct CategoryItem: Hashable {
     let id: UUID
     var name: String
     var position: Int
@@ -21,12 +22,13 @@ struct Category: Hashable {
         hasher.combine(id)
     }
 
-    static func == (lhs: Category, rhs: Category) -> Bool {
+    static func == (lhs: CategoryItem, rhs: CategoryItem) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-extension Category {
+// 도메인 to SwiftData모델
+extension CategoryItem {
     func toPersistent() -> CategoryStore {
         CategoryStore(
             id: id,
@@ -37,23 +39,21 @@ extension Category {
     }
 }
 
-
+// TODO: 컬러코드 완성되면 수정
 enum CategoryColor: Int, CaseIterable {
     case red = 0
-    case orange = 1
-    case blue = 2
-    case green = 3
-    case yellow = 4
-    case cyan = 5
+    case blue = 1
+    case yellow = 2
+    case purple = 3
+    case green = 4
     
     var uiColor: UIColor {
         switch self {
         case .red: return UIColor.systemRed
-        case .orange: return UIColor.systemOrange
         case .blue: return UIColor.systemBlue
-        case .green: return UIColor.systemGreen
         case .yellow: return UIColor.systemYellow
-        case .cyan: return UIColor.systemCyan
+        case .purple: return UIColor.systemOrange
+        case .green: return UIColor.systemGreen
         }
     }
 }

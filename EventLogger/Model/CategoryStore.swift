@@ -23,10 +23,11 @@ final class CategoryStore {
     }
 }
 
+// SwiftData to 도메인
 extension CategoryStore {
-    func toDomain() -> Category? {
+    func toDomain() -> CategoryItem? {
         guard let categoryColor = CategoryColor(rawValue: colorId) else { return nil }
-        return Category(
+        return CategoryItem(
             id: id,
             name: name,
             position: position,

@@ -39,7 +39,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "YOASOBI ZEPP TOUR 2024 POP OUT 東京公演 2日目",
-            category: Category(
+            category: CategoryItem(
                 id: UUID.init(),
                 name: "콘서트",
                 position: 0,
@@ -71,7 +71,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "THE IDOLM@STER CINDERELLA GIRLS UNIT LIVE TOUR ConnecTrip! @TOKYO",
-            category: Category(
+            category: CategoryItem(
                 id: UUID.init(),
                 name: "콘서트",
                 position: 0,
@@ -93,7 +93,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "(X) 2025 HAN SEON HWA FANMEETING 〈어트랙티브 선화log〉",
-            category: Category(
+            category: CategoryItem(
                 id: UUID.init(),
                 name: "팬미팅",
                 position: 1,
@@ -126,7 +126,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "2025 부산국제록페스티벌 1일차",
-            category: Category(
+            category: CategoryItem(
                     id: UUID.init(),
                     name: "페스티벌",
                     position: 2,

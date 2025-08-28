@@ -13,7 +13,7 @@ import UIKit
 
 final class CategoryFieldContainerView: UIView {
     // 선택 이벤트 (외부 구독용)
-    var selectionChanged: Observable<Category> {
+    var selectionChanged: Observable<CategoryItem> {
         categoryMenuButton.selectionRelay.asObservable()
     }
     
@@ -32,12 +32,12 @@ final class CategoryFieldContainerView: UIView {
         super.init(frame: frame)
         setupUI()
         
-        let categories: [Category] = [
-            Category(id: UUID(), name: "팬미팅", position: 0, colorId: 0),
-            Category(id: UUID(), name: "뮤지컬", position: 1, colorId: 1),
-            Category(id: UUID(), name: "연극", position: 2, colorId: 2),
-            Category(id: UUID(), name: "페스티벌", position: 3, colorId: 3),
-            Category(id: UUID(), name: "콘서트", position: 4, colorId: 4),
+        let categories: [CategoryItem] = [
+            CategoryItem(id: UUID(), name: "팬미팅", position: 0, colorId: 0),
+            CategoryItem(id: UUID(), name: "뮤지컬", position: 1, colorId: 1),
+            CategoryItem(id: UUID(), name: "연극", position: 2, colorId: 2),
+            CategoryItem(id: UUID(), name: "페스티벌", position: 3, colorId: 3),
+            CategoryItem(id: UUID(), name: "콘서트", position: 4, colorId: 4),
         ]
         
         categoryMenuButton.configure(categories: categories)
@@ -64,15 +64,15 @@ final class CategoryFieldContainerView: UIView {
         }
     }
     
-    func configure(categories: [Category], initial: Category? = nil) {
+    func configure(categories: [CategoryItem], initial: CategoryItem? = nil) {
         categoryMenuButton.configure(categories: categories, initial: initial)
     }
     
-    var selecatedCategory: Category? {
+    var selecatedCategory: CategoryItem? {
         return categoryMenuButton.selectedCategory
     }
     
-    func select(category: Category) {
+    func select(category: CategoryItem) {
         categoryMenuButton.select(category: category)
     }
 }
