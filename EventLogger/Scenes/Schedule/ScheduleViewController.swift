@@ -156,7 +156,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
-        
+               
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 

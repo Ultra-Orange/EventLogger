@@ -64,21 +64,21 @@ struct SwiftDataManager {
 
     // MARK: UPDATE
 
-    func updateCategory(_ category: CategoryStore,
+    func updateCategory(categoryStore: CategoryStore,
                         name: String? = nil,
                         position: Int? = nil,
                         colorId: Int? = nil)
     {
-        if let name { category.name = name }
-        if let position { category.position = position }
-        if let colorId { category.colorId = colorId }
+        if let name { categoryStore.name = name }
+        if let position { categoryStore.position = position }
+        if let colorId { categoryStore.colorId = colorId }
         saveContext()
     }
 
     // MARK: Delete
 
-    func deleteCategory(_ category: CategoryStore) {
-        modelContext.delete(category)
+    func deleteCategory(categoryStore: CategoryStore) {
+        modelContext.delete(categoryStore)
         saveContext()
     }
 }

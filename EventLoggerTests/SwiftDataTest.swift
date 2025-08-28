@@ -86,7 +86,7 @@ struct CategoryMappingTests {
 
         // UPDATE
         if let category = fetched {
-            swiftData.updateCategory(category, name: "수정됨", position: 1)
+            swiftData.updateCategory(categoryStore: category, name: "수정됨", position: 1)
         }
         all = swiftData.fetchAllCategories()
         #expect(all[0].name == "수정됨")
@@ -94,13 +94,13 @@ struct CategoryMappingTests {
 
         // DELETE
         if let category = fetched {
-            swiftData.deleteCategory(category)
+            swiftData.deleteCategory(categoryStore: category)
         }
         all = swiftData.fetchAllCategories()
         #expect(!all.isEmpty)
 
         if let category2 = fetched2 {
-            swiftData.deleteCategory(category2)
+            swiftData.deleteCategory(categoryStore: category2)
         }
 
         all = swiftData.fetchAllCategories()
