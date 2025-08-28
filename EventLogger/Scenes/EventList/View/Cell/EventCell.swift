@@ -78,7 +78,7 @@ struct EventCell: View { // EventItem 통으로 받자
                 id: UUID(),
                 name: "콘서트",
                 position: 0,
-                color: .blue
+                colorId: 0
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,

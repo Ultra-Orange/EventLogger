@@ -10,7 +10,6 @@ import UIKit
 struct Artist: Hashable {
     let id: UUID
     let name: String
-    let color: UIColor?
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

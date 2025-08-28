@@ -1,0 +1,36 @@
+//
+//  CategoryStore.swift
+//  EventLogger
+//
+//  Created by Yoon on 8/28/25.
+//
+
+import SwiftData
+import UIKit
+
+@Model
+final class CategoryStore {
+    @Attribute(.unique) var id: UUID
+    var name: String
+    var position: Int
+    var colorId: Int
+
+    init(id: UUID = UUID(), name: String, position: Int, colorId: Int) {
+        self.id = id
+        self.name = name
+        self.position = position
+        self.colorId = colorId
+    }
+}
+
+extension CategoryStore {
+    func toDomain() -> Category? {
+        guard let categoryColor = CategoryColor(rawValue: colorId) else { return nil }
+        return Category(
+            id: id,
+            name: name,
+            position: position,
+            colorId: colorId
+        )
+    }
+}

@@ -14,18 +14,11 @@ struct EventItem: Hashable {
     var image: UIImage? // 이미지
     var startTime: Date // 개연시간
     var endTime: Date // 종연시간
-
-    // TODO: Location 캘린더랑 연동할때 조사 필요
-    var location: Location? // 장소
-//    var latitude: Double
-//    var longitude: Double
-//    var displayName: String
-//    var formattedAddress: String
-
+    var location: String? // 장소
     var artists: [String] // 아티스트
-    var expense: Double // TODO: 토털은 원화변환
-    var currency: String
-    var memo: String // 메모
+    var expense: Double? // TODO: 토털은 원화변환
+    var currency: String? // TODO: MVP까지는 KRW단일
+    var memo: String? // 메모
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

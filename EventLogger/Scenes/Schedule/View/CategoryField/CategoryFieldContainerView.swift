@@ -33,11 +33,11 @@ final class CategoryFieldContainerView: UIView {
         setupUI()
         
         let categories: [Category] = [
-            Category(id: UUID(), name: "팬미팅", position: 0, color: .green),
-            Category(id: UUID(), name: "뮤지컬", position: 1, color: .purple),
-            Category(id: UUID(), name: "연극", position: 2, color: .yellow),
-            Category(id: UUID(), name: "페스티벌", position: 3, color: .blue),
-            Category(id: UUID(), name: "콘서트", position: 4, color: .cyan),
+            Category(id: UUID(), name: "팬미팅", position: 0, colorId: 0),
+            Category(id: UUID(), name: "뮤지컬", position: 1, colorId: 1),
+            Category(id: UUID(), name: "연극", position: 2, colorId: 2),
+            Category(id: UUID(), name: "페스티벌", position: 3, colorId: 3),
+            Category(id: UUID(), name: "콘서트", position: 4, colorId: 4),
         ]
         
         categoryMenuButton.configure(categories: categories)
@@ -77,16 +77,16 @@ final class CategoryFieldContainerView: UIView {
     }
 }
 
-#Preview {
-    let view = CategoryFieldContainerView()
-    // Preview에서는 임시로 샘플 주입
-    let categories: [Category] = [
-        Category(id: UUID(), name: "팬미팅", position: 0, color: .green),
-        Category(id: UUID(), name: "뮤지컬", position: 1, color: .purple),
-        Category(id: UUID(), name: "연극", position: 2, color: .yellow),
-        Category(id: UUID(), name: "페스티벌", position: 3, color: .blue),
-        Category(id: UUID(), name: "콘서트", position: 4, color: .cyan),
-    ]
-    view.configure(categories: categories, initial: categories.first)
-    return view
-}
+//#Preview {
+//    let view = CategoryFieldContainerView()
+//    // Preview에서는 임시로 샘플 주입
+//    let categories: [Category] = [
+//        Category(id: UUID(), name: "팬미팅", position: 0, colorId: .green),
+//        Category(id: UUID(), name: "뮤지컬", position: 1, colorId: .purple),
+//        Category(id: UUID(), name: "연극", position: 2, colorId: .yellow),
+//        Category(id: UUID(), name: "페스티벌", position: 3, colorId: .blue),
+//        Category(id: UUID(), name: "콘서트", position: 4, colorId: .cyan),
+//    ]
+//    view.configure(categories: categories, initial: categories.first)
+//    return view
+//}

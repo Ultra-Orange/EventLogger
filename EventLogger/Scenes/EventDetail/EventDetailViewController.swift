@@ -97,7 +97,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         let eventItem = reactor.currentState.eventItem
         titleLabel.text = eventItem.title
         infoItemView.configureView(eventItem: eventItem)
-        memoView.configureView(eventItem.memo)
+        memoView.configureView(eventItem.memo ?? "")
 
         // TODO: 버튼액션
         infoItemView.addCalendarButton.rx.tap

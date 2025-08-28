@@ -43,7 +43,7 @@ private enum eventItemsKey: DependencyKey {
                 id: UUID.init(),
                 name: "콘서트",
                 position: 0,
-                color: .blue
+                colorId: 0
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
@@ -75,7 +75,7 @@ private enum eventItemsKey: DependencyKey {
                 id: UUID.init(),
                 name: "콘서트",
                 position: 0,
-                color: .blue
+                colorId: 0
             ),
             startTime: DateFormatter.toDate("2024년 06월 1일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 6월 1일 16:00") ?? Date.now,
@@ -97,7 +97,7 @@ private enum eventItemsKey: DependencyKey {
                 id: UUID.init(),
                 name: "팬미팅",
                 position: 1,
-                color: .red
+                colorId: 1
             ),
             startTime: DateFormatter.toDate("2025년 09월 20일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 20일 15:30") ?? Date.now,
@@ -130,7 +130,7 @@ private enum eventItemsKey: DependencyKey {
                     id: UUID.init(),
                     name: "페스티벌",
                     position: 2,
-                    color: .green
+                    colorId: 2
                 ),
 
             startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
