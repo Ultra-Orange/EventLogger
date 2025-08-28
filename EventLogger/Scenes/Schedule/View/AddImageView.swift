@@ -32,14 +32,14 @@ final class AddImageView: UIView {
             $0.directionalEdges.equalToSuperview()
             $0.height.equalTo(self.snp.width)
         }
-        
+
         let layoutGuide = UILayoutGuide()
         addLayoutGuide(layoutGuide)
-        
+
         layoutGuide.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
-        
+
         photoBadgeIcon.snp.makeConstraints {
             $0.top.centerX.equalTo(layoutGuide)
         }

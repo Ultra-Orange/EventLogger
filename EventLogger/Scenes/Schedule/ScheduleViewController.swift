@@ -71,13 +71,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         scrollView.addSubview(contentView)
 
-        // 컨텐츠 뷰       
+        // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
-        
+
         contentView.addSubview(deleteLabel)
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
@@ -99,7 +99,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.top.equalToSuperview().offset(10)
             $0.trailing.equalToSuperview()
         }
-        
+
         addImageView.snp.makeConstraints {
             $0.top.equalTo(deleteLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
@@ -107,7 +107,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
-            $0.leading.trailing.equalToSuperview() 
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(addImageView.snp.height)
         }
 
@@ -157,13 +157,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
-        
+
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
             .bind(to: locationFieldView.textLabel.rx.text)
             .disposed(by: disposeBag)
-        
+
         // 장소 선택 empty면 버튼 히든
         reactor.state
             .map(\.selectedLocation)
@@ -222,23 +222,31 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             })
             .disposed(by: disposeBag)
 
-        // 임시
-        bottomButton.rx.tapGesture()
+        // TODO: SwiftData 연동, 현재는 임시 확인용 프린트만
+        bottomButton.rx.tap
             .bind { [weak self] _ in
                 guard let self else { return }
+                // 데이트 확인용 프린트
                 let start = self.dateRangeFieldView.startDate
                 let end = self.dateRangeFieldView.endDate
                 print("저장할 시작/종료 날짜:", start, end)
+                // 아티스트 태그획득 확인용 프린트
+                let artists = artistsFieldView.tagsField.tags.map(\.text)
+                print(artists)
             }
             .disposed(by: disposeBag)
 
-        // 수정의 경우 데이터 주입
+        // 수정의 경우 데이터 바인딩
         let item = reactor.currentState.eventItem
         guard let item else { return }
 
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime
+        // TODO: 로케이션 최초바인딩
+        for artist in item.artists {
+            artistsFieldView.tagsField.addTag(artist)
+        }
     }
 }
 
