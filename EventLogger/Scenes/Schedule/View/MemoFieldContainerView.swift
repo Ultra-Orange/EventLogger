@@ -23,11 +23,9 @@ final class MemoFieldContainerView: UIView {
 //    }
 
     let textView = UITextView().then {
-        $0.backgroundColor = .systemBackground
+        $0.backgroundColor = .systemGray5
+        $0.font = .font17Regular
         $0.layer.cornerRadius = 10
-        $0.layer.borderWidth = 1.0
-        $0.layer.borderColor = UIColor.white.cgColor
-        $0.font = UIFont.preferredFont(forTextStyle: .footnote)
     }
 
     init() {
@@ -37,7 +35,8 @@ final class MemoFieldContainerView: UIView {
         addSubview(textView)
 
         label.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         textView.snp.makeConstraints {

@@ -23,9 +23,8 @@ final class LocationFieldContainerView: UIView {
     }
 
     let inputField = UIView().then {
-        $0.layer.borderColor = UIColor.white.cgColor
-        $0.layer.borderWidth = 1
         $0.layer.cornerRadius = 10
+        $0.backgroundColor = .systemGray5
     }
 
     let closeIcon = UIImageView(image: UIImage.symbolXCircleFill(config: .font16Regular)).then {

@@ -14,7 +14,7 @@ final class AddImageView: UIView {
         $0.layer.cornerRadius = 12
     }
 
-    private let photoBadgeIcon = UIImageView(image: UIImage(systemName: "photo.badge.plus", withConfiguration: .font32Regular))
+    private let photoBadgeIcon = UIImageView(image: UIImage.symbolDefault(named: "photo.badge.plus", config: .font32Regular))
 
     private let textLabel = UILabel().then {
         $0.text = "클릭하여 이미지 업로드"
@@ -32,14 +32,14 @@ final class AddImageView: UIView {
             $0.directionalEdges.equalToSuperview()
             $0.height.equalTo(self.snp.width)
         }
-        
+
         let layoutGuide = UILayoutGuide()
         addLayoutGuide(layoutGuide)
-        
+
         layoutGuide.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
-        
+
         photoBadgeIcon.snp.makeConstraints {
             $0.top.centerX.equalTo(layoutGuide)
         }

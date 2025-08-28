@@ -26,7 +26,8 @@ final class ExpenseFieldContainerView: UIView {
         addSubview(textField)
 
         label.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         textField.snp.makeConstraints {
