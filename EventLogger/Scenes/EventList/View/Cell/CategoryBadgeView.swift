@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategoryBadgeView: View {
-    let category: Category
+    let category: CategoryItem
 
     var body: some View {
         Text(category.name)

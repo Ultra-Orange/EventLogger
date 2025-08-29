@@ -10,10 +10,10 @@ import RxSwift
 import UIKit
 
 final class CategoryDropDownButton: UIView {
-    private(set) var categories: [Category] = [] // private(set) var: 읽기는 퍼블릭, 쓰기는 private
-    private(set) var selectedCategory: Category?
+    private(set) var categories: [CategoryItem] = [] // private(set) var: 읽기는 퍼블릭, 쓰기는 private
+    private(set) var selectedCategory: CategoryItem?
     
-    let selectionRelay = PublishRelay<Category>()
+    let selectionRelay = PublishRelay<CategoryItem>()
     
     private let button = UIButton(type: .system).then {
         var config = UIButton.Configuration.filled()
@@ -54,7 +54,7 @@ final class CategoryDropDownButton: UIView {
     }
     
     // 카테고리/초기값 구성
-    func configure(categories: [Category], initial: Category? = nil) {
+    func configure(categories: [CategoryItem], initial: CategoryItem? = nil) {
         self.categories = categories
         selectedCategory = initial ?? categories.first
         
@@ -63,7 +63,7 @@ final class CategoryDropDownButton: UIView {
     }
     
     /// 외부에서 선택을 프로그램적으로 변경하고 싶을 때 사용
-    func select(category: Category) {
+    func select(category: CategoryItem) {
         guard categories.contains(category) else { return }
         updateSelection(to: category)
     }
@@ -78,7 +78,7 @@ final class CategoryDropDownButton: UIView {
         )
     }
     
-    private func makeAction(for category: Category, isSelected: Bool) -> UIAction {
+    private func makeAction(for category: CategoryItem, isSelected: Bool) -> UIAction {
         let image = UIImage.circle(diameter: 12, color: category.color)
         let state: UIMenuElement.State = isSelected ? .on : .off
         
@@ -90,7 +90,7 @@ final class CategoryDropDownButton: UIView {
         }
     }
     
-    private func updateSelection(to category: Category) {
+    private func updateSelection(to category: CategoryItem) {
         selectedCategory = category
         rebuildMenu()
         applySelectionToButton()
