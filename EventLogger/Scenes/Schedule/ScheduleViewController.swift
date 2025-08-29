@@ -267,7 +267,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
     func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        self.scrollView.setContentOffset(CGPoint(x: 0, y: 200), animated: animated)
+        self.scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
         // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
     }
 }
