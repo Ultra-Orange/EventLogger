@@ -19,25 +19,25 @@ import UIKit
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
-
+    
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
     }
-
+    
     private let contentView = UIView()
-
+    
     private let addImageView = AddImageView()
     private let imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
-
+    
     private let deleteLabel = UILabel().then {
         $0.text = "이미지 삭제"
         $0.font = .font12Regular
     }
-
+    
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CategoryFieldContainerView()
     private let dateRangeFieldView = DateRangeFieldContainerView()
@@ -45,46 +45,46 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let artistsFieldView = ArtistsFieldContainerView()
     private let expenseFieldView = ExpenseFieldContainerView()
     private let memoFieldView = MemoFieldContainerView()
-
+    
     private let bottomButton = UIButton(configuration: .bottomButton).then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
     }
-
+    
     private let selectedLocationRelay: PublishRelay<String>
-
+    
     // MARK: LifeCycle
-
+    
     init(selectedLocationRelay: PublishRelay<String>) {
         self.selectedLocationRelay = selectedLocationRelay
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func setupUI() {
         view.backgroundColor = .systemBackground
-
+        
         // 스크롤 뷰
         view.addSubview(scrollView)
-
+        
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
         }
-
+        
         scrollView.addSubview(contentView)
-
+        
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
-
+        
         contentView.addSubview(deleteLabel)
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
@@ -96,71 +96,71 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(expenseFieldView)
         contentView.addSubview(memoFieldView)
         contentView.addSubview(bottomButton)
-
+        
         // 삭제 라벨 히든/사용불가 처리
         deleteLabel.isHidden = true
         deleteLabel.isUserInteractionEnabled = true
-
+        
         // 오토 레이아웃
         deleteLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
             $0.trailing.equalToSuperview()
         }
-
+        
         addImageView.snp.makeConstraints {
             $0.top.equalTo(deleteLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(addImageView.snp.height)
         }
-
+        
         inputTitleView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         categoryFieldView.snp.makeConstraints {
             $0.top.equalTo(inputTitleView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         dateRangeFieldView.snp.makeConstraints {
             $0.top.equalTo(categoryFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         locationFieldView.snp.makeConstraints {
             $0.top.equalTo(dateRangeFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         artistsFieldView.snp.makeConstraints {
             $0.top.equalTo(locationFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         expenseFieldView.snp.makeConstraints {
             $0.top.equalTo(artistsFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         bottomButton.snp.makeConstraints {
             $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(48)
+            $0.height.equalTo(54)
             $0.bottom.equalToSuperview().inset(10)
         }
     }
-
+    
     override func bind(reactor: ScheduleReactor) {
         // 상단 타이틀 & 하단 버튼
         title = reactor.currentState.navTitle
@@ -168,13 +168,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         
         // 초기값 세팅
         configureInitialState(reactor: reactor)
-                
+        
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
             .bind(to: locationFieldView.textLabel.rx.text)
             .disposed(by: disposeBag)
-
+        
         // 장소 선택 empty면 버튼 히든
         reactor.state
             .map(\.selectedLocation)
@@ -182,7 +182,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { $0.isEmpty }
             .bind(to: locationFieldView.closeIcon.rx.isHidden)
             .disposed(by: disposeBag)
-
+        
         // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
             .when(.recognized)
@@ -190,7 +190,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.presentImagePicker()
             }
             .disposed(by: disposeBag)
-
+        
         // 이미지 삭제 라벨
         deleteLabel.rx.tapGesture()
             .when(.recognized)
@@ -199,7 +199,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
-
+        
         // 장소 입력 필드 탭 제스처
         locationFieldView.inputField.rx.tapGesture()
             .when(.recognized)
@@ -207,14 +207,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { AppStep.locationSearch($0) }
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
-
+        
         // 장소 입력 취소 탭 제스처
         locationFieldView.closeIcon.rx.tapGesture()
             .when(.recognized)
             .map { _ in .selectLocation("") }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
+        
         // 장소 선택 릴레이
         selectedLocationRelay
             .map { title in .selectLocation(title) }
@@ -228,7 +228,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self.scrollViewToShowWhole(self.memoFieldView.textView)
             })
             .disposed(by: disposeBag)
-
+        
         // 하단버튼 탭
         bottomButton.rx.tap
             .bind { [weak self] _ in
@@ -243,7 +243,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 let memo = memoFieldView.textView.text ?? ""
                 
                 let formatter = NumberFormatter().then {
-                        $0.numberStyle = .decimal
+                    $0.numberStyle = .decimal
                 }
                 let expense = expenseFieldView.textField.text.flatMap { formatter.number(from: $0) }.map(\.doubleValue) ?? 0
                 
@@ -301,15 +301,25 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             
             // 메모
             memoFieldView.textView.text = item.memo
+            
         }
     }
 }
 
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
-    func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
-        // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
+    func scrollViewToShowWhole(_ target: UIView, verticalPadding _: CGFloat = 10, animated: Bool = true) {
+        let contentHeight = scrollView.contentSize.height
+        
+        let screenHeight = view.bounds.height
+        let keyboardHeight = view.keyboardLayoutGuide.layoutFrame.height
+        let visibleHeight = screenHeight - keyboardHeight
+        
+        // target 뷰가 scrollView 좌표계에서 시작하는 Y 위치
+        let targetY = target.convert(target.bounds, to: scrollView).origin.y
+        
+        scrollView.setContentOffset(CGPoint(x: 0, y: contentHeight - visibleHeight + contentHeight - targetY), animated: animated)
+        // 800이 아니라 전체 스크롤뷰 높이
     }
 }
 
@@ -319,16 +329,16 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.selectionLimit = 1
         config.filter = .images
-
+        
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
         present(picker, animated: true)
     }
-
+    
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         guard let provider = results.first?.itemProvider else { return }
-
+        
         if provider.canLoadObject(ofClass: UIImage.self) {
             provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
                 guard let self, let uiImage = image as? UIImage else { return }
