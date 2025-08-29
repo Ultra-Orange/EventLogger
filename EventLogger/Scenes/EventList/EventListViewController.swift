@@ -79,17 +79,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        
-        rx.viewWillAppear
-            .map { _ in EventListReactor.Action.reloadEventItems }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
-        rx.viewWillAppear
-            .map { _ in EventListReactor.Action.reloadCategories }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         segmentedControl.rx.selectedSegmentIndex
             .map { index -> EventListReactor.Action in
                 switch index {
