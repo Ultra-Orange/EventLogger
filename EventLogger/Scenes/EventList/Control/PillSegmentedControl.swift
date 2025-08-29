@@ -19,12 +19,17 @@ public final class PillSegmentedControl: UIControl {
     /// 현재 선택된 인덱스
     public private(set) var selectedIndex: Int = 0 {
         didSet {
-            // 초기 세팅 중에는 valueChanged 이벤트를 보내지 않음
             if !isSettingUp {
                 sendActions(for: .valueChanged)
             }
             updateSelection(animated: true)
         }
+    }
+
+    /// 외부에서 UISegmentedControl처럼 접근할 수 있도록 유지 (Rx 확장에서 사용)
+    public var selectedSegmentIndex: Int {
+        get { selectedIndex }
+        set { setSelectedIndex(newValue, animated: false) }
     }
 
     /// 바깥 알약 컨테이너 안쪽 여백
@@ -60,6 +65,20 @@ public final class PillSegmentedControl: UIControl {
     public var capsuleBorderWidth: CGFloat = 0 {
         didSet { selectionCapsuleView.layer.borderWidth = capsuleBorderWidth }
     }
+    
+    /// 선택 캡슐 섀도우 속성
+    public var capsuleShadowColor: UIColor = UIColor(red: 0.961, green: 0.397, blue: 0.019, alpha: 1) {
+        didSet { selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor }
+    }
+    public var capsuleShadowOpacity: Float = 1.0 {
+        didSet { selectionCapsuleView.layer.shadowOpacity = capsuleShadowOpacity }
+    }
+    public var capsuleShadowRadius: CGFloat = 6 {
+        didSet { selectionCapsuleView.layer.shadowRadius = capsuleShadowRadius }
+    }
+    public var capsuleShadowOffset: CGSize = .zero {
+        didSet { selectionCapsuleView.layer.shadowOffset = capsuleShadowOffset }
+    }
 
     /// 외곽선 색
     public var borderColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.6) {
@@ -84,78 +103,6 @@ public final class PillSegmentedControl: UIControl {
     /// 폰트
     public var font: UIFont = .systemFont(ofSize: 15, weight: .medium) {
         didSet { buttons.forEach { $0.setNeedsUpdateConfiguration() } }
-    }
-
-    // MARK: - UISegmentedControl 호환 API (사용성 맞추기)
-
-    public var selectedSegmentIndex: Int {
-        get { selectedIndex }
-        set { setSelectedIndex(newValue, animated: false) }
-    }
-
-    public var numberOfSegments: Int { items.count }
-
-    public func titleForSegment(at index: Int) -> String? {
-        guard items.indices.contains(index) else { return nil }
-        return items[index]
-    }
-
-    public func setTitle(_ title: String?, forSegmentAt index: Int) {
-        guard items.indices.contains(index) else { return }
-        let newTitle = title ?? ""
-        items[index] = newTitle
-        if buttons.indices.contains(index) {
-            let button = buttons[index]
-            var cfg = button.configuration ?? .plain()
-            cfg.attributedTitle = AttributedString(newTitle, attributes: .init([.font: font]))
-            button.configuration = cfg
-        } else {
-            rebuildButtons()
-        }
-        invalidateIntrinsicContentSize()
-        setNeedsLayout()
-    }
-
-    public func insertSegment(withTitle title: String?, at index: Int, animated: Bool) {
-        let safeIndex = max(0, min(index, items.count))
-        items.insert(title ?? "", at: safeIndex)
-        if selectedIndex >= safeIndex { selectedIndex += 1 }
-        rebuildButtons()
-        if animated { animateStackFade() }
-    }
-
-    public func removeSegment(at index: Int, animated: Bool) {
-        guard items.indices.contains(index) else { return }
-        items.remove(at: index)
-        if selectedIndex == index {
-            selectedIndex = min(index, max(0, items.count - 1))
-        } else if selectedIndex > index {
-            selectedIndex -= 1
-        }
-        rebuildButtons()
-        if animated { animateStackFade() }
-    }
-
-    public func removeAllSegments() {
-        items.removeAll()
-        selectedIndex = 0
-        rebuildButtons()
-    }
-
-    public func setEnabled(_ enabled: Bool, forSegmentAt index: Int) {
-        guard buttons.indices.contains(index) else { return }
-        buttons[index].isEnabled = enabled
-        buttons[index].alpha = enabled ? 1.0 : 0.5
-    }
-
-    public func isEnabledForSegment(at index: Int) -> Bool {
-        guard buttons.indices.contains(index) else { return false }
-        return buttons[index].isEnabled
-    }
-
-    public var selectedSegmentTintColor: UIColor {
-        get { capsuleBackgroundColor }
-        set { capsuleBackgroundColor = newValue }
     }
 
     // MARK: - Subviews
@@ -202,19 +149,25 @@ public final class PillSegmentedControl: UIControl {
     private func configureOnce() {
         backgroundColor = .clear
 
-        // 외곽 알약
-        layer.cornerRadius = 999
+        // 외곽 알약 스타일
+        layer.masksToBounds = false
         layer.borderWidth = borderWidth
         layer.borderColor = borderColor.cgColor
-        layer.masksToBounds = true
-
+        
+        // 선택 캡슐
         selectionCapsuleView.backgroundColor = capsuleBackgroundColor
-        selectionCapsuleView.layer.cornerRadius = 999
         selectionCapsuleView.layer.borderColor = capsuleBorderColor.cgColor
         selectionCapsuleView.layer.borderWidth = capsuleBorderWidth
+        // 섀도우 기본값
+        selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor
+        selectionCapsuleView.layer.shadowOpacity = capsuleShadowOpacity
+        selectionCapsuleView.layer.shadowRadius = capsuleShadowRadius
+        selectionCapsuleView.layer.shadowOffset = capsuleShadowOffset
+        selectionCapsuleView.layer.masksToBounds = false
         selectionCapsuleView.isUserInteractionEnabled = false
         selectionCapsuleView.translatesAutoresizingMaskIntoConstraints = false
 
+        // 스택
         stackView.axis = .horizontal
         stackView.alignment = .fill
         stackView.distribution = .fillEqually
@@ -325,10 +278,16 @@ public final class PillSegmentedControl: UIControl {
 
     // MARK: - Layout
 
-    override public func layoutSubviews() {
+    public override func layoutSubviews() {
         super.layoutSubviews()
-        layer.cornerRadius = bounds.height / 2
-        selectionCapsuleView.layer.cornerRadius = selectionCapsuleView.bounds.height / 2
+
+        // 원형률은 고정 16으로 통일 (상단/하단에서 중복 세팅 제거)
+        layer.cornerRadius = 16
+        selectionCapsuleView.layer.cornerRadius = 16
+
+        // shadowPath를 현재 캡슐 프레임에 맞게 갱신
+        let path = UIBezierPath(roundedRect: selectionCapsuleView.bounds, cornerRadius: 16).cgPath
+        selectionCapsuleView.layer.shadowPath = path
 
         if needsInitialAttach, buttons.indices.contains(selectedIndex) {
             needsInitialAttach = false
@@ -336,7 +295,7 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    override public var intrinsicContentSize: CGSize {
+    public override var intrinsicContentSize: CGSize {
         let buttonHeights = buttons.map { $0.intrinsicContentSize.height }
         let height = (buttonHeights.max() ?? 28) + contentInsets.top + contentInsets.bottom
         let totalButtonsWidth = buttons.reduce(0) { $0 + $1.intrinsicContentSize.width }

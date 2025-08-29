@@ -156,7 +156,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         bottomButton.snp.makeConstraints {
             $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(48)
+            $0.height.equalTo(54)
             $0.bottom.equalToSuperview().inset(10)
         }
     }
@@ -253,8 +253,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
 
         // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
-        
-        
+
         let item = reactor.currentState.eventItem
         guard let item else { return }
         let selectedCategory = categories.filter { $0.id == item.categoryId }.first
@@ -276,9 +275,18 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
-    func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
-        // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
+    func scrollViewToShowWhole(_ target: UIView, verticalPadding _: CGFloat = 10, animated: Bool = true) {
+        let contentHeight = scrollView.contentSize.height
+
+        let screenHeight = view.bounds.height
+        let keyboardHeight = view.keyboardLayoutGuide.layoutFrame.height
+        let visibleHeight = screenHeight - keyboardHeight
+
+        // target 뷰가 scrollView 좌표계에서 시작하는 Y 위치
+        let targetY = target.convert(target.bounds, to: scrollView).origin.y
+
+        scrollView.setContentOffset(CGPoint(x: 0, y: contentHeight - visibleHeight + contentHeight - targetY), animated: animated)
+        // 800이 아니라 전체 스크롤뷰 높이
     }
 }
 

@@ -14,15 +14,17 @@ import Then
 import UIKit
 
 final class EventListViewController: BaseViewController<EventListReactor> {
+    private let backgroundGradientView = GradientBackgroundView()
+    
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
         $0.font = .font17Regular
         $0.capsuleBackgroundColor = .black
-        $0.capsuleBorderColor = .white.withAlphaComponent(0.6)
+        $0.capsuleBorderColor = UIColor(red: 0.961, green: 0.397, blue: 0.019, alpha: 1)
         $0.capsuleBorderWidth = 1
         $0.normalTextColor = .white
         $0.selectedTextColor = .white
-        $0.borderColor = .white.withAlphaComponent(0.6)
-        $0.borderWidth = 1
+        $0.borderColor = .clear
+//        $0.borderWidth = 1
         $0.segmentSpacing = 6
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
@@ -46,6 +48,11 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         title = "Event Logger"
         view.backgroundColor = .black
         
+        view.addSubview(backgroundGradientView)
+        backgroundGradientView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         view.addSubview(segmentedControl)
         segmentedControl.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
@@ -65,6 +72,9 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     override func bind(reactor: EventListReactor) {
+        let categories = reactor.currentState.categories
+        print(categories)
+        
         loadViewIfNeeded()
         
         // 액션

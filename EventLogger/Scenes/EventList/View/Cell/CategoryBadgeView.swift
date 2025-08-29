@@ -18,10 +18,10 @@ struct CategoryBadgeView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(color)
-            .cornerRadius(999)
+            .clipShape(Capsule())
             .shadow(color: color, radius: 10, x: 0, y: 0)
             .overlay(
-                RoundedRectangle(cornerRadius: 999)
+                Capsule()
                     .stroke(Color.gray.opacity(0.70), lineWidth: 1)
             )
     }
