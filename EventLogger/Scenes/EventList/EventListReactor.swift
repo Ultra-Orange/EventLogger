@@ -72,7 +72,7 @@ final class EventListReactor: BaseReactor {
 
         case .reloadCategories:
             let fetched = swiftDataManager.fetchAllCategories()
-            let categoryItems = fetched.map { $0.toDomain() }
+            let categoryItems = fetched.compactMap { $0.toDomain() }
             return .just(.setCategories(categoryItems))
         }
     }

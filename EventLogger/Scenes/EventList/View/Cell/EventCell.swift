@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Dependencies
 
 struct EventCategory {
     let name: String
@@ -14,11 +15,17 @@ struct EventCategory {
 
 struct EventCell: View { // EventItem 통으로 받자
     let item: EventItem
+    @Dependency(\.swiftDataManager) private var swiftDataManager
+    
+    @State private var categoryColor: Color = .gray
     
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
-                CategoryBadgeView(category: item.categoryName)
+                CategoryBadgeView(
+                    name: item.categoryName,
+                    color: swiftDataManager.colorForCategoryName(item.categoryName)
+                )
                     .padding(.bottom, 8)
                 
                 VStack {
@@ -61,11 +68,14 @@ struct EventCell: View { // EventItem 통으로 받자
         .padding(.vertical, 16)
         .background(Color.black)
         .cornerRadius(16)
-        .shadow(color: Color(item.categoryName.color), radius: 10, x: 0, y: 0) // 여기 나중에 수정
+        .shadow(color: categoryColor, radius: 10, x: 0, y: 0) // 여기 나중에 수정
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.gray.opacity(0.50), lineWidth: 1)
         )
+        .task {
+            categoryColor = swiftDataManager.colorForCategoryName(item.categoryName)
+        }
     }
 }
 

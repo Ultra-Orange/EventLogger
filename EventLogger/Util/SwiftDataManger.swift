@@ -8,6 +8,7 @@
 import Dependencies
 import Foundation
 import SwiftData
+import SwiftUI
 
 struct SwiftDataManager {
     @Dependency(\.modelContext) var modelContext
@@ -80,5 +81,17 @@ struct SwiftDataManager {
     func deleteCategory(categoryStore: CategoryStore) {
         modelContext.delete(categoryStore)
         saveContext()
+    }
+}
+
+extension SwiftDataManager {
+    
+    func colorForCategoryName(_ name: String) -> Color {
+        guard let store = fetchOneCategory(name: name),
+              let color = CategoryColor(rawValue: store.colorId)
+        else {
+            return .gray
+        }
+        return Color(color.uiColor)
     }
 }
