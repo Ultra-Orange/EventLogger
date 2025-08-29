@@ -60,7 +60,7 @@ final class CategoryFieldContainerView: UIView {
         categoryMenuButton.snp.makeConstraints {
             $0.top.equalTo(sectionHeader.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(44)
+            $0.height.equalTo(42)
         }
     }
     

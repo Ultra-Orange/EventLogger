@@ -20,7 +20,9 @@ import SwiftData
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
 
-    private let scrollView = UIScrollView()
+    private let scrollView = UIScrollView().then {
+        $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
+    }
     private let contentView = UIView()
 
     private let addImageView = AddImageView()
@@ -40,10 +42,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let dateRangeFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
-    private let expnsesFieldView = ExpenseFieldContainerView()
-    private let memoFieldview = MemoFieldContainerView()
+    private let expensesFieldView = ExpenseFieldContainerView()
+    private let memoFieldView = MemoFieldContainerView()
 
-    private let bottomButton = UIButton(configuration: .bottomButton)
+    private let bottomButton = UIButton(configuration: .bottomButton).then {
+        $0.layer.cornerRadius = 10
+        $0.clipsToBounds = true
+    }
 
     private let selectedLocationRelay: PublishRelay<String>
 
@@ -61,7 +66,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     override func setupUI() {
         view.backgroundColor = .systemBackground
-
+        
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -87,8 +92,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(dateRangeFieldView)
         contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
-        contentView.addSubview(expnsesFieldView)
-        contentView.addSubview(memoFieldview)
+        contentView.addSubview(expensesFieldView)
+        contentView.addSubview(memoFieldView)
         contentView.addSubview(bottomButton)
 
         // 삭제 라벨 히든/사용불가 처리
@@ -137,21 +142,21 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        expnsesFieldView.snp.makeConstraints {
+        expensesFieldView.snp.makeConstraints {
             $0.top.equalTo(artistsFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
-        memoFieldview.snp.makeConstraints {
-            $0.top.equalTo(expnsesFieldView.snp.bottom).offset(30)
+        memoFieldView.snp.makeConstraints {
+            $0.top.equalTo(expensesFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(memoFieldview.snp.bottom).offset(30)
+            $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(48)
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(10)
         }
     }
 
@@ -160,6 +165,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 
+        memoFieldView.textView.rx.didBeginEditing
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+                self.scrollViewToShowWhole(self.memoFieldView.textView)
+            })
+            .disposed(by: disposeBag)
+        
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
@@ -249,6 +261,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         for artist in item.artists {
             artistsFieldView.tagsField.addTag(artist)
         }
+    }
+}
+
+extension ScheduleViewController {
+    /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
+    func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
+        self.scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
+        // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
     }
 }
 

@@ -26,6 +26,7 @@ final class AppTextField: UITextField {
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureDefault()
+        inputAccessoryView = makeDoneToolbar(target: self, action: #selector(doneTapped))
     }
 
     @available(*, unavailable)
@@ -35,11 +36,14 @@ final class AppTextField: UITextField {
 
     private func configureDefault() {
         font = .font17Regular
-        borderStyle = .roundedRect
         backgroundColor = .systemGray5
         layer.cornerRadius = 10
         autocapitalizationType = .none // 자동 대문자 변환 무시
         autocorrectionType = .no // 자동 수정 무시
         smartQuotesType = .no // 스마트 구두점 무시
+    }
+
+    @objc private func doneTapped() {
+        endEditing(true)
     }
 }
