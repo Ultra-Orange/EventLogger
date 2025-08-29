@@ -12,14 +12,14 @@ import RxCocoa
 import RxGesture
 import RxSwift
 import SnapKit
+import SwiftData
 import SwiftUI
 import Then
 import UIKit
-import SwiftData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
-
     // MARK: UI Components
+
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
     }
@@ -67,7 +67,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     override func setupUI() {
         view.backgroundColor = .systemBackground
-        
+
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -162,7 +162,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
-                
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 
@@ -172,7 +171,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self.scrollViewToShowWhole(self.memoFieldView.textView)
             })
             .disposed(by: disposeBag)
-        
+
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
@@ -251,6 +250,22 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+        // 카테고리 실제 데이터 바인딩
+        reactor.state
+            .map(\.categories)
+            .distinctUntilChanged() // 이전과 같은 categories 배열이 방출되면 무시 (UI갱신 하지 않도록 막음)
+            .bind(onNext: { [weak self, weak reactor] categories in
+                guard let self else { return }
+                // 수정 모드면 기존 eventItem의 categoryName으로 초기 선택을 매칭
+                // eventItem에 categoryName이 존재하면 categories에서 해당 이름과 같은 카테고리를 찾아 initial에 담아 드롭다운 메뉴의 초기 선택값으로 사용
+                let initialName = reactor?.currentState.eventItem?.categoryName
+                let initial = initialName.flatMap { name in
+                    categories.first(where: { $0.name == name })
+                }
+                self.categoryFieldView.configure(categories: categories, initial: initial)
+            })
+            .disposed(by: disposeBag)
+
         // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
         let item = reactor.currentState.eventItem
         guard let item else { return }
@@ -272,7 +287,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
     func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        self.scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
+        scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
         // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
     }
 }

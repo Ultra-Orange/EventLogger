@@ -31,16 +31,6 @@ final class CategoryFieldContainerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        
-        let categories: [CategoryItem] = [
-            CategoryItem(name: "팬미팅", position: 0, colorId: 0),
-            CategoryItem(name: "뮤지컬", position: 1, colorId: 1),
-            CategoryItem(name: "연극", position: 2, colorId: 2),
-            CategoryItem(name: "페스티벌", position: 3, colorId: 3),
-            CategoryItem(name: "콘서트", position: 4, colorId: 4),
-        ]
-        
-        categoryMenuButton.configure(categories: categories)
     }
 
     @available(*, unavailable)
@@ -68,7 +58,7 @@ final class CategoryFieldContainerView: UIView {
         categoryMenuButton.configure(categories: categories, initial: initial)
     }
     
-    var selecatedCategory: CategoryItem? {
+    var selectedCategory: CategoryItem? {
         return categoryMenuButton.selectedCategory
     }
     
