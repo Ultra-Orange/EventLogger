@@ -43,7 +43,7 @@ final class ExpenseFieldContainerView: UIView {
         textField.snp.makeConstraints {
             $0.top.equalTo(label.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
-            $0.height.equalTo(40)
+            $0.height.equalTo(42)
         }
     }
 }

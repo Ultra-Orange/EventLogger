@@ -54,7 +54,7 @@ final class MemoFieldContainerView: UIView {
         textView.snp.makeConstraints {
             $0.top.equalTo(label.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
-            $0.height.equalTo(206)
+            $0.height.equalTo(174)
         }
     }
 
