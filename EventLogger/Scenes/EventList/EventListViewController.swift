@@ -14,15 +14,23 @@ import Then
 import UIKit
 
 final class EventListViewController: BaseViewController<EventListReactor> {
+    private let backgroundGradientView = GradientBackgroundView()
+    
+    private let titleLabel = UILabel().then {
+        $0.text = "Event Logger"
+        $0.textColor = .primary500
+        $0.font = .font17Semibold
+    }
+    
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
         $0.font = .font17Regular
         $0.capsuleBackgroundColor = .black
-        $0.capsuleBorderColor = .white.withAlphaComponent(0.6)
+        $0.capsuleBorderColor = .primary500
         $0.capsuleBorderWidth = 1
         $0.normalTextColor = .white
         $0.selectedTextColor = .white
-        $0.borderColor = .white.withAlphaComponent(0.6)
-        $0.borderWidth = 1
+        $0.borderColor = .clear
+//        $0.borderWidth = 1
         $0.segmentSpacing = 6
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
@@ -40,11 +48,25 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         style: .plain,
         target: nil,
         action: nil
-    )
+    ).then {
+        $0.tintColor = .white
+    }
+    
+    private lazy var addButton = UIBarButtonItem(
+        barButtonSystemItem: .add,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .white
+    }
     
     override func setupUI() {
-        title = "Event Logger"
         view.backgroundColor = .black
+        
+        view.addSubview(backgroundGradientView)
+        backgroundGradientView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         view.addSubview(segmentedControl)
         segmentedControl.snp.makeConstraints {
@@ -59,18 +81,28 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
-        navigationItem.rightBarButtonItem = sortButton
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+        
+        navigationItem.rightBarButtonItems = [sortButton, addButton]
         
         dataSource = EventListDataSource(collectionView: collectionView)
     }
     
     override func bind(reactor: EventListReactor) {
+        let categories = reactor.currentState.categories
+        print(categories)
+        
         loadViewIfNeeded()
         
         // 액션
         // 최초 로드
         rx.viewWillAppear
-            .map { _ in EventListReactor.Action.reloadEventItems }
+            .flatMap { _ in
+                Observable.from([
+                    EventListReactor.Action.reloadEventItems,
+                    EventListReactor.Action.reloadCategories
+                ])
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -88,6 +120,11 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         sortButton.rx.tap
             .map { .toggleSort }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        addButton.rx.tap
+            .map { AppStep.createSchedule }
+            .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
         // State -> Snapshot

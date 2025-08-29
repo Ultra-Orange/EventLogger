@@ -172,7 +172,7 @@ class InfoItemView: UIView {
     // 리액터에 바인딩 되는 값 주입
     func configureView(eventItem: EventItem) {
         dateLabel.text = DateFormatter.toDateString(eventItem.startTime)
-        categoryLabel.text = eventItem.category.name
+        categoryLabel.text = eventItem.categoryId.uuidString // TODO: 카테고리ID로 정보획득
         timelabel.text = makeTimeLabel(startTime: eventItem.startTime, endTime: eventItem.endTime)
         locationLabel.text = "TODO: 추후구현"
         artistsLabel.text = makeArtistsLabel(eventItem.artists)

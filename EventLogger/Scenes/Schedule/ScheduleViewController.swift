@@ -12,78 +12,79 @@ import RxCocoa
 import RxGesture
 import RxSwift
 import SnapKit
+import SwiftData
 import SwiftUI
 import Then
 import UIKit
-import SwiftData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
-
+    
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
     }
+    
     private let contentView = UIView()
-
+    
     private let addImageView = AddImageView()
     private let imageView = UIImageView().then {
         $0.clipsToBounds = true
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
-
+    
     private let deleteLabel = UILabel().then {
         $0.text = "이미지 삭제"
         $0.font = .font12Regular
     }
-
+    
     private let inputTitleView = TitleFieldContainerView()
     private let categoryFieldView = CategoryFieldContainerView()
     private let dateRangeFieldView = DateRangeFieldContainerView()
     private let locationFieldView = LocationFieldContainerView()
     private let artistsFieldView = ArtistsFieldContainerView()
-    private let expensesFieldView = ExpenseFieldContainerView()
+    private let expenseFieldView = ExpenseFieldContainerView()
     private let memoFieldView = MemoFieldContainerView()
-
+    
     private let bottomButton = UIButton(configuration: .bottomButton).then {
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
     }
-
+    
     private let selectedLocationRelay: PublishRelay<String>
-
+    
     // MARK: LifeCycle
-
+    
     init(selectedLocationRelay: PublishRelay<String>) {
         self.selectedLocationRelay = selectedLocationRelay
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     @available(*, unavailable)
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func setupUI() {
         view.backgroundColor = .systemBackground
         
         // 스크롤 뷰
         view.addSubview(scrollView)
-
+        
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
         }
-
+        
         scrollView.addSubview(contentView)
-
+        
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
-
+        
         contentView.addSubview(deleteLabel)
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
@@ -92,92 +93,88 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(dateRangeFieldView)
         contentView.addSubview(locationFieldView)
         contentView.addSubview(artistsFieldView)
-        contentView.addSubview(expensesFieldView)
+        contentView.addSubview(expenseFieldView)
         contentView.addSubview(memoFieldView)
         contentView.addSubview(bottomButton)
-
+        
         // 삭제 라벨 히든/사용불가 처리
         deleteLabel.isHidden = true
         deleteLabel.isUserInteractionEnabled = true
-
+        
         // 오토 레이아웃
         deleteLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
             $0.trailing.equalToSuperview()
         }
-
+        
         addImageView.snp.makeConstraints {
             $0.top.equalTo(deleteLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         imageView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.top)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(addImageView.snp.height)
         }
-
+        
         inputTitleView.snp.makeConstraints {
             $0.top.equalTo(addImageView.snp.bottom).offset(56)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         categoryFieldView.snp.makeConstraints {
             $0.top.equalTo(inputTitleView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         dateRangeFieldView.snp.makeConstraints {
             $0.top.equalTo(categoryFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         locationFieldView.snp.makeConstraints {
             $0.top.equalTo(dateRangeFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         artistsFieldView.snp.makeConstraints {
             $0.top.equalTo(locationFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
-        expensesFieldView.snp.makeConstraints {
+        
+        expenseFieldView.snp.makeConstraints {
             $0.top.equalTo(artistsFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         memoFieldView.snp.makeConstraints {
-            $0.top.equalTo(expensesFieldView.snp.bottom).offset(30)
+            $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
         }
-
+        
         bottomButton.snp.makeConstraints {
             $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(48)
+            $0.height.equalTo(54)
             $0.bottom.equalToSuperview().inset(10)
         }
     }
-
+    
     override func bind(reactor: ScheduleReactor) {
-               
+        // 상단 타이틀 & 하단 버튼
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
-
-        memoFieldView.textView.rx.didBeginEditing
-            .bind(onNext: { [weak self] in
-                guard let self else { return }
-                self.scrollViewToShowWhole(self.memoFieldView.textView)
-            })
-            .disposed(by: disposeBag)
+        
+        // 초기값 세팅
+        configureInitialState(reactor: reactor)
         
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
             .bind(to: locationFieldView.textLabel.rx.text)
             .disposed(by: disposeBag)
-
+        
         // 장소 선택 empty면 버튼 히든
         reactor.state
             .map(\.selectedLocation)
@@ -185,7 +182,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { $0.isEmpty }
             .bind(to: locationFieldView.closeIcon.rx.isHidden)
             .disposed(by: disposeBag)
-
+        
         // 이미지 뷰 탭 제스쳐
         addImageView.rx.tapGesture()
             .when(.recognized)
@@ -193,7 +190,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.presentImagePicker()
             }
             .disposed(by: disposeBag)
-
+        
         // 이미지 삭제 라벨
         deleteLabel.rx.tapGesture()
             .when(.recognized)
@@ -202,7 +199,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.deleteLabel.isHidden = true
             }
             .disposed(by: disposeBag)
-
+        
         // 장소 입력 필드 탭 제스처
         locationFieldView.inputField.rx.tapGesture()
             .when(.recognized)
@@ -210,65 +207,119 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { AppStep.locationSearch($0) }
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
-
+        
         // 장소 입력 취소 탭 제스처
         locationFieldView.closeIcon.rx.tapGesture()
             .when(.recognized)
             .map { _ in .selectLocation("") }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
+        
         // 장소 선택 릴레이
         selectedLocationRelay
             .map { title in .selectLocation(title) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
-        dateRangeFieldView.startDateChanged
-            .bind(onNext: { date in
-                print("시작 변경:", date)
+        
+        // 메모뷰 스크롤
+        memoFieldView.textView.rx.didBeginEditing
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+                self.scrollViewToShowWhole(self.memoFieldView.textView)
             })
             .disposed(by: disposeBag)
-
-        dateRangeFieldView.endDateChanged
-            .bind(onNext: { date in
-                print("종료 변경:", date)
-            })
-            .disposed(by: disposeBag)
-
-        // TODO: SwiftData 연동, 현재는 임시 확인용 프린트만
+        
+        // 하단버튼 탭
         bottomButton.rx.tap
             .bind { [weak self] _ in
-                guard let self else { return }
-                // 데이트 확인용 프린트
-                let start = self.dateRangeFieldView.startDate
-                let end = self.dateRangeFieldView.endDate
-                print("저장할 시작/종료 날짜:", start, end)
-                // 아티스트 태그획득 확인용 프린트
+                guard let self, let reactor = self.reactor else { return }
+                let image = imageView.image
+                let title = inputTitleView.textField.text ?? ""
+                let categoryId = categoryFieldView.selectedCategory?.id ?? UUID() // 문법상 옵셔널 바인딩
+                let start = dateRangeFieldView.startDate
+                let end = dateRangeFieldView.endDate
+                let location = reactor.currentState.selectedLocation
                 let artists = artistsFieldView.tagsField.tags.map(\.text)
-                print(artists)
+                let memo = memoFieldView.textView.text ?? ""
+                
+                let formatter = NumberFormatter().then {
+                    $0.numberStyle = .decimal
+                }
+                let expense = expenseFieldView.textField.text.flatMap { formatter.number(from: $0) }.map(\.doubleValue) ?? 0
+                
+                let item = EventItem(
+                    id: UUID(),
+                    title: title,
+                    categoryId: categoryId,
+                    image: image,
+                    startTime: start,
+                    endTime: end,
+                    location: location.isEmpty ? nil : location,
+                    artists: artists,
+                    expense: expense,
+                    currency: .KRW, // MVP 기준 고정
+                    memo: memo
+                )
+                
+                reactor.action.onNext(.sendEventItem(item))
             }
             .disposed(by: disposeBag)
-
-        // 수정의 경우 데이터 바인딩
-        let item = reactor.currentState.eventItem
-        guard let item else { return }
-
-        inputTitleView.textField.text = item.title
-        dateRangeFieldView.startDate = item.startTime
-        dateRangeFieldView.endDate = item.endTime
-        // TODO: 로케이션 최초바인딩
-        for artist in item.artists {
-            artistsFieldView.tagsField.addTag(artist)
+    }
+    
+    private func configureInitialState(reactor: ScheduleReactor) {
+        // 공통 카테고리 & 아이템
+        let categories = reactor.currentState.categories
+        
+        switch reactor.mode {
+        case .create:
+            // 신규등록은 카테고리 목록만 세팅
+            categoryFieldView.configure(categories: categories)
+        case let .update(item):
+            // TODO: 이미지
+            
+            // 제목
+            inputTitleView.textField.text = item.title
+            
+            // 카테고리 세팅
+            let selectedCategory = categories.first { $0.id == item.categoryId }
+            categoryFieldView.configure(categories: categories, initial: selectedCategory)
+            
+            // 날짜 및 시간
+            dateRangeFieldView.startDate = item.startTime
+            dateRangeFieldView.endDate = item.endTime
+            
+            // 장소
+            if let location = item.location {
+                reactor.action.onNext(.selectLocation(location))
+            }
+            
+            // 아티스트
+            item.artists.forEach { artistsFieldView.tagsField.addTag($0) }
+            
+            // 비용
+            expenseFieldView.textField.text = item.expense.formatted(.number)
+            
+            // 메모
+            memoFieldView.textView.text = item.memo
+            
         }
     }
 }
 
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
-    func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        self.scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
-        // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
+    func scrollViewToShowWhole(_ target: UIView, verticalPadding _: CGFloat = 10, animated: Bool = true) {
+        let contentHeight = scrollView.contentSize.height
+        
+        let screenHeight = view.bounds.height
+        let keyboardHeight = view.keyboardLayoutGuide.layoutFrame.height
+        let visibleHeight = screenHeight - keyboardHeight
+        
+        // target 뷰가 scrollView 좌표계에서 시작하는 Y 위치
+        let targetY = target.convert(target.bounds, to: scrollView).origin.y
+        
+        scrollView.setContentOffset(CGPoint(x: 0, y: contentHeight - visibleHeight + contentHeight - targetY), animated: animated)
+        // 800이 아니라 전체 스크롤뷰 높이
     }
 }
 
@@ -278,16 +329,16 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
         var config = PHPickerConfiguration(photoLibrary: .shared())
         config.selectionLimit = 1
         config.filter = .images
-
+        
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
         present(picker, animated: true)
     }
-
+    
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         guard let provider = results.first?.itemProvider else { return }
-
+        
         if provider.canLoadObject(ofClass: UIImage.self) {
             provider.loadObject(ofClass: UIImage.self) { [weak self] image, _ in
                 guard let self, let uiImage = image as? UIImage else { return }
@@ -301,14 +352,4 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
     }
 }
 
-#Preview {
-    @Dependency(\.eventItems) var eventItems
-    let testItem = eventItems[2]
 
-    let relay = PublishRelay<String>()
-//    let reactor = ScheduleReactor(mode: .create)
-    let reactor = ScheduleReactor(mode: .update(testItem))
-    UINavigationController(rootViewController: ScheduleViewController(selectedLocationRelay: relay).then {
-        $0.reactor = reactor
-    })
-}

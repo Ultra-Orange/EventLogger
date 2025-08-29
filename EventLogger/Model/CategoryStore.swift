@@ -8,13 +8,16 @@
 import SwiftData
 import UIKit
 
+// CategoryItem에 대응하는 SwiftData모델
 @Model
 final class CategoryStore {
-    @Attribute(.unique) var name: String
+    @Attribute(.unique) var id: UUID
+    var name: String
     var position: Int
     var colorId: Int
 
-    init(name: String, position: Int, colorId: Int) {
+    init(id: UUID, name: String, position: Int, colorId: Int) {
+        self.id = id
         self.name = name
         self.position = position
         self.colorId = colorId
@@ -23,9 +26,9 @@ final class CategoryStore {
 
 // SwiftData to 도메인
 extension CategoryStore {
-    func toDomain() -> CategoryItem? {
-        guard let categoryColor = CategoryColor(rawValue: colorId) else { return nil }
+    func toDomain() -> CategoryItem {
         return CategoryItem(
+            id: id,
             name: name,
             position: position,
             colorId: colorId

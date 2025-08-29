@@ -8,6 +8,7 @@
 import SnapKit
 import SwiftUI
 import UIKit
+import Dependencies
 
 /// Diffable DataSource & 헤더 등록 담당
 final class EventListDataSource {
@@ -34,6 +35,9 @@ final class EventListDataSource {
     private func configure(collectionView: UICollectionView) {
         // Cell: SwiftUI EventCell를 iOS 17의 UIHostingConfiguration으로 올림
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, EventListDSItem> { [weak self] cell, _, item in
+            @Dependency(\.swiftDataManager) var swiftDataManager
+            
+            
             guard let self else { return }
             let event: EventItem? = {
                 switch item {
@@ -41,9 +45,15 @@ final class EventListDataSource {
                 }
             }()
             guard let event else { return }
-            
+            let fetchedCategory = swiftDataManager.fetchOneCategory(id: event.categoryId)
+//            if let category = fetchedCategory {
+//                self.category = category
+//                self.categoryColor = swiftDataManager.colorForCategory(category.id)
+                
             cell.contentConfiguration = UIHostingConfiguration {
-                EventCell(item: event)
+                if let fetchedCategory {
+                    EventCell(item: event, category: fetchedCategory)
+                }
             }.margins(.all, 0)
             cell.backgroundConfiguration = nil
         }

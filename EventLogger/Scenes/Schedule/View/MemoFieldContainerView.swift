@@ -15,13 +15,6 @@ final class MemoFieldContainerView: UIView {
         $0.font = .font13Regular
     }
 
-    // TODO: PlaceHolder 처리?
-//    private let placeholderLabel = UILabel().then {
-//        $0.text = "메모를 입력하세요"
-//        $0.textColor = .placeholderText
-//        $0.font = UIFont.preferredFont(forTextStyle: .body)
-//    }
-
     let textView = UITextView().then {
         $0.backgroundColor = .systemGray5
         $0.font = .font17Regular

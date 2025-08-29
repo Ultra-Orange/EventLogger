@@ -25,6 +25,7 @@ enum CategorySeeder {
 
         for (index, name) in names.enumerated() {
             let store = CategoryStore(
+                id: UUID(),
                 name: name,
                 position: index,
                 colorId: index // 0~4

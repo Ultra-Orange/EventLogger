@@ -16,6 +16,7 @@ struct CategoryMappingTests {
     func categoryRoundTrip() throws {
         // Given: 도메인 Category 생성
         let original = CategoryItem(
+            id: UUID(),
             name: "콘서트",
             position: 1,
             colorId: CategoryColor.red.rawValue
@@ -26,13 +27,11 @@ struct CategoryMappingTests {
         let restored = store.toDomain()
 
         // Then: 값 검증
-        #expect(restored != nil)
-        #expect(restored?.name == original.name)
-        #expect(restored?.position == original.position)
-        #expect(restored?.colorId == original.colorId)
+        #expect(restored.id == original.id)
+        #expect(restored.name == original.name)
+        #expect(restored.position == original.position)
+        #expect(restored.colorId == original.colorId)
 
-        // UI 컬러도 일관성 검증
-        #expect(restored?.color == original.color)
     }
 
     @Test("기본 카테고리 5개 저장 후 복원 검증")
@@ -41,9 +40,10 @@ struct CategoryMappingTests {
         let names = ["콘서트", "페스티벌", "연극", "뮤지컬", "팬미팅"]
         let categories: [CategoryItem] = names.enumerated().map { index, name in
             CategoryItem(
+                id: UUID(),
                 name: name,
                 position: index,
-                colorId: CategoryColor.allCases[index % CategoryColor.allCases.count].rawValue
+                colorId: index,
             )
         }
 
@@ -57,53 +57,132 @@ struct CategoryMappingTests {
         // 이름들이 그대로 보존되는지 확인
         let restoredNames = restored.map { $0.name }
         #expect(restoredNames == names)
+        
     }
 
     @Test("Category CRUD 테스트")
     func categoryCRUD() throws {
-        @Dependency(\.swiftDataManager) var swiftData
-
+        @Dependency(\.swiftDataManager) var swiftDataManager
+        
+        let dummyItem1 = CategoryItem(
+            id: UUID(),
+            name: "테스트1",
+            position: 0,
+            colorId: 0
+        )
+        let dummyItem2 = CategoryItem(
+            id: UUID(),
+            name: "테스트2",
+            position: 1,
+            colorId: 1
+        )
+        
         // CREATE
-        swiftData.insertCategory(name: "테스트0", position: 0, colorId: 0)
-        swiftData.insertCategory(name: "테스트1", position: 1, colorId: 1)
-        var all = swiftData.fetchAllCategories()
-        #expect(all.count == 2)
-        #expect(all[0].name == "테스트0")
-        #expect(all[1].colorId == 1)
-
-        // READ (fetchOne)
-        let fetched = swiftData.fetchOneCategory(name: "테스트0")
-        #expect(fetched != nil)
-        #expect(fetched?.name == "테스트0")
-        #expect(fetched?.position == 0)
-        #expect(fetched?.colorId == 0)
-
-        let fetched2 = swiftData.fetchOneCategory(name: "테스트1")
-        #expect(fetched2 != nil)
-        #expect(fetched2?.name == "테스트1")
-        #expect(fetched2?.position == 1)
-        #expect(fetched2?.colorId == 1)
-
-        // UPDATE
-        if let category = fetched {
-            swiftData.updateCategory(categoryStore: category, name: "수정됨", position: 1)
-        }
-        all = swiftData.fetchAllCategories()
-        #expect(all[0].name == "수정됨")
-        #expect(all[0].position == 1)
-
+        swiftDataManager.insertCategory(category: dummyItem1)
+        swiftDataManager.insertCategory(category: dummyItem2)
+        
+        // READ
+        let fetchAll = swiftDataManager.fetchAllCategories()
+        
+        #expect(fetchAll.count == 2)
+        
+        let data1 = fetchAll[0]
+        #expect(data1.name == "테스트1")
+        #expect(data1.position == 0)
+        #expect(data1.colorId == 0)
+        
+        //UPDATE
+        
+        let modify = CategoryItem(
+            id: data1.id,
+            name: "변경",
+            position: 2,
+            colorId: 2)
+        
+        swiftDataManager.updateCategory(id: data1.id, category: modify)
+        
+        let check = swiftDataManager.fetchOneCategory(id: data1.id)
+        #expect(check?.name == "변경")
+        #expect(check?.position == 2)
+        #expect(check?.colorId == 2)
+        
+        swiftDataManager.deleteCategory(id: data1.id)
+        #expect(swiftDataManager.fetchAllCategories().count == 1)
+    }
+    
+    @Test("EventItem CRUD TEST")
+    func EventItemCRUDTests() throws {
+        @Dependency(\.swiftDataManager) var swiftDataManager
+        
+        let dummyCategory1 = CategoryItem(
+            id: UUID(),
+            name: "테스트용 카테고리1",
+            position: 0,
+            colorId: 0
+        )
+        
+        
+        let dummyEventItem1 = EventItem(
+            id: UUID(),
+            title: "이벤트 아이템",
+            categoryId: dummyCategory1.id,
+            startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,
+            artists: ["아티스트1","아티스트2"],
+            expense: 10000,
+            currency: Currency.KRW,
+            memo: "메모메모"
+        )
+        
+        let dummyEventItem2 = EventItem(
+            id: UUID(),
+            title: "이벤트 아이템2",
+            categoryId: dummyCategory1.id,
+            startTime: DateFormatter.toDate("2025년 10월 26일 12:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2025년 10월 26일 14:00") ?? Date.now,
+            artists: ["아티스트3"],
+            expense: 12000,
+            currency: Currency.KRW,
+            memo: "메모메모alpha"
+        )
+        
+        // CREATE
+        swiftDataManager.insertEventItem(dummyEventItem1)
+        swiftDataManager.insertEventItem(dummyEventItem2)
+        
+        // READ
+        let fetchAll = swiftDataManager.fetchAllEvents()
+        #expect(fetchAll.count == 2)
+        
+        let fetchOne = swiftDataManager.fetchOneEvent(id: dummyEventItem1.id)
+        #expect(fetchOne?.title == "이벤트 아이템")
+        #expect(fetchOne?.expense == 10000)
+        #expect(fetchOne?.memo == "메모메모")
+        #expect(fetchOne?.artists[0] == "아티스트1")
+        
+        //UPDATE
+        
+        let modify = EventItem(
+            id: dummyEventItem2.id,
+            title: "이벤트 아이템20",
+            categoryId: dummyCategory1.id,
+            startTime: DateFormatter.toDate("2025년 10월 26일 12:00") ?? Date.now,
+            endTime: DateFormatter.toDate("2025년 10월 26일 14:00") ?? Date.now,
+            artists: ["아티스트3"],
+            expense: 12000,
+            currency: Currency.KRW,
+            memo: "수정함"
+        )
+        
+        swiftDataManager.updateEvent(id: dummyEventItem2.id, event: modify)
+        
+        let target = swiftDataManager.fetchOneEvent(id: dummyEventItem2.id)
+        #expect(target?.title == "이벤트 아이템20")
+        #expect(target?.memo == "수정함")
+        
         // DELETE
-        if let category = fetched {
-            swiftData.deleteCategory(categoryStore: category)
-        }
-        all = swiftData.fetchAllCategories()
-        #expect(!all.isEmpty)
-
-        if let category2 = fetched2 {
-            swiftData.deleteCategory(categoryStore: category2)
-        }
-
-        all = swiftData.fetchAllCategories()
-        #expect(all.isEmpty)
+        
+        swiftDataManager.deleteEvent(id: dummyEventItem2.id)
+        #expect(swiftDataManager.fetchAllEvents().count == 1)
     }
 }

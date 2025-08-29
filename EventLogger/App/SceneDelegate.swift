@@ -30,13 +30,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //            with: OneStepper(withSingleStep: AppStep.eventList)
 //        )
 
-        @Dependency(\.eventItems) var eventItems
-        let testItem = eventItems[0]
+
         let appFlow = AppFlow(windowScene: windowScene)
         coordinator.coordinate(
             flow: appFlow,
-//            with: OneStepper(withSingleStep: AppStep.createSchedule)
-            with: OneStepper(withSingleStep: AppStep.updateSchedule(testItem))
+            with: OneStepper(withSingleStep: AppStep.createSchedule)
+//            with: OneStepper(withSingleStep: AppStep.updateSchedule(testItem))
         )
     }
 

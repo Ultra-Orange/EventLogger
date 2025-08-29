@@ -8,21 +8,20 @@
 import SwiftUI
 
 struct CategoryBadgeView: View {
-    let category: CategoryItem
+    let name: String
+    let color: Color
 
     var body: some View {
-        Text(category.name)
+        Text(name)
             .font(Font(UIFont.font12Medium))
             .foregroundStyle(.white) // 지정 흰색으로 바꿔야 함
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(
-                Color(category.color)
-            )
-            .cornerRadius(999)
-            .shadow(color: Color( category.color), radius: 10, x: 0, y: 0)
+            .background(color)
+            .clipShape(Capsule())
+            .shadow(color: color, radius: 10, x: 0, y: 0)
             .overlay(
-                RoundedRectangle(cornerRadius: 999)
+                Capsule()
                     .stroke(Color.gray.opacity(0.70), lineWidth: 1)
             )
     }

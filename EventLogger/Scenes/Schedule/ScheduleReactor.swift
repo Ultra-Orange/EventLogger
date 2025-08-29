@@ -5,6 +5,7 @@
 //  Created by Yoon on 8/22/25.
 //
 
+import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
@@ -13,6 +14,7 @@ final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case selectLocation(String)
+        case sendEventItem(EventItem)
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -26,32 +28,48 @@ final class ScheduleReactor: BaseReactor {
         let navTitle: String
         let buttonTitle: String
         var selectedLocation: String = ""
+        var categories: [CategoryItem]
     }
 
     enum Mode {
         case create
         case update(EventItem)
+        
+        var navTitle: String {
+            switch self {
+            case .create: return "새 일정 등록"
+            case .update: return "일정 수정"
+            }
+        }
+        var buttonTitle: String {
+            switch self {
+            case .create: return "등록하기"
+            case .update: return "수정하기"
+            }
+        }
+
+        var eventItem: EventItem? {
+            switch self {
+            case .create: return nil
+            case let .update(item): return item
+            }
+        }
     }
 
     let initialState: State
-    private let mode: Mode
+    let mode: Mode
 
     init(mode: Mode) {
+        @Dependency(\.swiftDataManager) var swiftDataManager
+        let categories = swiftDataManager.fetchAllCategories()
+
         self.mode = mode
-        switch mode {
-        case .create:
-            initialState = State(
-                eventItem: nil,
-                navTitle: "새 일정 등록",
-                buttonTitle: "등록하기"
-            )
-        case let .update(item):
-            initialState = State(
-                eventItem: item,
-                navTitle: "일정 수정",
-                buttonTitle: "수정하기",
-            )
-        }
+        initialState = State(
+            eventItem: mode.eventItem,
+            navTitle: mode.navTitle,
+            buttonTitle: mode.buttonTitle,
+            categories: categories
+        )
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
@@ -60,6 +78,16 @@ final class ScheduleReactor: BaseReactor {
         switch action {
         case let .selectLocation(location):
             return .just(.setLocation(location))
+        case let .sendEventItem(item):
+            switch mode {
+            case .create:
+                @Dependency(\.swiftDataManager) var swiftDataManager
+                swiftDataManager.insertEventItem(item)
+                steps.accept(AppStep.eventList)
+                return .never()
+            case .update:
+                return .never()
+            }
         }
     }
 
