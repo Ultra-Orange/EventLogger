@@ -18,8 +18,8 @@ import UIKit
 import SwiftData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
-    // MARK: UI Components
 
+    // MARK: UI Components
     private let scrollView = UIScrollView()
     private let contentView = UIView()
 
@@ -156,7 +156,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
-               
+                
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 
