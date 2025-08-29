@@ -67,6 +67,7 @@ private enum eventItemsKey: DependencyKey {
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
+            location: "Zepp Haneda TOKYO",
             artists:
             ["YOASOBI"],
             expense: 75000,
@@ -152,6 +153,7 @@ private enum eventItemsKey: DependencyKey {
 
             startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,
+            location: "광안리 해수욕장",
             artists:
             ["SUEDETHE", "SMASHING", "PUMPKINSBABYMETALMIKAPORTER", "ROBINSON", "자우림", "국카스텐"],
             expense: 110_000,

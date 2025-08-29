@@ -238,14 +238,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-        // 수정의 경우 데이터 바인딩
+        // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
         let item = reactor.currentState.eventItem
         guard let item else { return }
 
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime
-        // TODO: 로케이션 최초바인딩
+        if let location = item.location {
+            reactor.action.onNext(.selectLocation(location))
+        }
+        
         for artist in item.artists {
             artistsFieldView.tagsField.addTag(artist)
         }
