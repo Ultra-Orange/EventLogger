@@ -36,7 +36,7 @@ private enum ModelContextKey: DependencyKey {
 
     static var testValue: ModelContext {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let schema = Schema([CategoryStore.self])
+        let schema = Schema([CategoryStore.self, EventStore.self])
         let container = try! ModelContainer(for: schema, configurations: config)
         return ModelContext(container)
     }

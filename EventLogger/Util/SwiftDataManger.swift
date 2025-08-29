@@ -19,15 +19,15 @@ struct SwiftDataManager {
         do {
             try modelContext.save()
         } catch {
-            assertionFailure("SwiftData 저장 실패: \(error.localizedDescription)")
+            print("SwiftData 저장 실패: \(error.localizedDescription)")
         }
     }
     
     // MARK: Category 관련
     // CREATE
         
-    func insertCategory(caetgory: CategoryItem) {
-        let storeCategory = caetgory.toPersistent()
+    func insertCategory(category: CategoryItem) {
+        let storeCategory = category.toPersistent()
         modelContext.insert(storeCategory)
         saveContext()
     }
@@ -41,7 +41,7 @@ struct SwiftDataManager {
             let stores = try modelContext.fetch(descriptor)
             return stores.map{ $0.toDomain() }
         } catch {
-            assertionFailure("카테고리 fetch 실패: \(error.localizedDescription)")
+            print("카테고리 fetch 실패: \(error.localizedDescription)")
             return []
         }
     }
@@ -52,7 +52,7 @@ struct SwiftDataManager {
         do {
             return try modelContext.fetch(descriptor).first?.toDomain()
         } catch {
-            assertionFailure("카테고리 fetchOne 실패: \(error.localizedDescription)")
+            print("카테고리 fetchOne 실패: \(error.localizedDescription)")
             return nil
         }
     }
@@ -63,7 +63,7 @@ struct SwiftDataManager {
         do {
             return try modelContext.fetch(descriptor).first
         } catch {
-            assertionFailure("fetchOneCategoryStore 실패: \(error.localizedDescription)")
+            print("fetchOneCategoryStore 실패: \(error.localizedDescription)")
             return nil
         }
     }
@@ -71,23 +71,22 @@ struct SwiftDataManager {
     // UPDATE
     func updateCategory(id: UUID, category: CategoryItem) {
         if let store = fetchOneCategoryStore(id: id) {
-            let new = category.toPersistent()
-            store.name = new.name
-            store.position = new.position
-            store.colorId = new.colorId
+            store.name = category.name
+            store.position = category.position
+            store.colorId = category.colorId
             saveContext()
         } else {
-            assertionFailure("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
+            print("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
         }
     }
 
     // Delete
     func deleteCategory(id: UUID) {
-        if let target = fetchOneEvent(id: id){
+        if let target = fetchOneCategoryStore(id: id){
             modelContext.delete(target)
             saveContext()
         } else {
-            assertionFailure("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
+            print("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
         }
     }
     
@@ -100,19 +99,33 @@ struct SwiftDataManager {
     }
     
     // READ
-    func fetchAllEvents() -> [EventStore] {
+    func fetchAllEvents() -> [EventItem] {
         let descriptor = FetchDescriptor<EventStore>(
             sortBy: [SortDescriptor(\.startTime, order: .forward)]
         )
         do {
-            return try modelContext.fetch(descriptor)
+            let stores = try modelContext.fetch(descriptor)
+            return stores.map { $0.toDomain() }
         } catch {
-            assertionFailure("이벤트 일정 fetch 실패: \(error.localizedDescription)")
+            print("이벤트 일정 fetch 실패: \(error.localizedDescription)")
             return []
         }
     }
     
-    func fetchOneEvent(id: UUID) -> EventStore? {
+    func fetchOneEvent(id: UUID) -> EventItem? {
+        let predicate = #Predicate<EventStore> { $0.id == id }
+        let descriptor = FetchDescriptor<EventStore>(
+            predicate: predicate
+        )
+        do {
+            return try modelContext.fetch(descriptor).first?.toDomain()
+        } catch {
+            print("이벤트 일정 fetch 실패: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    func fetchOneEventStore(id: UUID) -> EventStore? {
         let predicate = #Predicate<EventStore> { $0.id == id }
         let descriptor = FetchDescriptor<EventStore>(
             predicate: predicate
@@ -120,37 +133,36 @@ struct SwiftDataManager {
         do {
             return try modelContext.fetch(descriptor).first
         } catch {
-            assertionFailure("이벤트 일정 fetch 실패: \(error.localizedDescription)")
+            print("이벤트 일정 fetch 실패: \(error.localizedDescription)")
             return nil
         }
     }
     
     // UPDATE
     func updateEvent(id: UUID, event: EventItem) {
-        if let store = fetchOneEvent(id: id) {
-            let new = event.toPersistent()
-            store.title = new.title
-            store.categoryId = new.categoryId
-            store.imageData = new.imageData
-            store.startTime = new.startTime
-            store.endTime = new.endTime
-            store.location = new.location
-            store.artists = new.artists
-            store.expense = new.expense
-            store.currency = new.currency
-            store.memo = new.memo
+        if let store = fetchOneEventStore(id: id) {
+            store.title = event.title
+            store.categoryId = event.categoryId
+            store.imageData = event.image?.jpegData(compressionQuality: 0.8)
+            store.startTime = event.startTime
+            store.endTime = event.endTime
+            store.location = event.location
+            store.artists = event.artists
+            store.expense = event.expense
+            store.currency = event.currency.rawValue
+            store.memo = event.memo
             saveContext()
         } else {
-            assertionFailure("해당 id에 일치하는 일정이 존재하지 않습니다.")
+            print("해당 id에 일치하는 일정이 존재하지 않습니다.")
         }
     }
     
     func deleteEvent(id: UUID) {
-        if let target = fetchOneEvent(id: id){
+        if let target = fetchOneEventStore(id: id){
             modelContext.delete(target)
             saveContext()
         } else {
-            assertionFailure("해당 id에 일치하는 일정이 존재하지 않습니다.")
+            print("해당 id에 일치하는 일정이 존재하지 않습니다.")
         }
     }
 }
@@ -158,8 +170,8 @@ struct SwiftDataManager {
 extension SwiftDataManager {
     // 카테고리에 해당하는 컬러 리턴
     func colorForCategory(_ id: UUID) -> Color {
-        guard let store = fetchOneCategory(id: id),
-              let color = CategoryColor(rawValue: store.colorId)
+        guard let item = fetchOneCategory(id: id),
+              let color = CategoryColor(rawValue: item.colorId)
         else {
             return .gray
         }

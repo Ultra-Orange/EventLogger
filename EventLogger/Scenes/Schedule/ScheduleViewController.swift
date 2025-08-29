@@ -165,6 +165,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
         let categories = reactor.currentState.categories
+        print(categories)
         categoryFieldView.configure(categories: categories)
 
         memoFieldView.textView.rx.didBeginEditing

@@ -8,7 +8,6 @@
 import SwiftData
 import UIKit
 
-// EventItem에 대응하는 SwiftData 모델
 @Model
 final class EventStore {
     
@@ -19,7 +18,10 @@ final class EventStore {
     var startTime: Date
     var endTime: Date
     var location: String?
-    var artists: [String]
+    
+    // DB에는 Data로 저장
+    var artistsData: Data?
+    
     var expense: Double
     var currency: String
     var memo: String
@@ -44,10 +46,22 @@ final class EventStore {
         self.startTime = startTime
         self.endTime = endTime
         self.location = location
-        self.artists = artists
         self.expense = expense
         self.currency = currency
         self.memo = memo
+        
+        self.artistsData = try? JSONEncoder().encode(artists)
+    }
+    
+    //  computed property로 [String] 다루기
+    var artists: [String] {
+        get {
+            guard let data = artistsData else { return [] }
+            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        }
+        set {
+            artistsData = try? JSONEncoder().encode(newValue)
+        }
     }
 }
 
