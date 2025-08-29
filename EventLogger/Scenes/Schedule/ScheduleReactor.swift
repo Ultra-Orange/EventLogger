@@ -9,19 +9,20 @@ import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
+import Foundation
 
 final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case selectLocation(String)
-        case sendEventItem(EventItem)
+        case sendEventPayload(EventPayload)
     }
-
+    
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setLocation(String)
     }
-
+    
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         let eventItem: EventItem?
@@ -30,7 +31,7 @@ final class ScheduleReactor: BaseReactor {
         var selectedLocation: String = ""
         var categories: [CategoryItem]
     }
-
+    
     enum Mode {
         case create
         case update(EventItem)
@@ -47,7 +48,7 @@ final class ScheduleReactor: BaseReactor {
             case .update: return "수정하기"
             }
         }
-
+        
         var eventItem: EventItem? {
             switch self {
             case .create: return nil
@@ -55,14 +56,14 @@ final class ScheduleReactor: BaseReactor {
             }
         }
     }
-
+    
     let initialState: State
     let mode: Mode
-
+    
     init(mode: Mode) {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let categories = swiftDataManager.fetchAllCategories()
-
+        
         self.mode = mode
         initialState = State(
             eventItem: mode.eventItem,
@@ -71,26 +72,55 @@ final class ScheduleReactor: BaseReactor {
             categories: categories
         )
     }
-
+    
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {
+        @Dependency(\.swiftDataManager) var swiftDataManager
         switch action {
         case let .selectLocation(location):
             return .just(.setLocation(location))
-        case let .sendEventItem(item):
+        case let .sendEventPayload(payload):
             switch mode {
             case .create:
-                @Dependency(\.swiftDataManager) var swiftDataManager
+                let item = EventItem(
+                    id: UUID(),  //  새 id 생성
+                    title: payload.title,
+                    categoryId: payload.categoryId,
+                    image: payload.image,
+                    startTime: payload.startTime,
+                    endTime: payload.endTime,
+                    location: payload.location,
+                    artists: payload.artists,
+                    expense: payload.expense,
+                    currency: payload.currency,
+                    memo: payload.memo
+                )
                 swiftDataManager.insertEventItem(item)
                 steps.accept(AppStep.eventList)
                 return .never()
-            case .update:
+                
+            case let .update(oldItem):
+                let updated = EventItem(
+                    id: oldItem.id,   // 기존 id 유지
+                    title: payload.title,
+                    categoryId: payload.categoryId,
+                    image: payload.image,
+                    startTime: payload.startTime,
+                    endTime: payload.endTime,
+                    location: payload.location,
+                    artists: payload.artists,
+                    expense: payload.expense,
+                    currency: payload.currency,
+                    memo: payload.memo
+                )
+                swiftDataManager.updateEvent(id: updated.id, event: updated)
+                steps.accept(AppStep.eventList)
                 return .never()
             }
         }
     }
-
+    
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {
