@@ -14,6 +14,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
+        @Dependency(\.modelContext) var modelContext
+        do {
+            try CategorySeeder.runIfNeeded(modelContext: modelContext)
+        } catch {
+            assertionFailure("기본 카테고리 시딩 실패: \(error.localizedDescription)")
+        }
+
 //        prepareDependencies{
 //        }
 

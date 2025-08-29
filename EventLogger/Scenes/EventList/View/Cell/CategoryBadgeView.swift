@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CategoryBadgeView: View {
-    let category: Category
+    let category: CategoryItem
 
     var body: some View {
         Text(category.name)
@@ -25,7 +25,7 @@ struct CategoryBadgeView: View {
 //                )
             )
             .cornerRadius(999)
-            .shadow(color: Color(category.color), radius: 10, x: 0, y: 0)
+            .shadow(color: Color( category.color), radius: 10, x: 0, y: 0)
             .overlay(
                 RoundedRectangle(cornerRadius: 999)
                     .stroke(Color.gray.opacity(0.70), lineWidth: 1)
@@ -33,12 +33,12 @@ struct CategoryBadgeView: View {
     }
 }
 
-#Preview {
-    HStack(spacing: 16) {
-        CategoryBadgeView(category: Category(id: UUID(), name: "팬미팅", position: 0, color: .green))
-        CategoryBadgeView(category: Category(id: UUID(), name: "뮤지컬", position: 1, color: .purple))
-        CategoryBadgeView(category: Category(id: UUID(), name: "연극", position: 2, color: .yellow))
-        CategoryBadgeView(category: Category(id: UUID(), name: "페스티벌", position: 3, color: .blue))
-        CategoryBadgeView(category: Category(id: UUID(), name: "콘서트", position: 4, color: .cyan))
-    }
-}
+//#Preview {
+//    HStack(spacing: 16) {
+//        CategoryBadgeView(category: Category(id: UUID(), name: "팬미팅", position: 0, colorId: .green))
+//        CategoryBadgeView(category: Category(id: UUID(), name: "뮤지컬", position: 1, colorId: .purple))
+//        CategoryBadgeView(category: Category(id: UUID(), name: "연극", position: 2, colorId: .yellow))
+//        CategoryBadgeView(category: Category(id: UUID(), name: "페스티벌", position: 3, colorId: .blue))
+//        CategoryBadgeView(category: Category(id: UUID(), name: "콘서트", position: 4, colorId: .cyan))
+//    }
+//}

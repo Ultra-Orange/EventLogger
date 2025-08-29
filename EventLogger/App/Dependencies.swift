@@ -20,6 +20,11 @@ extension DependencyValues {
         get { self[eventItemsKey.self] }
         set { self[eventItemsKey.self] = newValue }
     }
+
+    var swiftDataManager: SwiftDataManager {
+        get { self[SwiftDataManagerKey.self] }
+        set { self[SwiftDataManagerKey.self] = newValue }
+    }
 }
 
 // MARK: ModelContext
@@ -27,6 +32,22 @@ extension DependencyValues {
 private enum ModelContextKey: DependencyKey {
     static var liveValue: ModelContext {
         ModelContext(Persistence.container)
+    }
+
+    static var testValue: ModelContext {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let schema = Schema([CategoryStore.self])
+        let container = try! ModelContainer(for: schema, configurations: config)
+        return ModelContext(container)
+    }
+}
+
+// MARK: SwiftData Manager
+
+private enum SwiftDataManagerKey: DependencyKey {
+    static var liveValue = SwiftDataManager()
+    static var testValue: SwiftDataManager {
+        SwiftDataManager()
     }
 }
 
@@ -39,11 +60,10 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "YOASOBI ZEPP TOUR 2024 POP OUT 東京公演 2日目",
-            category: Category(
-                id: UUID.init(),
+            category: CategoryItem(
                 name: "콘서트",
                 position: 0,
-                color: .blue
+                colorId: 0
             ),
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
@@ -71,11 +91,10 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "THE IDOLM@STER CINDERELLA GIRLS UNIT LIVE TOUR ConnecTrip! @TOKYO",
-            category: Category(
-                id: UUID.init(),
+            category: CategoryItem(
                 name: "콘서트",
                 position: 0,
-                color: .blue
+                colorId: 0
             ),
             startTime: DateFormatter.toDate("2024년 06월 1일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 6월 1일 16:00") ?? Date.now,
@@ -93,11 +112,10 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "(X) 2025 HAN SEON HWA FANMEETING 〈어트랙티브 선화log〉",
-            category: Category(
-                id: UUID.init(),
+            category: CategoryItem(
                 name: "팬미팅",
                 position: 1,
-                color: .red
+                colorId: 1
             ),
             startTime: DateFormatter.toDate("2025년 09월 20일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 20일 15:30") ?? Date.now,
@@ -126,12 +144,11 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "2025 부산국제록페스티벌 1일차",
-            category: Category(
-                    id: UUID.init(),
-                    name: "페스티벌",
-                    position: 2,
-                    color: .green
-                ),
+            category: CategoryItem(
+                name: "페스티벌",
+                position: 2,
+                colorId: 2
+            ),
 
             startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,

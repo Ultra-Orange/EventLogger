@@ -11,7 +11,7 @@ enum Persistence {
     static let container: ModelContainer = {
         do {
             let models: [any PersistentModel.Type] = [
-                // 컨테이너에 올릴 스위프트 데이터 모델 추가
+                CategoryStore.self,
             ]
             let schema = Schema(models)
             return try ModelContainer(for: schema)
