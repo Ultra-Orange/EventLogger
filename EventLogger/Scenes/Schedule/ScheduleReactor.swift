@@ -8,16 +8,19 @@
 import ReactorKit
 import RxFlow
 import RxRelay
+import Dependencies
 
 final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case selectLocation(String)
+        case setCategories
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setLocation(String)
+        case setCategories([CategoryItem])
     }
 
     // View의 상태 정의 (현재 View의 상태값)
@@ -26,6 +29,7 @@ final class ScheduleReactor: BaseReactor {
         let navTitle: String
         let buttonTitle: String
         var selectedLocation: String = ""
+        var categories: [CategoryItem]
     }
 
     enum Mode {
@@ -37,21 +41,27 @@ final class ScheduleReactor: BaseReactor {
     private let mode: Mode
 
     init(mode: Mode) {
+        @Dependency(\.swiftDataManager) var swiftDataManager
+        let fetched = swiftDataManager.fetchAllCategories()
+        
         self.mode = mode
         switch mode {
         case .create:
             initialState = State(
                 eventItem: nil,
                 navTitle: "새 일정 등록",
-                buttonTitle: "등록하기"
+                buttonTitle: "등록하기",
+                categories: fetched.compactMap { $0.toDomain() }
             )
         case let .update(item):
             initialState = State(
                 eventItem: item,
                 navTitle: "일정 수정",
                 buttonTitle: "수정하기",
+                categories: fetched.compactMap { $0.toDomain() }
             )
         }
+        
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
