@@ -94,6 +94,27 @@ struct SwiftDataManager {
     // CREATE
     func insertEventItem(_ item: EventItem) {
         let eventStore = item.toPersistent()
+
+        // [String] → [ArtistStore]
+        var artistStores: [ArtistStore] = []
+        for name in item.artists {
+            let predicate = #Predicate<ArtistStore> { $0.name == name }
+            let descriptor = FetchDescriptor<ArtistStore>(predicate: predicate)
+            do {
+                if let existing = try modelContext.fetch(descriptor).first {
+                    artistStores.append(existing)
+                } else {
+                    let newArtist = ArtistStore(name: name)
+                    modelContext.insert(newArtist)
+                    artistStores.append(newArtist)
+                }
+            } catch {
+                print("아티스트 fetch 실패: \(error.localizedDescription)")
+            }
+        }
+        eventStore.artists = artistStores
+        eventStore.artistsOrder = item.artists
+
         modelContext.insert(eventStore)
         saveContext()
     }
@@ -140,21 +161,43 @@ struct SwiftDataManager {
     
     // UPDATE
     func updateEvent(id: UUID, event: EventItem) {
-        if let store = fetchOneEventStore(id: id) {
-            store.title = event.title
-            store.categoryId = event.categoryId
-            store.imageData = event.image?.jpegData(compressionQuality: 0.8)
-            store.startTime = event.startTime
-            store.endTime = event.endTime
-            store.location = event.location
-            store.artists = event.artists
-            store.expense = event.expense
-            store.currency = event.currency.rawValue
-            store.memo = event.memo
-            saveContext()
-        } else {
+        guard let store = fetchOneEventStore(id: id) else {
             print("해당 id에 일치하는 일정이 존재하지 않습니다.")
+            return
         }
+
+        store.title = event.title
+        store.categoryId = event.categoryId
+        store.imageData = event.image?.jpegData(compressionQuality: 0.8)
+        store.startTime = event.startTime
+        store.endTime = event.endTime
+        store.location = event.location
+
+        // [String] → [ArtistStore]
+        var artistStores: [ArtistStore] = []
+        for name in event.artists {
+            let predicate = #Predicate<ArtistStore> { $0.name == name }
+            let descriptor = FetchDescriptor<ArtistStore>(predicate: predicate)
+            do {
+                if let existing = try modelContext.fetch(descriptor).first {
+                    artistStores.append(existing)
+                } else {
+                    let newArtist = ArtistStore(name: name)
+                    modelContext.insert(newArtist)
+                    artistStores.append(newArtist)
+                }
+            } catch {
+                print("아티스트 fetch 실패: \(error.localizedDescription)")
+            }
+        }
+        store.artists = artistStores
+        store.artistsOrder = event.artists
+
+        store.expense = event.expense
+        store.currency = event.currency.rawValue
+        store.memo = event.memo
+
+        saveContext()
     }
     
     func deleteEvent(id: UUID) {
