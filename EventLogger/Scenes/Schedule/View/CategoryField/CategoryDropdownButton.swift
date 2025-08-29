@@ -62,12 +62,6 @@ final class CategoryDropDownButton: UIView {
         applySelectionToButton() // 버튼에 초기 선택사항 반영 (PublishRelay이므로 초기 방출은 X)
     }
     
-    /// 외부에서 선택을 프로그램적으로 변경하고 싶을 때 사용
-    func select(category: CategoryItem) {
-        guard categories.contains(category) else { return }
-        updateSelection(to: category)
-    }
-    
     private func rebuildMenu() {
         button.menu = UIMenu(
             title: "",

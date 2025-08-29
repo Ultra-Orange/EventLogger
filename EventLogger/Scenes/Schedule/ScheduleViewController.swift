@@ -250,26 +250,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-        // 카테고리 실제 데이터 바인딩
-        reactor.state
-            .map(\.categories)
-            .distinctUntilChanged() // 이전과 같은 categories 배열이 방출되면 무시 (UI갱신 하지 않도록 막음)
-            .bind(onNext: { [weak self, weak reactor] categories in
-                guard let self else { return }
-                // 수정 모드면 기존 eventItem의 categoryName으로 초기 선택을 매칭
-                // eventItem에 categoryName이 존재하면 categories에서 해당 이름과 같은 카테고리를 찾아 initial에 담아 드롭다운 메뉴의 초기 선택값으로 사용
-                let initialName = reactor?.currentState.eventItem?.categoryName
-                let initial = initialName.flatMap { name in
-                    categories.first(where: { $0.name == name })
-                }
-                self.categoryFieldView.configure(categories: categories, initial: initial)
-            })
-            .disposed(by: disposeBag)
-
         // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
+        let categories = reactor.currentState.categories
         let item = reactor.currentState.eventItem
         guard let item else { return }
 
+        let categoryItem = categories.first { $0.name == item.categoryName }
+        categoryFieldView.configure(categories: categories, initial: categoryItem)
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime
