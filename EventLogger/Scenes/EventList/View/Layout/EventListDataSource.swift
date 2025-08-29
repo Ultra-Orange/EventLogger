@@ -32,6 +32,15 @@ final class EventListDataSource {
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
     
+    func eventItem(at indexPath: IndexPath) -> EventItem? {
+        guard let idItem = dataSource.itemIdentifier(for: indexPath) else { return nil }
+        let eventID: UUID
+        switch idItem {
+        case let .nextUp(id), let .monthEvent(id): eventID = id
+        }
+        return itemsByID[eventID]
+    }
+    
     private func configure(collectionView: UICollectionView) {
         // Cell: SwiftUI EventCell를 iOS 17의 UIHostingConfiguration으로 올림
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, EventListDSItem> { [weak self] cell, _, item in

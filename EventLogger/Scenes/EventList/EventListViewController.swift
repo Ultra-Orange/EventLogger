@@ -41,6 +41,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     private var dataSource: EventListDataSource!
+    private var currentItemsByID: [UUID: EventItem] = [:]
     
     // 정렬 토글 나중에 변경
     private lazy var sortButton = UIBarButtonItem(
@@ -127,6 +128,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
+        collectionView.rx.itemSelected
+            .compactMap { [weak self] indexPath -> EventItem? in
+                self?.collectionView.deselectItem(at: indexPath, animated: true)
+                return self?.dataSource.eventItem(at: indexPath)
+            }
+            .map { AppStep.eventDetail($0) }
+            .bind(to: reactor.steps)
+            .disposed(by: disposeBag)
+        
         // State -> Snapshot
         Observable
             .combineLatest(
@@ -146,6 +156,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] output in
                 guard let self else { return }
+                self.currentItemsByID = output.itemsByID
                 self.dataSource.updateItemsMap(output.itemsByID)
                 self.dataSource.apply(output.snapshot, animated: true)
             })
@@ -159,6 +170,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
                 self?.sortButton.image = UIImage(systemName: order == .newestFirst ? "arrow.up" : "arrow.down")
             })
             .disposed(by: disposeBag)
+    }
+}
+
+private extension EventListDSItem {
+    var eventID: UUID? {
+        switch self {
+        case let .nextUp(id): return id
+        case let .monthEvent(id): return id
+        }
     }
 }
 
