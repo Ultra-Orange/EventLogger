@@ -8,6 +8,8 @@
 import SnapKit
 import Then
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class ExpenseFieldContainerView: UIView {
     let label = UILabel().then {
@@ -18,7 +20,9 @@ final class ExpenseFieldContainerView: UIView {
     let textField = AppTextField().then {
         $0.placeholder = "비용을 입력하세요"
     }
-
+    
+    private let disposeBag = DisposeBag()
+    
     init() {
         super.init(frame: .zero)
 
@@ -35,6 +39,13 @@ final class ExpenseFieldContainerView: UIView {
             $0.leading.bottom.trailing.equalToSuperview()
             $0.height.equalTo(40)
         }
+        
+        textField.rx.controlEvent(.editingDidEnd)
+            .withLatestFrom(textField.rx.text.orEmpty)
+            .compactMap { Double($0) }
+            .map { $0.formatted(.number) }
+            .bind(to: textField.rx.text)
+            .disposed(by: disposeBag)
     }
 
     @available(*, unavailable)

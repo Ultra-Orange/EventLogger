@@ -245,13 +245,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime
+        expnsesFieldView.textField.text = item.expense.formatted(.number)
         if let location = item.location {
             reactor.action.onNext(.selectLocation(location))
         }
-        
         for artist in item.artists {
             artistsFieldView.tagsField.addTag(artist)
         }
+        memoFieldview.textView.text = item.memo
     }
 }
 

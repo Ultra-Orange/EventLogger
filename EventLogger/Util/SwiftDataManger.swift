@@ -22,9 +22,9 @@ struct SwiftDataManager {
             assertionFailure("SwiftData 저장 실패: \(error.localizedDescription)")
         }
     }
-
-    // MARK: CREATE
-
+    
+    // MARK: Category 관련
+    // CREATE
     func insertCategory(name: String, position: Int, colorId: Int) {
         let category = CategoryStore(
             name: name,
@@ -35,8 +35,7 @@ struct SwiftDataManager {
         saveContext()
     }
 
-    // MARK: READ
-
+    // READ
     func fetchAllCategories() -> [CategoryStore] {
         let descriptor = FetchDescriptor<CategoryStore>(
             sortBy: [SortDescriptor(\.position, order: .forward)]
@@ -48,7 +47,7 @@ struct SwiftDataManager {
             return []
         }
     }
-
+    
     func fetchOneCategory(name: String) -> CategoryStore? {
         let predicate = #Predicate<CategoryStore> { $0.name == name }
         let descriptor = FetchDescriptor<CategoryStore>(
@@ -63,8 +62,7 @@ struct SwiftDataManager {
         }
     }
 
-    // MARK: UPDATE
-
+    // UPDATE
     func updateCategory(categoryStore: CategoryStore,
                         name: String? = nil,
                         position: Int? = nil,
@@ -76,16 +74,18 @@ struct SwiftDataManager {
         saveContext()
     }
 
-    // MARK: Delete
-
+    // Delete
     func deleteCategory(categoryStore: CategoryStore) {
         modelContext.delete(categoryStore)
         saveContext()
     }
+    
+    // MARK: EventItem
+    // Create
 }
 
 extension SwiftDataManager {
-    
+    // 카테고리에 해당하는 컬러 리턴
     func colorForCategoryName(_ name: String) -> Color {
         guard let store = fetchOneCategory(name: name),
               let color = CategoryColor(rawValue: store.colorId)

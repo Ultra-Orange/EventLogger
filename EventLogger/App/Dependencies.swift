@@ -67,7 +67,7 @@ private enum eventItemsKey: DependencyKey {
             artists:
             ["YOASOBI"],
             expense: 75000,
-            currency: Currency.KRW.rawValue,
+            currency: Currency.KRW,
             memo:
             """
             [YOASOBI ZEPP TOUR 2024 "POP OUT"]
@@ -94,7 +94,7 @@ private enum eventItemsKey: DependencyKey {
             artists:
             ["アイドルマスターシンデレラガールズ", "原紗友里", "赤﨑千夏", "金子有希", "M・A・O(市道真央)", "森下来奈", "梅澤めぐ", "富田美憂", "星希成奏"],
             expense: 90000,
-            currency: Currency.KRW.rawValue,
+            currency: Currency.KRW,
             memo:
             """
             開催場所
@@ -111,7 +111,7 @@ private enum eventItemsKey: DependencyKey {
             artists:
             ["한선화"],
             expense: 88000,
-            currency: Currency.KRW.rawValue,
+            currency: Currency.KRW,
             memo:
             """
             ■ 변경 일정
@@ -140,7 +140,7 @@ private enum eventItemsKey: DependencyKey {
             artists:
             ["SUEDETHE", "SMASHING", "PUMPKINSBABYMETALMIKAPORTER", "ROBINSON", "자우림", "국카스텐"],
             expense: 110_000,
-            currency: Currency.KRW.rawValue,
+            currency: Currency.KRW,
             memo:
             """
             ※ 티켓 예매 시 본 예매페이지에 기재된 안내사항에 동의한 것으로 간주하며,
