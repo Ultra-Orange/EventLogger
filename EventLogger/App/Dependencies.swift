@@ -60,7 +60,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "YOASOBI ZEPP TOUR 2024 POP OUT 東京公演 2日目",
-            categoryName: "콘서트",
+            categoryId: TestUUID.uuid0!,
             startTime: DateFormatter.toDate("2024년 01월 26일 19:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 01월 26일 21:00") ?? Date.now,
             location: "Zepp Haneda TOKYO",
@@ -88,7 +88,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "THE IDOLM@STER CINDERELLA GIRLS UNIT LIVE TOUR ConnecTrip! @TOKYO",
-            categoryName: "콘서트",
+            categoryId: TestUUID.uuid0!,
             startTime: DateFormatter.toDate("2024년 06월 1일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2024년 6월 1일 16:00") ?? Date.now,
             artists:
@@ -105,7 +105,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "(X) 2025 HAN SEON HWA FANMEETING 〈어트랙티브 선화log〉",
-            categoryName: "팬미팅",
+            categoryId: TestUUID.uuid4!,
             startTime: DateFormatter.toDate("2025년 09월 20일 14:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 20일 15:30") ?? Date.now,
             artists:
@@ -133,7 +133,7 @@ private enum eventItemsKey: DependencyKey {
         EventItem(
             id: UUID(),
             title: "2025 부산국제록페스티벌 1일차",
-            categoryName: "페스티벌",
+            categoryId: TestUUID.uuid1!,
             startTime: DateFormatter.toDate("2025년 09월 26일 12:00") ?? Date.now,
             endTime: DateFormatter.toDate("2025년 09월 26일 22:00") ?? Date.now,
             location: "광안리 해수욕장",
@@ -157,6 +157,14 @@ private enum eventItemsKey: DependencyKey {
             """
         ),
     ]
+}
+
+struct TestUUID {
+    static let uuid0 = UUID(uuidString: "AB81EDCC-A57B-485B-8149-08044D687DD6")
+    static let uuid1 = UUID(uuidString: "A6B2937E-68DF-4BCF-AD88-BE97783507AC")
+    static let uuid2 = UUID(uuidString: "98B0816E-0C13-43B1-91DC-7B547476EDCB")
+    static let uuid3 = UUID(uuidString: "3EB8CF81-5502-4235-9D46-77B951D6791F")
+    static let uuid4 = UUID(uuidString: "AC14D390-5113-4F79-AC74-F6E8B4753220")
 }
 
 // 사용법

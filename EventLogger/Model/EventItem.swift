@@ -11,7 +11,7 @@ import UIKit
 struct EventItem: Hashable {
     let id: UUID // 고유 식별자
     var title: String // 제목
-    var categoryName: String // 카테고리
+    var categoryId: UUID // 카테고리
     var image: UIImage? // 이미지
     var startTime: Date // 개연시간
     var endTime: Date // 종연시간
@@ -35,7 +35,7 @@ extension EventItem {
         return EventStore(
             id: id,
             title: title,
-            categoryName: categoryName,
+            categoryId: categoryId,
             imageData: image?.jpegData(compressionQuality: 0.8),
             startTime: startTime,
             endTime: endTime,

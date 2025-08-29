@@ -49,14 +49,14 @@ final class ScheduleReactor: BaseReactor {
                 eventItem: nil,
                 navTitle: "새 일정 등록",
                 buttonTitle: "등록하기",
-                categories: fetched.compactMap { $0.toDomain() }
+                categories: fetched
             )
         case let .update(item):
             initialState = State(
                 eventItem: item,
                 navTitle: "일정 수정",
                 buttonTitle: "수정하기",
-                categories: fetched.compactMap { $0.toDomain() }
+                categories: fetched
             )
         }
     }

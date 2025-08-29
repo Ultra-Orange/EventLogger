@@ -18,16 +18,18 @@ struct EventCell: View { // EventItem 통으로 받자
     @Dependency(\.swiftDataManager) private var swiftDataManager
     
     @State private var categoryColor: Color = .gray
+    @State private var category: CategoryItem? = nil // TODO: 옵셔널 처리
     
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
-                CategoryBadgeView(
-                    name: item.categoryName,
-                    color: swiftDataManager.colorForCategoryName(item.categoryName)
-                )
+                if let category = category {
+                    CategoryBadgeView(
+                        name: category.name,
+                        color: swiftDataManager.colorForCategory(category.id)
+                    )
                     .padding(.bottom, 8)
-                
+                }
                 VStack {
                     Text(item.title)
                         .font(Font(UIFont.font20Bold))
@@ -47,9 +49,9 @@ struct EventCell: View { // EventItem 통으로 받자
                     .padding(.bottom, 4)
                 
                 // 여기 로케이션 나중에 넣어줘야 됨
-//                Text(location)
-//                    .font(.footnote)
-//                    .foregroundStyle(.white)
+                //                Text(location)
+                //                    .font(.footnote)
+                //                    .foregroundStyle(.white)
             }
             
             Spacer(minLength: 0)
@@ -74,7 +76,13 @@ struct EventCell: View { // EventItem 통으로 받자
                 .stroke(Color.gray.opacity(0.50), lineWidth: 1)
         )
         .task {
-            categoryColor = swiftDataManager.colorForCategoryName(item.categoryName)
+            
+            let fetchedCategory = swiftDataManager.fetchOneCategory(id: item.id)
+            if let category = fetchedCategory {
+                self.category = category
+                self.categoryColor = swiftDataManager.colorForCategory(category.id)
+            }
+            
         }
     }
 }

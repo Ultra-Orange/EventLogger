@@ -164,6 +164,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
+        let categories = reactor.currentState.categories
+        categoryFieldView.configure(categories: categories)
 
         memoFieldView.textView.rx.didBeginEditing
             .bind(onNext: { [weak self] in
@@ -251,12 +253,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
 
         // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
-        let categories = reactor.currentState.categories
+        
+        
         let item = reactor.currentState.eventItem
         guard let item else { return }
-
-        let categoryItem = categories.first { $0.name == item.categoryName }
-        categoryFieldView.configure(categories: categories, initial: categoryItem)
+        let selectedCategory = categories.filter { $0.id == item.categoryId }.first
+        print(categories)
+        categoryFieldView.configure(categories: categories, initial: selectedCategory)
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime

@@ -9,6 +9,7 @@ import UIKit
 
 // 앱에서 사용하는 카테고리용 도메인 모델
 struct CategoryItem: Hashable {
+    var id: UUID
     var name: String
     var position: Int
     var colorId: Int
@@ -18,11 +19,11 @@ struct CategoryItem: Hashable {
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
+        hasher.combine(id)
     }
 
     static func == (lhs: CategoryItem, rhs: CategoryItem) -> Bool {
-        return lhs.name == rhs.name
+        return lhs.id == rhs.id
     }
 }
 
@@ -30,6 +31,7 @@ struct CategoryItem: Hashable {
 extension CategoryItem {
     func toPersistent() -> CategoryStore {
         CategoryStore(
+            id: id,
             name: name,
             position: position,
             colorId: colorId

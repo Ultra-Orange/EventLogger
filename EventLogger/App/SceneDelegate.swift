@@ -31,7 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        )
 
         @Dependency(\.eventItems) var eventItems
-        let testItem = eventItems[0]
+        let testItem = eventItems[2]
         let appFlow = AppFlow(windowScene: windowScene)
         coordinator.coordinate(
             flow: appFlow,

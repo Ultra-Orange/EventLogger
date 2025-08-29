@@ -14,7 +14,7 @@ final class EventStore {
     
     @Attribute(.unique) var id: UUID
     var title: String
-    var categoryName: String
+    var categoryId: UUID
     var imageData: Data?
     var startTime: Date
     var endTime: Date
@@ -27,7 +27,7 @@ final class EventStore {
     init(
         id: UUID = UUID(),
         title: String,
-        categoryName: String,
+        categoryId: UUID,
         imageData: Data? = nil,
         startTime: Date,
         endTime: Date,
@@ -39,7 +39,7 @@ final class EventStore {
     ) {
         self.id = id
         self.title = title
-        self.categoryName = categoryName
+        self.categoryId = categoryId
         self.imageData = imageData
         self.startTime = startTime
         self.endTime = endTime
@@ -56,7 +56,7 @@ extension EventStore {
         return EventItem(
             id: id,
             title: title,
-            categoryName: categoryName,
+            categoryId: categoryId,
             image: imageData.flatMap { UIImage(data: $0) },
             startTime: startTime,
             endTime: endTime,
