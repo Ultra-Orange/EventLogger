@@ -12,14 +12,14 @@ import RxCocoa
 import RxGesture
 import RxSwift
 import SnapKit
+import SwiftData
 import SwiftUI
 import Then
 import UIKit
-import SwiftData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
-
     // MARK: UI Components
+
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
     }
@@ -67,7 +67,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     override func setupUI() {
         view.backgroundColor = .systemBackground
-        
+
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -162,7 +162,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
-                
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
 
@@ -172,7 +171,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self.scrollViewToShowWhole(self.memoFieldView.textView)
             })
             .disposed(by: disposeBag)
-        
+
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
@@ -252,9 +251,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
 
         // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
+        let categories = reactor.currentState.categories
         let item = reactor.currentState.eventItem
         guard let item else { return }
 
+        let categoryItem = categories.first { $0.name == item.categoryName }
+        categoryFieldView.configure(categories: categories, initial: categoryItem)
         inputTitleView.textField.text = item.title
         dateRangeFieldView.startDate = item.startTime
         dateRangeFieldView.endDate = item.endTime
@@ -272,7 +274,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 extension ScheduleViewController {
     /// 특정 서브뷰 전체가 보이도록 스크롤(상하 10pt 여유)
     func scrollViewToShowWhole(_ target: UIView, verticalPadding: CGFloat = 10, animated: Bool = true) {
-        self.scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
+        scrollView.setContentOffset(CGPoint(x: 0, y: 800), animated: animated)
         // 200이 아니라 스크롤뷰 전체 길이에서 메모 뷰 시작점에서 맨 밑까지의 높이를 뺀 값을 주자
     }
 }

@@ -5,10 +5,10 @@
 //  Created by Yoon on 8/22/25.
 //
 
+import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
-import Dependencies
 
 final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -41,7 +41,7 @@ final class ScheduleReactor: BaseReactor {
     init(mode: Mode) {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let fetched = swiftDataManager.fetchAllCategories()
-        
+
         self.mode = mode
         switch mode {
         case .create:
@@ -59,7 +59,6 @@ final class ScheduleReactor: BaseReactor {
                 categories: fetched.compactMap { $0.toDomain() }
             )
         }
-        
     }
 
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
