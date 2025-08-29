@@ -44,9 +44,8 @@ final class EventListReactor: BaseReactor {
     @Dependency(\.swiftDataManager) var swiftDataManager
 
     init() {
-        @Dependency(\.eventItems) var fetchItems
         initialState = State(
-            eventItems: fetchItems,
+            eventItems: [],
             filter: .all,
             sortOrder: .newestFirst
         )
@@ -57,7 +56,7 @@ final class EventListReactor: BaseReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .reloadEventItems:
-            @Dependency(\.eventItems) var fetchItems
+            let fetchItems = swiftDataManager.fetchAllEvents()
             return .just(.setEventItems(fetchItems))
 
         case let .setFilter(filter):

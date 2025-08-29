@@ -114,11 +114,4 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     }
 }
 
-#Preview {
-    @Dependency(\.eventItems) var eventItems
-    let testItem = eventItems[2]
-    let reactor = EventDetailReactor(eventItem: testItem)
-    UINavigationController(rootViewController: EventDetailViewController().then {
-        $0.reactor = reactor
-    })
-}
+

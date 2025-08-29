@@ -162,19 +162,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
+        // 상단 타이틀 & 하단 버튼
         title = reactor.currentState.navTitle
         bottomButton.configuration?.title = reactor.currentState.buttonTitle
-        let categories = reactor.currentState.categories
-        print(categories)
-        categoryFieldView.configure(categories: categories)
-
-        memoFieldView.textView.rx.didBeginEditing
-            .bind(onNext: { [weak self] in
-                guard let self else { return }
-                self.scrollViewToShowWhole(self.memoFieldView.textView)
-            })
-            .disposed(by: disposeBag)
-
+        
+        // 초기값 세팅
+        configureInitialState(reactor: reactor)
+                
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
             .map { $0.isEmpty ? "장소를 입력하세요" : $0 }
@@ -226,52 +220,88 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { title in .selectLocation(title) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
-        dateRangeFieldView.startDateChanged
-            .bind(onNext: { date in
-                print("시작 변경:", date)
+        
+        // 메모뷰 스크롤
+        memoFieldView.textView.rx.didBeginEditing
+            .bind(onNext: { [weak self] in
+                guard let self else { return }
+                self.scrollViewToShowWhole(self.memoFieldView.textView)
             })
             .disposed(by: disposeBag)
 
-        dateRangeFieldView.endDateChanged
-            .bind(onNext: { date in
-                print("종료 변경:", date)
-            })
-            .disposed(by: disposeBag)
-
-        // TODO: SwiftData 연동, 현재는 임시 확인용 프린트만
+        // 하단버튼 탭
         bottomButton.rx.tap
             .bind { [weak self] _ in
-                guard let self else { return }
-                // 데이트 확인용 프린트
-                let start = self.dateRangeFieldView.startDate
-                let end = self.dateRangeFieldView.endDate
-                print("저장할 시작/종료 날짜:", start, end)
-                // 아티스트 태그획득 확인용 프린트
+                guard let self, let reactor = self.reactor else { return }
+                let image = imageView.image
+                let title = inputTitleView.textField.text ?? ""
+                let categoryId = categoryFieldView.selectedCategory?.id ?? UUID() // 문법상 옵셔널 바인딩
+                let start = dateRangeFieldView.startDate
+                let end = dateRangeFieldView.endDate
+                let location = reactor.currentState.selectedLocation
                 let artists = artistsFieldView.tagsField.tags.map(\.text)
-                print(artists)
+                let memo = memoFieldView.textView.text ?? ""
+                
+                let formatter = NumberFormatter().then {
+                        $0.numberStyle = .decimal
+                }
+                let expense = expenseFieldView.textField.text.flatMap { formatter.number(from: $0) }.map(\.doubleValue) ?? 0
+                
+                let item = EventItem(
+                    id: UUID(),
+                    title: title,
+                    categoryId: categoryId,
+                    image: image,
+                    startTime: start,
+                    endTime: end,
+                    location: location.isEmpty ? nil : location,
+                    artists: artists,
+                    expense: expense,
+                    currency: .KRW, // MVP 기준 고정
+                    memo: memo
+                )
+                
+                reactor.action.onNext(.sendEventItem(item))
             }
             .disposed(by: disposeBag)
-
-        // 수정의 경우(eventItem이 존재할 경우) 데이터 바인딩
+    }
+    
+    private func configureInitialState(reactor: ScheduleReactor) {
+        // 공통 카테고리 & 아이템
+        let categories = reactor.currentState.categories
         
-        
-        let item = reactor.currentState.eventItem
-        guard let item else { return }
-        let selectedCategory = categories.filter { $0.id == item.categoryId }.first
-        print(categories)
-        categoryFieldView.configure(categories: categories, initial: selectedCategory)
-        inputTitleView.textField.text = item.title
-        dateRangeFieldView.startDate = item.startTime
-        dateRangeFieldView.endDate = item.endTime
-        expenseFieldView.textField.text = item.expense.formatted(.number)
-        if let location = item.location {
-            reactor.action.onNext(.selectLocation(location))
+        switch reactor.mode {
+        case .create:
+            // 신규등록은 카테고리 목록만 세팅
+            categoryFieldView.configure(categories: categories)
+        case let .update(item):
+            // TODO: 이미지
+            
+            // 제목
+            inputTitleView.textField.text = item.title
+            
+            // 카테고리 세팅
+            let selectedCategory = categories.first { $0.id == item.categoryId }
+            categoryFieldView.configure(categories: categories, initial: selectedCategory)
+            
+            // 날짜 및 시간
+            dateRangeFieldView.startDate = item.startTime
+            dateRangeFieldView.endDate = item.endTime
+            
+            // 장소
+            if let location = item.location {
+                reactor.action.onNext(.selectLocation(location))
+            }
+            
+            // 아티스트
+            item.artists.forEach { artistsFieldView.tagsField.addTag($0) }
+            
+            // 비용
+            expenseFieldView.textField.text = item.expense.formatted(.number)
+            
+            // 메모
+            memoFieldView.textView.text = item.memo
         }
-        for artist in item.artists {
-            artistsFieldView.tagsField.addTag(artist)
-        }
-        memoFieldView.textView.text = item.memo
     }
 }
 
@@ -312,14 +342,4 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
     }
 }
 
-#Preview {
-    @Dependency(\.eventItems) var eventItems
-    let testItem = eventItems[2]
 
-    let relay = PublishRelay<String>()
-//    let reactor = ScheduleReactor(mode: .create)
-    let reactor = ScheduleReactor(mode: .update(testItem))
-    UINavigationController(rootViewController: ScheduleViewController(selectedLocationRelay: relay).then {
-        $0.reactor = reactor
-    })
-}
