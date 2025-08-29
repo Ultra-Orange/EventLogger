@@ -70,7 +70,23 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         // 액션
         // 최초 로드
         rx.viewWillAppear
+            .flatMap { _ in
+                Observable.from([
+                    EventListReactor.Action.reloadEventItems,
+                    EventListReactor.Action.reloadCategories
+                ])
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        
+        rx.viewWillAppear
             .map { _ in EventListReactor.Action.reloadEventItems }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        rx.viewWillAppear
+            .map { _ in EventListReactor.Action.reloadCategories }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
