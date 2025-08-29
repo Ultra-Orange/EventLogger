@@ -26,10 +26,9 @@ struct CategoryMappingTests {
         let restored = store.toDomain()
 
         // Then: 값 검증
-        #expect(restored != nil)
-        #expect(restored?.name == original.name)
-        #expect(restored?.position == original.position)
-        #expect(restored?.colorId == original.colorId)
+        #expect(restored.name == original.name)
+        #expect(restored.position == original.position)
+        #expect(restored.colorId == original.colorId)
 
         // UI 컬러도 일관성 검증
         #expect(restored?.color == original.color)
@@ -86,6 +85,7 @@ struct CategoryMappingTests {
 
         // UPDATE
         if let category = fetched {
+            swiftData.updateCategory(name: "테스트1", category: category)
             swiftData.updateCategory(categoryStore: category, name: "수정됨", position: 1)
         }
         all = swiftData.fetchAllCategories()

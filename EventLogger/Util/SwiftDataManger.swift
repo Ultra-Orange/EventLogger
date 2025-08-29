@@ -25,6 +25,11 @@ struct SwiftDataManager {
     
     // MARK: Category 관련
     // CREATE
+    
+    func tmp(category: CategoryItem){
+        
+    }
+    
     func insertCategory(name: String, position: Int, colorId: Int) {
         let category = CategoryStore(
             name: name,
@@ -81,7 +86,67 @@ struct SwiftDataManager {
     }
     
     // MARK: EventItem
-    // Create
+    // CREATE
+    func insertEventItem(_ item: EventItem) {
+        let eventStore = item.toPersistent()
+        modelContext.insert(eventStore)
+        saveContext()
+    }
+    
+    // READ
+    func fetchAllEvents() -> [EventStore] {
+        let descriptor = FetchDescriptor<EventStore>(
+            sortBy: [SortDescriptor(\.startTime, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(descriptor)
+        } catch {
+            assertionFailure("이벤트 일정 fetch 실패: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    func fetchOneEvent(id: UUID) -> EventStore? {
+        let predicate = #Predicate<EventStore> { $0.id == id }
+        let descriptor = FetchDescriptor<EventStore>(
+            predicate: predicate
+        )
+        do {
+            return try modelContext.fetch(descriptor).first
+        } catch {
+            assertionFailure("이벤트 일정 fetch 실패: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    // UPDATE
+    func updateEvent(id: UUID, event: EventItem) {
+        if let past = fetchOneEvent(id: id) {
+            let income = event.toPersistent()
+            past.title = income.title
+            past.categoryName = income.categoryName
+            past.imageData = income.imageData
+            past.startTime = income.startTime
+            past.endTime = income.endTime
+            past.location = income.location
+            past.artists = income.artists
+            past.expense = income.expense
+            past.currency = income.currency
+            past.memo = income.memo
+            saveContext()
+        } else {
+            assertionFailure("해당 id에 일치하는 일정이 존재하지 않습니다.")
+        }
+    }
+    
+    func deleteEvent(id: UUID) {
+        if let target = fetchOneEvent(id: id){
+            modelContext.delete(target)
+            saveContext()
+        } else {
+            assertionFailure("해당 id에 일치하는 일정이 존재하지 않습니다.")
+        }
+    }
 }
 
 extension SwiftDataManager {
