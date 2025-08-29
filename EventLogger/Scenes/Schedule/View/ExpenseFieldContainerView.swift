@@ -19,6 +19,7 @@ final class ExpenseFieldContainerView: UIView {
 
     let textField = AppTextField().then {
         $0.placeholder = "비용을 입력하세요"
+        $0.keyboardType = .decimalPad
     }
     
     private let disposeBag = DisposeBag()
