@@ -67,7 +67,7 @@ public final class PillSegmentedControl: UIControl {
     }
     
     /// 선택 캡슐 섀도우 속성
-    public var capsuleShadowColor: UIColor = UIColor(red: 0.961, green: 0.397, blue: 0.019, alpha: 1) {
+    public var capsuleShadowColor: UIColor = .primary500 {
         didSet { selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor }
     }
     public var capsuleShadowOpacity: Float = 1.0 {

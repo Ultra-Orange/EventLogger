@@ -19,7 +19,7 @@ extension UIButton {
         button.configurationUpdateHandler = { button in
             var config = button.configuration ?? .bordered()
             let isOn = button.isSelected
-            config.baseForegroundColor = isOn ? .systemOrange : .white
+            config.baseForegroundColor = isOn ? .primary500 : .white
             button.configuration = config
         }
         return button

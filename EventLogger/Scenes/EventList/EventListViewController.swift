@@ -16,10 +16,16 @@ import UIKit
 final class EventListViewController: BaseViewController<EventListReactor> {
     private let backgroundGradientView = GradientBackgroundView()
     
+    private let titleLabel = UILabel().then {
+        $0.text = "Event Logger"
+        $0.textColor = .primary500
+        $0.font = .font17Semibold
+    }
+    
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
         $0.font = .font17Regular
         $0.capsuleBackgroundColor = .black
-        $0.capsuleBorderColor = UIColor(red: 0.961, green: 0.397, blue: 0.019, alpha: 1)
+        $0.capsuleBorderColor = .primary500
         $0.capsuleBorderWidth = 1
         $0.normalTextColor = .white
         $0.selectedTextColor = .white
@@ -42,10 +48,19 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         style: .plain,
         target: nil,
         action: nil
-    )
+    ).then {
+        $0.tintColor = .white
+    }
+    
+    private lazy var addButton = UIBarButtonItem(
+        barButtonSystemItem: .add,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .white
+    }
     
     override func setupUI() {
-        title = "Event Logger"
         view.backgroundColor = .black
         
         view.addSubview(backgroundGradientView)
@@ -66,7 +81,9 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
-        navigationItem.rightBarButtonItem = sortButton
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+        
+        navigationItem.rightBarButtonItems = [sortButton, addButton]
         
         dataSource = EventListDataSource(collectionView: collectionView)
     }
@@ -103,6 +120,11 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         sortButton.rx.tap
             .map { .toggleSort }
             .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        addButton.rx.tap
+            .map { AppStep.createSchedule }
+            .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
         // State -> Snapshot
