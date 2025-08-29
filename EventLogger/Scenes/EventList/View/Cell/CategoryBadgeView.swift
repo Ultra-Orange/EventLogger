@@ -18,11 +18,6 @@ struct CategoryBadgeView: View {
             .padding(.vertical, 4)
             .background(
                 Color(category.color)
-//                LinearGradient(
-//                    gradient: Gradient(colors: [color, .clear]),
-//                    startPoint: .leading,
-//                    endPoint: .trailing
-//                )
             )
             .cornerRadius(999)
             .shadow(color: Color( category.color), radius: 10, x: 0, y: 0)
@@ -32,13 +27,3 @@ struct CategoryBadgeView: View {
             )
     }
 }
-
-//#Preview {
-//    HStack(spacing: 16) {
-//        CategoryBadgeView(category: Category(id: UUID(), name: "팬미팅", position: 0, colorId: .green))
-//        CategoryBadgeView(category: Category(id: UUID(), name: "뮤지컬", position: 1, colorId: .purple))
-//        CategoryBadgeView(category: Category(id: UUID(), name: "연극", position: 2, colorId: .yellow))
-//        CategoryBadgeView(category: Category(id: UUID(), name: "페스티벌", position: 3, colorId: .blue))
-//        CategoryBadgeView(category: Category(id: UUID(), name: "콘서트", position: 4, colorId: .cyan))
-//    }
-//}
