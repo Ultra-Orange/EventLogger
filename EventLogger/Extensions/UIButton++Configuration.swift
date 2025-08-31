@@ -68,4 +68,16 @@ extension UIButton.Configuration {
         }
         return config
     }
+    
+    // 네비게이션 편집버튼 버튼
+    static var navEdit: UIButton.Configuration {
+        var config = plain()
+        config.titleTextAttributesTransformer = .init { attr in
+            var newAttr = attr
+            newAttr.font = UIFont.font13Regular
+//            newAttr.foregroundColor = .accent
+            return newAttr
+        }
+        return config
+    }
 }
