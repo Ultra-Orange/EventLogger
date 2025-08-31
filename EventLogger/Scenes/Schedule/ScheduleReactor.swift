@@ -9,6 +9,7 @@ import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
+import RxSwift
 
 final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -59,6 +60,12 @@ final class ScheduleReactor: BaseReactor {
     let initialState: State
     let mode: Mode
 
+    
+    @Dependency(\.settingsService) private var settingsService
+    @Dependency(\.calendarService) private var calendarService
+    
+    private let disposeBag = DisposeBag()
+    
     init(mode: Mode) {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let categories = swiftDataManager.fetchAllCategories()
@@ -78,11 +85,13 @@ final class ScheduleReactor: BaseReactor {
         switch action {
         case let .selectLocation(location):
             return .just(.setLocation(location))
+            
         case let .sendEventItem(item):
             switch mode {
             case .create:
                 @Dependency(\.swiftDataManager) var swiftDataManager
                 swiftDataManager.insertEventItem(item)
+                autoSaveToCalendarIfNeeded(item)
                 steps.accept(AppStep.eventList)
                 return .never()
             case .update:
@@ -100,5 +109,20 @@ final class ScheduleReactor: BaseReactor {
             newState.selectedLocation = location
         }
         return newState
+    }
+}
+
+// MARK: - Private helpers
+
+private extension ScheduleReactor {
+    func autoSaveToCalendarIfNeeded(_ item: EventItem) {
+        guard settingsService.autoSaveToCalendar else { return }
+
+        calendarService.requestAccess()
+            .flatMap { [calendarService] granted -> Single<Void> in
+                granted ? calendarService.save(eventItem: item) : .never()
+            }
+            .subscribe() // 저장 잘 됐는지 안됐는지 결과는 무시
+            .disposed(by: disposeBag)
     }
 }
