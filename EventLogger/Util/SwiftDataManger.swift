@@ -12,9 +12,9 @@ import SwiftUI
 
 struct SwiftDataManager {
     @Dependency(\.modelContext) var modelContext
-
+    
     // MARK: SaveContext
-
+    
     private func saveContext() {
         do {
             try modelContext.save()
@@ -25,13 +25,13 @@ struct SwiftDataManager {
     
     // MARK: Category 관련
     // CREATE
-        
+    
     func insertCategory(category: CategoryItem) {
         let storeCategory = category.toPersistent()
         modelContext.insert(storeCategory)
         saveContext()
     }
-
+    
     // READ
     func fetchAllCategories() -> [CategoryItem] {
         let descriptor = FetchDescriptor<CategoryStore>(
@@ -67,7 +67,7 @@ struct SwiftDataManager {
             return nil
         }
     }
-
+    
     // UPDATE
     func updateCategory(id: UUID, category: CategoryItem) {
         if let store = fetchOneCategoryStore(id: id) {
@@ -79,7 +79,7 @@ struct SwiftDataManager {
             print("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
         }
     }
-
+    
     // Delete
     func deleteCategory(id: UUID) {
         if let target = fetchOneCategoryStore(id: id){
@@ -94,7 +94,7 @@ struct SwiftDataManager {
     // CREATE
     func insertEventItem(_ item: EventItem) {
         let eventStore = item.toPersistent()
-
+        
         // [String] → [ArtistStore]
         var artistStores: [ArtistStore] = []
         for name in item.artists {
@@ -114,7 +114,7 @@ struct SwiftDataManager {
         }
         eventStore.artists = artistStores
         eventStore.artistsOrder = item.artists
-
+        
         modelContext.insert(eventStore)
         saveContext()
     }
@@ -165,14 +165,14 @@ struct SwiftDataManager {
             print("해당 id에 일치하는 일정이 존재하지 않습니다.")
             return
         }
-
+        
         store.title = event.title
         store.categoryId = event.categoryId
         store.imageData = event.image?.jpegData(compressionQuality: 0.8)
         store.startTime = event.startTime
         store.endTime = event.endTime
         store.location = event.location
-
+        
         // [String] → [ArtistStore]
         var artistStores: [ArtistStore] = []
         for name in event.artists {
@@ -192,11 +192,11 @@ struct SwiftDataManager {
         }
         store.artists = artistStores
         store.artistsOrder = event.artists
-
+        
         store.expense = event.expense
         store.currency = event.currency.rawValue
         store.memo = event.memo
-
+        
         saveContext()
     }
     
@@ -219,5 +219,29 @@ extension SwiftDataManager {
             return .gray
         }
         return Color(color.uiColor)
+    }
+    
+    // 아티스트 통계용 데이터 리턴
+    func fetchArtistStatistics() -> [ArtistStats] {
+        let events = fetchAllEvents()  // [EventItem]
+        
+        // 아티스트별 데이터 집계
+        var stats: [String: (count: Int, totalExpense: Double)] = [:]
+        
+        for event in events {
+            for artist in event.artists {
+                if var current = stats[artist] {
+                    current.count += 1
+                    current.totalExpense += event.expense
+                    stats[artist] = current
+                } else {
+                    stats[artist] = (count: 1, totalExpense: event.expense)
+                }
+            }
+        }
+        
+        // 결과 변환
+        return stats.map { ArtistStats(name: $0.key, count: $0.value.count, totalExpense: $0.value.totalExpense) }
+            .sorted { $0.count > $1.count } // 예시: 많이 참가한 순으로 정렬
     }
 }
