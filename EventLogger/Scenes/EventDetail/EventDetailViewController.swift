@@ -131,7 +131,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .disposed(by: disposeBag)
         
-        // 저장 결과 알럿
+        // TODO: 한 스트림에서 switch로 알럿을 만들지 말고, saveOutcome을 케이스별로 분기된 스트림으로 나눠서, 각각 UIAlertController의 Rx 확장으로 처리하라
         reactor.saveOutcome
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, outcome in
@@ -167,5 +167,3 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .disposed(by: disposeBag)
     }
 }
-
-
