@@ -106,7 +106,7 @@ final class ScheduleReactor: BaseReactor {
                 swiftDataManager.insertEventItem(item)
                 autoSaveToCalendarIfNeeded(item)
                 steps.accept(AppStep.eventList)
-                return .never()
+                return .empty()
                 
             case let .update(oldItem):
                 let updated = EventItem(
@@ -124,7 +124,7 @@ final class ScheduleReactor: BaseReactor {
                 )
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
                 steps.accept(AppStep.eventList)
-                return .never()
+                return .empty()
             }
         }
     }
