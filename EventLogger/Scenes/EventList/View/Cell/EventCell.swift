@@ -5,8 +5,8 @@
 //  Created by 김우성 on 8/21/25.
 //
 
-import SwiftUI
 import Dependencies
+import SwiftUI
 
 struct EventCategory {
     let name: String
@@ -20,7 +20,6 @@ struct EventCell: View { // EventItem 통으로 받자
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
-                
                 CategoryBadgeView(
                     name: category.name,
                     color: Color(uiColor: category.color)
@@ -50,8 +49,7 @@ struct EventCell: View { // EventItem 통으로 받자
                         .font(Font(UIFont.font13Regular))
                         .foregroundStyle(Color(UIColor.neutral50))
                 }
-                
-            }
+             }
             
             Spacer(minLength: 0)
             
@@ -68,8 +66,7 @@ struct EventCell: View { // EventItem 통으로 받자
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                     }
-                        
-                }
+                 }
                 .cornerRadius(10)
         }
         .padding(.horizontal, 12)

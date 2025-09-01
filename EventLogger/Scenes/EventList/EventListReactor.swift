@@ -71,11 +71,10 @@ final class EventListReactor: BaseReactor {
         case .reloadCategories:
             let categoryItems = swiftDataManager.fetchAllCategories()
             return .just(.setCategories(categoryItems))
-            
+
         case let .setYearFilter(year):
             return .just(.setYearFilter(year))
         }
-        
     }
 
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
@@ -94,7 +93,7 @@ final class EventListReactor: BaseReactor {
 
         case let .setCategories(categories):
             newState.categories = categories
-            
+
         case let .setYearFilter(year):
             newState.yearFilter = year
         }

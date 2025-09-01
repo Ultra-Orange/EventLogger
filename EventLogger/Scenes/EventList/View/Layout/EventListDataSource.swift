@@ -5,10 +5,10 @@
 //  Created by 김우성 on 8/25/25.
 //
 
+import Dependencies
 import SnapKit
 import SwiftUI
 import UIKit
-import Dependencies
 
 /// Diffable DataSource & 헤더 등록 담당
 final class EventListDataSource {
@@ -36,7 +36,7 @@ final class EventListDataSource {
         guard let idItem = dataSource.itemIdentifier(for: indexPath) else { return nil }
         let eventID: UUID
         switch idItem {
-        case let .nextUp(id), let .monthEvent(id): eventID = id
+        case .nextUp(let id), .monthEvent(let id): eventID = id
         }
         return itemsByID[eventID]
     }
@@ -45,7 +45,6 @@ final class EventListDataSource {
         // Cell: SwiftUI EventCell를 iOS 17의 UIHostingConfiguration으로 올림
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, EventListDSItem> { [weak self] cell, _, item in
             @Dependency(\.swiftDataManager) var swiftDataManager
-            
             
             guard let self else { return }
             let event: EventItem? = {

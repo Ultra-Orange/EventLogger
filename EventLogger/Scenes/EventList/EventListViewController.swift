@@ -165,7 +165,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
                 reactor.state.map(\.eventItems).distinctUntilChanged(),
                 reactor.state.map(\.filter).distinctUntilChanged(),
                 reactor.state.map(\.sortOrder).distinctUntilChanged(),
-                reactor.state.map( \.yearFilter).distinctUntilChanged()
+                reactor.state.map(\.yearFilter).distinctUntilChanged()
             )
             .map { items, filter, sortOrder, yearFilter in
                 EventListSnapshotBuilder.build(input: .init(

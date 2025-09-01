@@ -57,7 +57,7 @@ public final class PillSegmentedControl: UIControl {
     public var capsuleBorderWidth: CGFloat = 0 {
         didSet { selectionCapsuleView.layer.borderWidth = capsuleBorderWidth }
     }
-    
+
     public var capsuleShadowColor: UIColor = .white {
         didSet { selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor }
     }
