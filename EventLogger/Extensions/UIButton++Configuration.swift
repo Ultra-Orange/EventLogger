@@ -34,11 +34,27 @@ extension UIButton.Configuration {
     // 기본 버튼
     static var defaultButton: UIButton.Configuration {
         var config = filled()
-        config.baseBackgroundColor = .systemBlue
+        config.baseBackgroundColor = .accent
         config.titleTextAttributesTransformer = .init { attr in
             var newAttr = attr
             newAttr.font = UIFont.font16Regular
-            newAttr.foregroundColor = .systemBackground
+            newAttr.foregroundColor = .white
+            return newAttr
+        }
+        return config
+    }
+    
+    static var defaultColorReversed: UIButton.Configuration {
+        var config = filled()
+        config.baseBackgroundColor = .systemGray5
+        config.baseForegroundColor = .accent
+        config.background.strokeColor = .accent
+        config.background.strokeWidth = 1
+        config.titleTextAttributesTransformer = .init { attr in
+            var newAttr = attr
+            newAttr.font = UIFont.font16Regular
+            newAttr.foregroundColor = .accent
+            
             return newAttr
         }
         return config

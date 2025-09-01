@@ -12,6 +12,8 @@ import UIKit
 /// label.font = .font16Regular
 
 extension UIFont {
+    static let font28Bold = UIFont.systemFont(ofSize: 28, weight: .bold)
+    
     static let font20Bold = UIFont.systemFont(ofSize: 20, weight: .bold)
     static let font20Semibold = UIFont.systemFont(ofSize: 20, weight: .semibold)
     

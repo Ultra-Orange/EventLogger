@@ -8,6 +8,7 @@
 import SnapKit
 import Then
 import UIKit
+import Dependencies
 
 // 정보 카드 부분 뷰
 class InfoItemView: UIView {
@@ -20,37 +21,37 @@ class InfoItemView: UIView {
     // MARK: Label
 
     private let dateLabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     private let categoryLabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     private let timelabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     private let locationLabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     private let artistsLabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     private let expenseLabel = UILabel().then {
-        $0.font = .font16Regular
+        $0.font = .font17Regular
     }
 
     // MARK: SF Symbol
 
-    private let calendarIcon = UIImageView(image: UIImage(systemName: "calendar", withConfiguration: .font16Regular))
-    private let tagIcon = UIImageView(image: UIImage(systemName: "tag", withConfiguration: .font16Regular))
-    private let clockIcon = UIImageView(image: UIImage(systemName: "clock", withConfiguration: .font16Regular))
-    private let mapPinIcon = UIImageView(image: UIImage(systemName: "mappin.and.ellipse", withConfiguration: .font16Regular))
-    private let personIcon = UIImageView(image: UIImage(systemName: "person", withConfiguration: .font16Regular))
-    private let moneysignIcon = UIImageView(image: UIImage(systemName: "wonsign.circle", withConfiguration: .font16Regular))
+    private let calendarIcon = UIImageView(image: UIImage(systemName: "calendar", withConfiguration: .font17Regular))
+    private let tagIcon = UIImageView(image: UIImage(systemName: "tag", withConfiguration: .font17Regular))
+    private let clockIcon = UIImageView(image: UIImage(systemName: "clock", withConfiguration: .font17Regular))
+    private let mapPinIcon = UIImageView(image: UIImage(systemName: "mappin.and.ellipse", withConfiguration: .font17Regular))
+    private let personIcon = UIImageView(image: UIImage(systemName: "person", withConfiguration: .font17Regular))
+    private let moneysignIcon = UIImageView(image: UIImage(systemName: "wonsign.circle", withConfiguration: .font17Regular))
 
     // MARK: Button
 
@@ -58,7 +59,7 @@ class InfoItemView: UIView {
         $0.configuration?.title = "캘린더에 추가"
     }
 
-    let findDirectionsButton = UIButton(configuration: .defaultButton).then {
+    let findDirectionsButton = UIButton(configuration: .defaultColorReversed).then {
         $0.configuration?.title = "길 찾기"
     }
 
@@ -108,7 +109,7 @@ class InfoItemView: UIView {
 
         dateLabel.snp.makeConstraints {
             $0.top.equalTo(calendarIcon)
-            $0.leading.equalTo(calendarIcon.snp.trailing).offset(8)
+            $0.leading.equalTo(calendarIcon.snp.trailing).offset(10)
         }
 
         tagIcon.snp.makeConstraints {
@@ -128,7 +129,7 @@ class InfoItemView: UIView {
 
         timelabel.snp.makeConstraints {
             $0.top.equalTo(clockIcon)
-            $0.leading.equalTo(clockIcon.snp.trailing).offset(8)
+            $0.leading.equalTo(clockIcon.snp.trailing).offset(11)
         }
 
         mapPinIcon.snp.makeConstraints {
@@ -138,7 +139,7 @@ class InfoItemView: UIView {
 
         locationLabel.snp.makeConstraints {
             $0.top.equalTo(mapPinIcon)
-            $0.leading.equalTo(mapPinIcon.snp.trailing).offset(8)
+            $0.leading.equalTo(mapPinIcon.snp.trailing).offset(12)
         }
 
         personIcon.snp.makeConstraints {
@@ -148,7 +149,7 @@ class InfoItemView: UIView {
 
         artistsLabel.snp.makeConstraints {
             $0.top.equalTo(personIcon)
-            $0.leading.equalTo(personIcon.snp.trailing).offset(8)
+            $0.leading.equalTo(personIcon.snp.trailing).offset(12)
         }
 
         moneysignIcon.snp.makeConstraints {
@@ -158,7 +159,7 @@ class InfoItemView: UIView {
 
         expenseLabel.snp.makeConstraints {
             $0.top.equalTo(moneysignIcon)
-            $0.leading.equalTo(moneysignIcon.snp.trailing).offset(8)
+            $0.leading.equalTo(moneysignIcon.snp.trailing).offset(11)
         }
 
         buttonStackView.snp.makeConstraints {
@@ -171,8 +172,12 @@ class InfoItemView: UIView {
 
     // 리액터에 바인딩 되는 값 주입
     func configureView(eventItem: EventItem) {
+        @Dependency(\.swiftDataManager) var swiftDataManager
+        let categories = swiftDataManager.fetchAllCategories()
+        let categoryName = categories.first{ $0.id == eventItem.categoryId }?.name
+        
         dateLabel.text = DateFormatter.toDateString(eventItem.startTime)
-        categoryLabel.text = eventItem.categoryId.uuidString // TODO: 카테고리ID로 정보획득
+        categoryLabel.text = categoryName
         timelabel.text = makeTimeLabel(startTime: eventItem.startTime, endTime: eventItem.endTime)
         locationLabel.text = eventItem.location
         artistsLabel.text = makeArtistsLabel(eventItem.artists)

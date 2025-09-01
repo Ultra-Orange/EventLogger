@@ -10,14 +10,15 @@ import HostingView
 import ReactorKit
 import RxCocoa
 import RxSwift
+import RxRelay
 import SnapKit
 import SwiftUI
 import Then
 
 class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: UI Component
-    // TODO: 상단버튼 후변경
-    private lazy var editButton = UIBarButtonItem(
+    
+    private let moreButton = UIBarButtonItem(
         image: UIImage(systemName: "ellipsis"),
         style: .plain,
         target: nil,
@@ -25,7 +26,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     ).then {
         $0.tintColor = .white
     }
-
+    
     private let scrollView = UIScrollView()
     private let contentView = UIView()
 
@@ -41,23 +42,44 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     }
 
     private let titleLabel = UILabel().then {
-        $0.font = .font20Semibold
+        $0.font = .font28Bold
         $0.numberOfLines = 2
         $0.lineBreakMode = .byTruncatingTail
         $0.textAlignment = .left
     }
 
     private let infoItemView = InfoItemView()
-
+    
+    private let memoLabel = UILabel().then {
+        $0.text = "메모"
+        $0.font = .font13Regular
+        $0.textColor = .label
+    }
     private let memoView = MemoView()
 
+    private let editActionRelay = PublishRelay<Void>()
+    private let deleteActionRelay = PublishRelay<Void>()
+    
     // MARK: SetupUI
 
     override func setupUI() {
         view.backgroundColor = .systemBackground
         // 네비게이션 영역
         title = "Event Logger"
-        navigationItem.rightBarButtonItem = editButton
+        navigationItem.rightBarButtonItem = moreButton
+        
+        // UIMenu & Action
+        let editAction = UIAction(title: "수정하기", image: UIImage(systemName: "pencil")) { [editActionRelay] _ in
+            editActionRelay.accept(())
+        }
+
+        let deleteAction = UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) {  [deleteActionRelay] _ in
+            deleteActionRelay.accept(())
+        }
+        
+        moreButton.menu = UIMenu(title: "", children: [editAction, deleteAction])
+        moreButton.primaryAction = nil   // 탭 시 바로 메뉴 표시
+        
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -77,27 +99,33 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(infoItemView)
+        contentView.addSubview(memoLabel)
         contentView.addSubview(memoView)
 
         // 오토 레이아웃
         imageView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(246)
+            $0.height.equalTo(contentView.snp.width)
         }
 
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(imageView.snp.bottom).offset(14)
+            $0.top.equalTo(imageView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
         }
 
         infoItemView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(14)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
+        }
+        
+        memoLabel.snp.makeConstraints {
+            $0.top.equalTo(infoItemView.snp.bottom).offset(30)
+            $0.leading.trailing.equalTo(memoView).inset(16)
         }
 
         memoView.snp.makeConstraints {
-            $0.top.equalTo(infoItemView.snp.bottom).offset(20)
+            $0.top.equalTo(memoLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
@@ -106,16 +134,26 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: Binding
 
     override func bind(reactor: EventDetailReactor) {
+               
         // 1회성 데이터 바인딩
         let eventItem = reactor.currentState.eventItem
         titleLabel.text = eventItem.title
         imageView.image = eventItem.image
         infoItemView.configureView(eventItem: eventItem)
         memoView.configureView(eventItem.memo)
-
-        // TODO: 버튼액션
-        editButton.rx.tap
-            .map { _ in .moveToEdit(eventItem) }
+        
+        editActionRelay.map { .moveToEdit(eventItem) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+        
+        deleteActionRelay
+            .withUnretained(self)
+            .flatMap { `self`, _ in
+                UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제하시겠습니까?", actions: [
+                    .cancel("취소"),
+                    .destructive("삭제", payload: .deleteEvent(eventItem.id)),
+                ])
+            }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
@@ -126,8 +164,10 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
 
         // TODO: 버튼액션
         infoItemView.findDirectionsButton.rx.tap
-            .bind {
-                print("Find Way")
+            .withUnretained(self)
+            .bind { `self`, _ in
+                let keyword = self.reactor?.currentState.eventItem.location ?? ""
+                self.openInGoogleMaps(keyword: keyword)
             }
             .disposed(by: disposeBag)
         
@@ -166,4 +206,22 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .disposed(by: disposeBag)
     }
+    
+    private func openInGoogleMaps(keyword: String) {
+        // URL은 공백이나 한글 같은 특수문자를 직접 포함할 수 없기 때문에 addingPercentEncoding으로 변환
+        let encoded = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? keyword
+        
+        // 1) 구글맵 앱으로 열기
+        if let appURL = URL(string: "comgooglemaps://?q=\(encoded)"),
+           UIApplication.shared.canOpenURL(appURL) {
+            UIApplication.shared.open(appURL, options: [:], completionHandler: nil)
+            return
+        }
+        
+        // 2) 앱이 없으면 웹으로 열기
+        if let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(encoded)") {
+            UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
+        }
+    }
+
 }
