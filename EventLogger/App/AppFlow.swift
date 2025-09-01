@@ -36,6 +36,10 @@ final class AppFlow: Flow {
             return navigateToSchedule(mode: .update(item))
         case let .locationSearch(string):
             return navigateToLocationSearch(query: string)
+        case .settings:
+            return navigateToSettings()
+        case .categoryEdit:
+            return navigateToCategoryEdit()
         }
     }
 
@@ -93,5 +97,32 @@ final class AppFlow: Flow {
         }
         rootNav.present(nav, animated: true)
         return .none
+    }
+    
+    private func navigateToSettings() -> FlowContributors {
+        let vc = SettingsViewController()
+        let reactor = SettingsReactor()
+        vc.reactor = reactor
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+    }
+    
+    private func navigateToCategoryEdit() -> FlowContributors {
+        let vc = CategoryEditViewController()
+        let reactor = CategoryEditReactor()
+        vc.reactor = reactor
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+        
     }
 }

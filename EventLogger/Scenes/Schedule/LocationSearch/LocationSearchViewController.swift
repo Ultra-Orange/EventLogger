@@ -232,7 +232,6 @@ extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
     }
 
     func completer(_: MKLocalSearchCompleter, didFailWithError error: Error) {
-        print("자동완성 오류: \(error.localizedDescription)")
         completerResults.accept([])
     }
 }

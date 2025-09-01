@@ -23,6 +23,7 @@ enum CalendarSaveOutcome {
 final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
+        case moveToEdit(EventItem)
         case addToCalendarTapped
     }
 
@@ -53,6 +54,9 @@ final class EventDetailReactor: BaseReactor {
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
+        case let .moveToEdit(item):
+            steps.accept(AppStep.updateSchedule(item))
+            return .never()
         case .addToCalendarTapped:
             // 권한 요청 -> 저장 -> 결과 알림
             let item = currentState.eventItem
