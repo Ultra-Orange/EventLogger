@@ -59,9 +59,16 @@ struct EventCell: View { // EventItem 통으로 받자
                 .fill(Color.gray.opacity(0.5))
                 .frame(width: 80, height: 80)
                 .background {
-                    Image(systemName: "photo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    if let uiImage = item.image {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    }
+                        
                 }
                 .cornerRadius(10)
         }
