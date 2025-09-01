@@ -215,12 +215,12 @@ private extension EventListViewController {
         dispatcher: ActionSubject<EventListReactor.Action>
     ) -> UIMenu {
         // 1) 정렬 액션 (단일 선택처럼 체크)
-        let newest = UIAction(title: "최신 순", image: UIImage(systemName: "arrow.up")) { [weak dispatcher] _ in
+        let newest = UIAction(title: "최신 순", image: UIImage(systemName: "arrow.down.to.line")) { [weak dispatcher] _ in
             dispatcher?.onNext(.setSortOrder(.newestFirst))
         }
         newest.state = (currentSort == .newestFirst) ? .on : .off
         
-        let oldest = UIAction(title: "오래된 순", image: UIImage(systemName: "arrow.down")) { [weak dispatcher] _ in
+        let oldest = UIAction(title: "오래된 순", image: UIImage(systemName: "arrow.up.to.line")) { [weak dispatcher] _ in
             dispatcher?.onNext(.setSortOrder(.oldestFirst))
         }
         oldest.state = (currentSort == .oldestFirst) ? .on : .off
