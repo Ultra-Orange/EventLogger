@@ -16,8 +16,8 @@ import Then
 
 class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: UI Component
-    // TODO: 상단버튼 후변경
-    private lazy var editButton = UIBarButtonItem(
+    
+    private lazy var ellipsisButton = UIBarButtonItem(
         image: UIImage(systemName: "ellipsis"),
         style: .plain,
         target: nil,
@@ -41,14 +41,19 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     }
 
     private let titleLabel = UILabel().then {
-        $0.font = .font20Semibold
+        $0.font = .font28Bold
         $0.numberOfLines = 2
         $0.lineBreakMode = .byTruncatingTail
         $0.textAlignment = .left
     }
 
     private let infoItemView = InfoItemView()
-
+    
+    private let memoLabel = UILabel().then {
+        $0.text = "메모"
+        $0.font = .font13Regular
+        $0.textColor = .label
+    }
     private let memoView = MemoView()
 
     // MARK: SetupUI
@@ -57,7 +62,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         view.backgroundColor = .systemBackground
         // 네비게이션 영역
         title = "Event Logger"
-        navigationItem.rightBarButtonItem = editButton
+        navigationItem.rightBarButtonItem = ellipsisButton
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -77,27 +82,33 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(infoItemView)
+        contentView.addSubview(memoLabel)
         contentView.addSubview(memoView)
 
         // 오토 레이아웃
         imageView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(246)
+            $0.height.equalTo(contentView.snp.width)
         }
 
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(imageView.snp.bottom).offset(14)
+            $0.top.equalTo(imageView.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
         }
 
         infoItemView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(14)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
+        }
+        
+        memoLabel.snp.makeConstraints {
+            $0.top.equalTo(infoItemView.snp.bottom).offset(30)
+            $0.leading.trailing.equalTo(memoView).inset(16)
         }
 
         memoView.snp.makeConstraints {
-            $0.top.equalTo(infoItemView.snp.bottom).offset(20)
+            $0.top.equalTo(memoLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
@@ -106,6 +117,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: Binding
 
     override func bind(reactor: EventDetailReactor) {
+               
         // 1회성 데이터 바인딩
         let eventItem = reactor.currentState.eventItem
         titleLabel.text = eventItem.title
@@ -114,7 +126,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         memoView.configureView(eventItem.memo)
 
         // TODO: 버튼액션
-        editButton.rx.tap
+        ellipsisButton.rx.tap
             .map { _ in .moveToEdit(eventItem) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

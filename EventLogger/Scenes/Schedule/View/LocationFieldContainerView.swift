@@ -27,7 +27,7 @@ final class LocationFieldContainerView: UIView {
         $0.backgroundColor = .systemGray5
     }
 
-    let closeIcon = UIImageView(image: UIImage.symbolXCircleFill(config: .font16Regular)).then {
+    let closeIcon = UIImageView(image: UIImage.symbolXCircleFill(config: .font17Regular)).then {
         $0.contentMode = .center
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
