@@ -25,7 +25,7 @@ struct EventCell: View { // EventItem 통으로 받자
                     name: category.name,
                     color: Color(uiColor: category.color)
                 )
-                .padding(.bottom, 8)
+                .padding(.bottom, 14)
                 
                 VStack {
                     Text(item.title)
@@ -57,7 +57,7 @@ struct EventCell: View { // EventItem 통으로 받자
             
             Rectangle()
                 .fill(Color.gray.opacity(0.5))
-                .frame(width: 80, height: 80)
+                .frame(width: 60, height: 60)
                 .background {
                     if let uiImage = item.image {
                         Image(uiImage: uiImage)

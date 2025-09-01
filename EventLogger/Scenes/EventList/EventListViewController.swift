@@ -63,7 +63,17 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     private lazy var addButton = UIBarButtonItem(
-        barButtonSystemItem: .add,
+        image: UIImage(systemName: "note.text.badge.plus"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .neutral50
+    }
+    
+    private lazy var statisticsButton = UIBarButtonItem(
+        image: UIImage(systemName: "chart.bar.xaxis"),
+        style: .plain,
         target: nil,
         action: nil
     ).then {
@@ -93,7 +103,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         
-        navigationItem.rightBarButtonItems = [sortButton, addButton]
+        navigationItem.rightBarButtonItems = [sortButton, addButton, statisticsButton]
         
         dataSource = EventListDataSource(collectionView: collectionView)
     }
@@ -137,6 +147,12 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
+        statisticsButton.rx.tap
+            .bind {
+                print("통계 버튼 탭함")
+            }
+            .disposed(by: disposeBag)
+        
         collectionView.rx.itemSelected
             .compactMap { [weak self] indexPath -> EventItem? in
                 self?.collectionView.deselectItem(at: indexPath, animated: true)
@@ -174,7 +190,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         // 버튼 아이콘 업데이터 (정렬 변화 반영)
         reactor.state.map(\.sortOrder)
             .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] order in
                 self?.sortButton.image = UIImage(systemName: order == .newestFirst ? "arrow.up" : "arrow.down")
             })
