@@ -10,14 +10,12 @@ import SwiftData
 
 // 앱 최초실행시 카테고리 부여
 
-enum UDKey: String {
-    case didSetupDefaultCategories
-}
-
 enum CategorySeeder {
     static func runIfNeeded(modelContext: ModelContext) throws {
-        let didSetup = UserDefaults.standard.bool(forKey: UDKey.didSetupDefaultCategories.rawValue)
-
+//        let didSetup = UserDefaults.standard.bool(forKey: UDKey.didSetupDefaultCategories.rawValue)
+        @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
+        var didSetup: Bool
+        
         // UserDefaults에 실행기록이 없으면
         guard !didSetup else { return }
 
@@ -35,6 +33,7 @@ enum CategorySeeder {
 
         try modelContext.save()
 
-        UserDefaults.standard.set(true, forKey: UDKey.didSetupDefaultCategories.rawValue)
+//        UserDefaults.standard.set(true, forKey: UDKey.didSetupDefaultCategories.rawValue)
+        didSetup = true
     }
 }
