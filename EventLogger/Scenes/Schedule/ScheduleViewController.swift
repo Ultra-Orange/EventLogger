@@ -203,6 +203,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         // 장소 입력 필드 탭 제스처
         locationFieldView.inputField.rx.tapGesture()
             .when(.recognized)
+            .do(onNext: { [artistsFieldView] _ in
+                artistsFieldView.tagsField.textField.resignFirstResponder()
+            })
             .withLatestFrom(reactor.state.map(\.selectedLocation))
             .map { AppStep.locationSearch($0) }
             .bind(to: reactor.steps)
@@ -233,35 +236,25 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         bottomButton.rx.tap
             .bind { [weak self] _ in
                 guard let self, let reactor = self.reactor else { return }
-                let image = imageView.image
-                let title = inputTitleView.textField.text ?? ""
-                let categoryId = categoryFieldView.selectedCategory?.id ?? UUID() // 문법상 옵셔널 바인딩
-                let start = dateRangeFieldView.startDate
-                let end = dateRangeFieldView.endDate
-                let location = reactor.currentState.selectedLocation
-                let artists = artistsFieldView.tagsField.tags.map(\.text)
-                let memo = memoFieldView.textView.text ?? ""
-                
-                let formatter = NumberFormatter().then {
-                    $0.numberStyle = .decimal
-                }
-                let expense = expenseFieldView.textField.text.flatMap { formatter.number(from: $0) }.map(\.doubleValue) ?? 0
-                
-                let item = EventItem(
-                    id: UUID(),
-                    title: title,
-                    categoryId: categoryId,
-                    image: image,
-                    startTime: start,
-                    endTime: end,
-                    location: location.isEmpty ? nil : location,
-                    artists: artists,
-                    expense: expense,
+
+                let payload = EventPayload(
+                    title: inputTitleView.textField.text ?? "",
+                    categoryId: categoryFieldView.selectedCategory?.id ?? UUID(),
+                    image: imageView.image,
+                    startTime: dateRangeFieldView.startDate,
+                    endTime: dateRangeFieldView.endDate,
+                    location: reactor.currentState.selectedLocation.isEmpty
+                        ? nil
+                        : reactor.currentState.selectedLocation,
+                    artists: artistsFieldView.tagsField.tags.map(\.text),
+                    expense: NumberFormatter().then {
+                        $0.numberStyle = .decimal
+                    }.number(from: expenseFieldView.textField.text ?? "")?.doubleValue ?? 0,
                     currency: .KRW, // MVP 기준 고정
-                    memo: memo
+                    memo: memoFieldView.textView.text ?? ""
                 )
-                
-                reactor.action.onNext(.sendEventItem(item))
+
+                reactor.action.onNext(.sendEventPayload(payload))
             }
             .disposed(by: disposeBag)
     }
@@ -275,8 +268,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             // 신규등록은 카테고리 목록만 세팅
             categoryFieldView.configure(categories: categories)
         case let .update(item):
-            // TODO: 이미지
-            
+            // 이미지
+            imageView.image = item.image
             // 제목
             inputTitleView.textField.text = item.title
             
@@ -348,8 +341,19 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
                 }
             }
         }
-        print("사진 선택 완료, 결과: \(results)")
     }
 }
 
+struct EventPayload {
+    var title: String
+    var categoryId: UUID
+    var image: UIImage?
+    var startTime: Date
+    var endTime: Date
+    var location: String?
+    var artists: [String]
+    var expense: Double
+    var currency: Currency
+    var memo: String
+}
 

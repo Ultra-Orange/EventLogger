@@ -174,7 +174,7 @@ class InfoItemView: UIView {
         dateLabel.text = DateFormatter.toDateString(eventItem.startTime)
         categoryLabel.text = eventItem.categoryId.uuidString // TODO: 카테고리ID로 정보획득
         timelabel.text = makeTimeLabel(startTime: eventItem.startTime, endTime: eventItem.endTime)
-        locationLabel.text = "TODO: 추후구현"
+        locationLabel.text = eventItem.location
         artistsLabel.text = makeArtistsLabel(eventItem.artists)
         expenseLabel.text = "\(eventItem.expense.formatted(.number))원"
         

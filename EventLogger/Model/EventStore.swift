@@ -20,7 +20,20 @@ final class EventStore {
     var location: String?
     
     // DB에는 Data로 저장
-    var artistsData: Data?
+    @Relationship var artists: [ArtistStore] = []
+    
+    // 순서 정보
+    var artistsOrderData: Data?
+
+    var artistsOrder: [String] {
+        get {
+            guard let data = artistsOrderData else { return [] }
+            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        }
+        set {
+            artistsOrderData = try? JSONEncoder().encode(newValue)
+        }
+    }
     
     var expense: Double
     var currency: String
@@ -49,24 +62,17 @@ final class EventStore {
         self.expense = expense
         self.currency = currency
         self.memo = memo
-        
-        self.artistsData = try? JSONEncoder().encode(artists)
+
     }
     
-    //  computed property로 [String] 다루기
-    var artists: [String] {
-        get {
-            guard let data = artistsData else { return [] }
-            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
-        }
-        set {
-            artistsData = try? JSONEncoder().encode(newValue)
-        }
-    }
+
 }
 
 extension EventStore {
     func toDomain() -> EventItem {
+        // ✅ 저장된 순서대로 반환
+        let orderedNames = artistsOrder.isEmpty ? artists.map { $0.name } : artistsOrder
+
         return EventItem(
             id: id,
             title: title,
@@ -75,10 +81,11 @@ extension EventStore {
             startTime: startTime,
             endTime: endTime,
             location: location,
-            artists: artists,
+            artists: orderedNames,
             expense: expense,
             currency: Currency(rawValue: currency) ?? .KRW,
             memo: memo
         )
     }
 }
+

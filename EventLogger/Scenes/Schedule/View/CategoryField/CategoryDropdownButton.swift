@@ -58,11 +58,6 @@ final class CategoryDropDownButton: UIView {
         self.categories = categories
         // 카테고리 비어있을 경우 방어로직(테스트 때 필요)
         guard !categories.isEmpty else {
-            selectedCategory = nil
-            let dummy = UIAction(title: "선택 가능한 항목이 없습니다", state: .off) { _ in }
-            button.menu = UIMenu(title: "", options: [.displayInline], children: [dummy])
-            button.configuration?.title = "선택하세요"
-            button.configuration?.image = nil
             return
         }
         selectedCategory = initial ?? categories.first
