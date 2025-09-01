@@ -23,7 +23,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         target: nil,
         action: nil
     ).then {
-        $0.tintColor = .white
+        $0.tintColor = .neutral50
     }
 
     private let scrollView = UIScrollView()

@@ -20,7 +20,7 @@ final class CategoryFieldContainerView: UIView {
     let sectionHeader = UILabel().then {
         $0.text = "카테고리"
         $0.font = .font13Regular
-        $0.textColor = .white
+        $0.textColor = .neutral50
     }
 
     let categoryMenuButton = CategoryDropDownButton().then {

@@ -8,7 +8,7 @@ extension UIButton {
         var config = UIButton.Configuration.bordered()
         config.contentInsets = .init(top: 2, leading: 8, bottom: 2, trailing: 8)
         config.background.cornerRadius = 6
-        config.baseForegroundColor = .white
+        config.baseForegroundColor = .neutral50
         config.background.backgroundColor = .systemGray3
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
@@ -19,7 +19,7 @@ extension UIButton {
         button.configurationUpdateHandler = { button in
             var config = button.configuration ?? .bordered()
             let isOn = button.isSelected
-            config.baseForegroundColor = isOn ? .primary500 : .white
+            config.baseForegroundColor = isOn ? .primary500 : .neutral50
             button.configuration = config
         }
         return button

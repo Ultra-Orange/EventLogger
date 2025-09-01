@@ -77,7 +77,7 @@ final class EventListDataSource {
             } else {
                 label = UILabel()
                 label.tag = tag
-                label.textColor = .white
+                label.textColor = .neutral50
                 label.font = .font17Bold
                 header.addSubview(label)
                 label.snp.makeConstraints {

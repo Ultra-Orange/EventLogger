@@ -30,7 +30,7 @@ struct EventCell: View { // EventItem 통으로 받자
                 VStack {
                     Text(item.title)
                         .font(Font(UIFont.font20Bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color(UIColor.neutral50))
                         .lineLimit(2)
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
@@ -42,13 +42,13 @@ struct EventCell: View { // EventItem 통으로 받자
                 
                 Text("\(DateFormatter.toDateString(item.startTime)) ∙ 시작 \(DateFormatter.toTimeString(item.startTime))")
                     .font(Font(UIFont.font13Regular))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color(UIColor.neutral50))
                     .padding(.bottom, 4)
                 
                 if let location = item.location, !location.isEmpty {
                     Text(location)
                         .font(Font(UIFont.font13Regular))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color(UIColor.neutral50))
                 }
                 
             }
@@ -78,7 +78,7 @@ struct EventCell: View { // EventItem 통으로 받자
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.40), lineWidth: 1)
+                .stroke(Color(UIColor.neutral50).opacity(0.40), lineWidth: 1)
         )
     }
 }
