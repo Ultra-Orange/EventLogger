@@ -5,8 +5,8 @@
 //  Created by 김우성 on 8/21/25.
 //
 
-import Dependencies
 import SwiftUI
+import Dependencies
 
 struct EventCategory {
     let name: String
@@ -20,6 +20,7 @@ struct EventCell: View { // EventItem 통으로 받자
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
+                
                 CategoryBadgeView(
                     name: category.name,
                     color: Color(uiColor: category.color)
@@ -49,25 +50,26 @@ struct EventCell: View { // EventItem 통으로 받자
                         .font(Font(UIFont.font13Regular))
                         .foregroundStyle(Color(UIColor.neutral50))
                 }
-             }
+                
+            }
             
             Spacer(minLength: 0)
             
-            Rectangle()
-                .fill(Color.gray.opacity(0.5))
-                .frame(width: 60, height: 60)
-                .background {
-                    if let uiImage = item.image {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                 }
-                .cornerRadius(10)
+            if let uiImage = item.image {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(10)
+                    .clipped()
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit) // placeholder는 보통 fit
+                    .frame(width: 60, height: 60)
+                    .foregroundStyle(.gray)
+                    .cornerRadius(10)
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 16)
