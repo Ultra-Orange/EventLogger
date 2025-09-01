@@ -74,6 +74,7 @@ struct EventCell: View { // EventItem 통으로 받자
         .padding(.horizontal, 12)
         .padding(.vertical, 16)
         .background(Color.clear)
+//        .background(Color(UIColor.primary100).opacity(0.08))
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)

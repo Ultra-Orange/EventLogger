@@ -87,7 +87,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         
         view.addSubview(backgroundGradientView)
         backgroundGradientView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalToSuperview().multipliedBy(0.5)
         }
         
         view.addSubview(segmentedControl)
