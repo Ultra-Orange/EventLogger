@@ -21,6 +21,7 @@ final class EventListReactor: BaseReactor {
         case setFilter(EventListFilter)
         case setSortOrder(EventListSortOrder)
         case setYearFilter(Int?)
+        case goSettings
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -74,6 +75,10 @@ final class EventListReactor: BaseReactor {
 
         case let .setYearFilter(year):
             return .just(.setYearFilter(year))
+            
+        case .goSettings:
+            steps.accept(AppStep.settings)
+            return .empty()
         }
     }
 

@@ -207,7 +207,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
 }
 
 private extension EventListViewController {
-    /// 정렬/연도 메뉴 생성
+    /// 정렬/연도/설정 메뉴 생성
     func makeSortAndYearMenu(
         items: [EventItem],
         currentSort: EventListSortOrder,
@@ -250,8 +250,14 @@ private extension EventListViewController {
         
         let yearMenu = UIMenu(title: "", options: .displayInline, children: [allYears] + yearActions)
         
-        // 3) 최종 메뉴 (위에서부터 정렬 2개, 그 다음 연도들)
-        return UIMenu(title: "", children: [sortMenu, yearMenu])
+        // 3) 설정 화면으로
+        let goSettings = UIAction(title: "설정", image: UIImage(systemName: "gearshape.fill")) { [weak dispatcher] _ in
+            dispatcher?.onNext(.goSettings)
+        }
+        
+        
+        // 4) 최종 메뉴 (위에서부터 정렬 2개, 그 다음 연도들)
+        return UIMenu(title: "", children: [sortMenu, yearMenu, goSettings])
     }
 }
 
