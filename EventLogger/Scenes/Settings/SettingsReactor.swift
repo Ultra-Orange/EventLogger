@@ -40,7 +40,7 @@ final class SettingsReactor: BaseReactor {
         switch action {
         case .tapCategoryControl:
             steps.accept(AppStep.categoryEdit)
-            return .never()
+            return .empty()
         }
     }
 

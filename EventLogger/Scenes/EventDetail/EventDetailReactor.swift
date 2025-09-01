@@ -6,12 +6,14 @@
 //
 
 import SwiftData
+import Foundation
 
 import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
 import RxSwift
+
 
 // 결과를 VC에서 알럿으로 보여주기 위한 단발 이벤트
 enum CalendarSaveOutcome {
@@ -24,6 +26,7 @@ final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case moveToEdit(EventItem)
+        case deleteEvent(UUID)
         case addToCalendarTapped
     }
 
@@ -56,7 +59,12 @@ final class EventDetailReactor: BaseReactor {
         switch action {
         case let .moveToEdit(item):
             steps.accept(AppStep.updateSchedule(item))
-            return .never()
+            return .empty()
+        case let .deleteEvent(eventId):
+            @Dependency(\.swiftDataManager) var swiftDataManager
+            swiftDataManager.deleteEvent(id: eventId)
+            steps.accept(AppStep.eventList)
+            return .empty()
         case .addToCalendarTapped:
             // 권한 요청 -> 저장 -> 결과 알림
             let item = currentState.eventItem
@@ -67,7 +75,7 @@ final class EventDetailReactor: BaseReactor {
                     } else {
                         // 접근 거부
                         self.saveOutcome.accept(.denied)
-                        return .never()
+                        return .never() // TODO: 리액터킷에서는 never 안쓰고 empty, 쓸수있게 + 리액터킷에 맞게 리팩토링
                     }
                 }
                 .subscribe(
