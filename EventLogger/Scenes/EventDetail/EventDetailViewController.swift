@@ -106,7 +106,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         imageView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(contentView.snp.width)
+            $0.height.equalTo(imageView.snp.width)
         }
 
         titleLabel.snp.makeConstraints {
