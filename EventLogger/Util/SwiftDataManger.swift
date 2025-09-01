@@ -244,4 +244,32 @@ extension SwiftDataManager {
         return stats.map { ArtistStats(name: $0.key, count: $0.value.count, totalExpense: $0.value.totalExpense) }
             .sorted { $0.count > $1.count } // 예시: 많이 참가한 순으로 정렬
     }
+    
+    // 카테고리 통계용 데이터 리턴
+    func fetchCategoryStatistics() -> [CategoryStats] {
+        let events = fetchAllEvents()          // [EventItem]
+        let categories = fetchAllCategories()  // [CategoryItem]
+        
+        // categoryId → (count, totalExpense) 집계
+        var stats: [UUID: (count: Int, totalExpense: Double)] = [:]
+        
+        for event in events {
+            if var current = stats[event.categoryId] {
+                current.count += 1
+                current.totalExpense += event.expense
+                stats[event.categoryId] = current
+            } else {
+                stats[event.categoryId] = (count: 1, totalExpense: event.expense)
+            }
+        }
+        
+        // 결과 CategoryItem과 매핑
+        return categories.compactMap { category in
+            guard let value = stats[category.id] else { return nil }
+            return CategoryStats(category: category, count: value.count, totalExpense: value.totalExpense)
+        }
+        .sorted { $0.count > $1.count } // 이벤트 수 많은 순 정렬 (옵션)
+    }
+    
+
 }
