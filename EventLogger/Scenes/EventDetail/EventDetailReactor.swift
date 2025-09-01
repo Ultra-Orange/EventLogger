@@ -13,10 +13,18 @@ import RxFlow
 import RxRelay
 import RxSwift
 
+// 결과를 VC에서 알럿으로 보여주기 위한 단발 이벤트
+enum CalendarSaveOutcome {
+    case success
+    case denied
+    case failure(message: String)
+}
+
 final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case moveToEdit(EventItem)
+        case addToCalendarTapped
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -29,7 +37,15 @@ final class EventDetailReactor: BaseReactor {
 
     // 생성자에서 초기 상태 설정
     let initialState: State
+    
+    // 외부로 노출할 단발 이벤트 스트림
+    let saveOutcome = PublishRelay<CalendarSaveOutcome>()
+    
+    // DI
+    @Dependency(\.calendarService) private var calendarService
 
+    private let disposeBag = DisposeBag()
+    
     init(eventItem: EventItem) {
         initialState = State(eventItem: eventItem)
     }
@@ -41,6 +57,28 @@ final class EventDetailReactor: BaseReactor {
         case let .moveToEdit(item):
             steps.accept(AppStep.updateSchedule(item))
             return .never()
+        case .addToCalendarTapped:
+            // 권한 요청 -> 저장 -> 결과 알림
+            let item = currentState.eventItem
+            calendarService.requestAccess()
+                .flatMap { [calendarService] granted -> Single<Void> in
+                    if granted {
+                        return calendarService.save(eventItem: item)
+                    } else {
+                        // 접근 거부
+                        self.saveOutcome.accept(.denied)
+                        return .never()
+                    }
+                }
+                .subscribe(
+                    onSuccess: { [weak self] in self?.saveOutcome.accept(.success) },
+                    onFailure: { [weak self] error in
+                        self?.saveOutcome.accept(.failure(message: error.localizedDescription))
+                    }
+                )
+                .disposed(by: disposeBag)
+            
+            return .empty()
         }
     }
 

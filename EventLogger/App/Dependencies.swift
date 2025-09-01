@@ -20,6 +20,16 @@ extension DependencyValues {
         get { self[SwiftDataManagerKey.self] }
         set { self[SwiftDataManagerKey.self] = newValue }
     }
+    
+    var calendarService: CalendarServicing {
+        get { self[CalendarServiceKey.self] }
+        set { self[CalendarServiceKey.self] = newValue }
+    }
+    
+    var settingsService: SettingsServicing {
+        get { self[SettingsServiceKey.self] }
+        set { self[SettingsServiceKey.self] = newValue }
+    }
 }
 
 // MARK: ModelContext
@@ -44,6 +54,18 @@ private enum SwiftDataManagerKey: DependencyKey {
     static var testValue: SwiftDataManager {
         SwiftDataManager()
     }
+}
+
+// MARK: Calendar Service
+private enum CalendarServiceKey: DependencyKey {
+    static var liveValue: CalendarServicing = CalendarService()
+    static var testValue: CalendarServicing = CalendarService() // 테스트용 만들 필요
+}
+
+// MARK: Settings Service
+private enum SettingsServiceKey: DependencyKey {
+    static var liveValue: SettingsServicing = SettingsService()
+    static var testValue: SettingsServicing = SettingsService() // 테스트용 만들 필요
 }
 
 extension ModelContext: @unchecked @retroactive Sendable {}

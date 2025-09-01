@@ -120,14 +120,49 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .disposed(by: disposeBag)
         
         infoItemView.addCalendarButton.rx.tap
-            .bind {
-                print("Add Calendar")
-            }
+            .map { EventDetailReactor.Action.addToCalendarTapped }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
+        // TODO: 버튼액션
         infoItemView.findDirectionsButton.rx.tap
             .bind {
                 print("Find Way")
+            }
+            .disposed(by: disposeBag)
+        
+        // 저장 결과 알럿
+        reactor.saveOutcome
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, outcome in
+                let alert: UIAlertController
+                switch outcome {
+                case .success:
+                    alert = UIAlertController(
+                        title: "캘린더 저장 완료",
+                        message: "이 이벤트가 캘린더에 저장되었습니다.",
+                        preferredStyle: .alert
+                    )
+                case .denied:
+                    alert = UIAlertController(
+                        title: "접근 권한 필요",
+                        message: "설정 > 개인정보보호 > 캘린더에서 권한을 허용해주세요.",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(url)
+                        }
+                    })
+                case .failure(let message):
+                    alert = UIAlertController(
+                        title: "저장 실패",
+                        message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
+                        preferredStyle: .alert
+                    )
+                }
+                alert.addAction(UIAlertAction(title: "확인", style: .default))
+                owner.present(alert, animated: true)
             }
             .disposed(by: disposeBag)
     }
