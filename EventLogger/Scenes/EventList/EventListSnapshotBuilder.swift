@@ -13,6 +13,7 @@ enum EventListSnapshotBuilder {
         let allItems: [EventItem]
         let sortOrder: EventListSortOrder
         let filter: EventListFilter
+        let yearFilter: Int? // nil = 모든 연도
         let calendar: Calendar
         let today: Date
     }
@@ -28,8 +29,8 @@ enum EventListSnapshotBuilder {
         let calendar = input.calendar
         let today = calendar.startOfDay(for: input.today)
         
-        // 1) 필터
-        let filtered: [EventItem] = {
+        // 1) 상태 필터 (전체 / 참여예정 / 참여완료)
+        let stateFiltered: [EventItem] = {
             switch input.filter {
             case .all:
                 input.allItems
@@ -40,19 +41,25 @@ enum EventListSnapshotBuilder {
             }
         }()
         
+        // 2) 연도 필터
+        let filtered: [EventItem] = {
+            guard let year = input.yearFilter else { return stateFiltered }
+            return stateFiltered.filter { calendar.component(.year, from: $0.startTime) == year }
+        }()
+        
         let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0) })
         
-        // 2) 다음 일정: 현재 필터링 결과에서 "가장 가까운 미래 1개" (일반 전체 그룹과 중복 허용)
+        // 3) 다음 일정: 현재 필터링 결과에서 "가장 가까운 미래 1개" (일반 전체 그룹과 중복 허용)
         let nextUp: EventItem? = filtered
             .filter { $0.startTime >= today }
             .min(by: { $0.startTime < $1.startTime })
         
-        // 3) 월 그룹
+        // 4) 월 그룹
         let grouped = Dictionary(grouping: filtered, by: { calendar.yearMonth(for: $0.startTime) })
         let monthKeysSorted = (input.sortOrder == .newestFirst)
             ? grouped.keys.sorted().reversed() : grouped.keys.sorted()
         
-        // 4) 섹션/아이템
+        // 5) 섹션/아이템
         var sections: [EventListSection] = []
         var itemsForSection: [EventListSection: [EventListDSItem]] = [:]
         
@@ -70,7 +77,7 @@ enum EventListSnapshotBuilder {
             itemsForSection[section] = monthItems.map { .monthEvent($0.id) }
         }
         
-        // 5) 스냅샷
+        // 6) 스냅샷
         var snapshot = NSDiffableDataSourceSnapshot<EventListSection, EventListDSItem>()
         snapshot.appendSections(sections)
         for s in sections {

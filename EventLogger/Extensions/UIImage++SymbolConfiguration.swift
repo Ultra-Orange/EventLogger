@@ -24,7 +24,7 @@ extension UIImage {
     static func symbolDefault(
         named name: String,
         config: UIImage.SymbolConfiguration,
-        color: UIColor = .white // TODO: App Primary
+        color: UIColor = .neutral50 // TODO: App Primary
     ) -> UIImage? {
         return UIImage(systemName: name)?
             .withConfiguration(config)

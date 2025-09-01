@@ -14,7 +14,7 @@ struct CategoryBadgeView: View {
     var body: some View {
         Text(name)
             .font(Font(UIFont.font12Medium))
-            .foregroundStyle(.white) // 지정 흰색으로 바꿔야 함
+            .foregroundStyle(Color(UIColor.neutral50))
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(color)

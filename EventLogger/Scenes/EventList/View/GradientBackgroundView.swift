@@ -24,7 +24,8 @@ final class GradientBackgroundView: UIView {
     
     /// 그라데이션 방향 (기본: 위→아래)
     var direction: (start: CGPoint, end: CGPoint) = (CGPoint(x: 0.5, y: 0.0),
-                                                     CGPoint(x: 0.5, y: 1.0)) {
+                                                     CGPoint(x: 0.5, y: 1.0))
+    {
         didSet {
             gradient.startPoint = direction.start
             gradient.endPoint = direction.end
@@ -36,15 +37,16 @@ final class GradientBackgroundView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         // 만약 layerClass를 쓰면 gradient = self.layer as! CAGradientLayer 로 바로 접근 가능
-        if let g = self.layer as? CAGradientLayer {
+        if let g = layer as? CAGradientLayer {
             gradient.colors = nil // dummy, 곧 updateGradient에서 세팅
         } else {
             layer.addSublayer(gradient)
         }
-        isUserInteractionEnabled = false  // 배경이므로 이벤트 막지 않게
+        isUserInteractionEnabled = false // 배경이므로 이벤트 막지 않게
         updateGradient()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func layoutSubviews() {
@@ -57,7 +59,7 @@ final class GradientBackgroundView: UIView {
     
     private func updateGradient() {
         let cgColors = colors.map { $0.cgColor }
-        if let gradientLayer = self.layer as? CAGradientLayer {
+        if let gradientLayer = layer as? CAGradientLayer {
             gradientLayer.colors = cgColors
             gradientLayer.locations = locations
             gradientLayer.startPoint = direction.start

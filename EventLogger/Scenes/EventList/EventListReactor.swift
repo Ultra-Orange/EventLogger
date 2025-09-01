@@ -19,7 +19,9 @@ final class EventListReactor: BaseReactor {
         case reloadEventItems
         case reloadCategories
         case setFilter(EventListFilter)
-        case toggleSort
+        case setSortOrder(EventListSortOrder)
+        case setYearFilter(Int?)
+        case goSettings
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -28,6 +30,7 @@ final class EventListReactor: BaseReactor {
         case setFilter(EventListFilter)
         case setSortOrder(EventListSortOrder)
         case setCategories([CategoryItem])
+        case setYearFilter(Int?)
     }
 
     // View의 상태 정의 (현재 View의 상태값)
@@ -36,6 +39,7 @@ final class EventListReactor: BaseReactor {
         var filter: EventListFilter
         var sortOrder: EventListSortOrder
         var categories: [CategoryItem] = []
+        var yearFilter: Int? = nil // nil = 모든 연도
     }
 
     // 생성자에서 초기 상태 설정
@@ -62,16 +66,19 @@ final class EventListReactor: BaseReactor {
         case let .setFilter(filter):
             return .just(.setFilter(filter))
 
-        case .toggleSort:
-            return .just(
-                .setSortOrder(
-                    currentState.sortOrder == .newestFirst ? .oldestFirst : .newestFirst
-                )
-            )
+        case let .setSortOrder(order):
+            return .just(.setSortOrder(order))
 
         case .reloadCategories:
             let categoryItems = swiftDataManager.fetchAllCategories()
             return .just(.setCategories(categoryItems))
+
+        case let .setYearFilter(year):
+            return .just(.setYearFilter(year))
+            
+        case .goSettings:
+            steps.accept(AppStep.settings)
+            return .empty()
         }
     }
 
@@ -91,6 +98,9 @@ final class EventListReactor: BaseReactor {
 
         case let .setCategories(categories):
             newState.categories = categories
+
+        case let .setYearFilter(year):
+            newState.yearFilter = year
         }
 
         return newState

@@ -27,7 +27,7 @@ final class DateRangeFieldContainerView: UIView {
     private let sectionHeader = UILabel().then {
         $0.text = "날짜 및 시간"
         $0.font = .font13Regular
-        $0.textColor = .white // Neutral/50으로 수정예정
+        $0.textColor = .neutral50
     }
     
     private let cardView = UIView().then {
@@ -55,7 +55,7 @@ final class DateRangeFieldContainerView: UIView {
     private let startLabel = UILabel().then {
         $0.text = "시작 시간"
         $0.font = .font17Regular
-        $0.textColor = .white
+        $0.textColor = .neutral50
         $0.setContentHuggingPriority(.required, for: .horizontal)
     }
     
@@ -98,7 +98,7 @@ final class DateRangeFieldContainerView: UIView {
     private let endLabel = UILabel().then {
         $0.text = "종료 시간"
         $0.font = .font17Regular
-        $0.textColor = .white
+        $0.textColor = .neutral50
         $0.setContentHuggingPriority(.required, for: .horizontal)
     }
 

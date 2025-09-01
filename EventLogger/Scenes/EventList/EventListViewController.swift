@@ -23,14 +23,23 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
-        $0.font = .font17Regular
-        $0.capsuleBackgroundColor = .black
+        $0.capsuleBackgroundColor = .appBackground
         $0.capsuleBorderColor = .primary500
+        $0.capsuleShadowColor = .primary500
         $0.capsuleBorderWidth = 1
-        $0.normalTextColor = .white
-        $0.selectedTextColor = .white
         $0.borderColor = .clear
-//        $0.borderWidth = 1
+        
+        $0.normalTextColor = .neutral50
+        $0.normalFont = .font17Regular
+        
+        $0.selectedTextColor = .primary200
+        $0.selectedFont = .font17Semibold
+        
+        $0.selectedTextShadowColor = UIColor.primary500
+        $0.textShadowOpacity = 1
+        $0.textShadowRadius = 7
+        $0.textShadowOffset = CGSize(width: 0, height: 0)
+        
         $0.segmentSpacing = 6
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
@@ -43,22 +52,34 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     private var dataSource: EventListDataSource!
     private var currentItemsByID: [UUID: EventItem] = [:]
     
-    // 정렬 토글 나중에 변경
-    private lazy var sortButton = UIBarButtonItem(
-        image: UIImage(systemName: "arrow.up.arrow.down"),
+    private lazy var menuButton = UIBarButtonItem(
+        image: UIImage(systemName: "ellipsis.circle"),
         style: .plain,
         target: nil,
         action: nil
     ).then {
-        $0.tintColor = .white
+        $0.tintColor = .neutral50
+        $0.isSpringLoaded = true
+        $0.primaryAction = nil
+        $0.menu = nil
     }
     
     private lazy var addButton = UIBarButtonItem(
-        barButtonSystemItem: .add,
+        image: UIImage(systemName: "note.text.badge.plus"),
+        style: .plain,
         target: nil,
         action: nil
     ).then {
-        $0.tintColor = .white
+        $0.tintColor = .neutral50
+    }
+    
+    private lazy var statisticsButton = UIBarButtonItem(
+        image: UIImage(systemName: "chart.bar.xaxis"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .neutral50
     }
     
     override func setupUI() {
@@ -66,7 +87,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         
         view.addSubview(backgroundGradientView)
         backgroundGradientView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalToSuperview().multipliedBy(0.5)
         }
         
         view.addSubview(segmentedControl)
@@ -84,7 +106,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         
-        navigationItem.rightBarButtonItems = [sortButton, addButton]
+        navigationItem.rightBarButtonItems = [menuButton, addButton, statisticsButton]
         
         dataSource = EventListDataSource(collectionView: collectionView)
     }
@@ -118,14 +140,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        sortButton.rx.tap
-            .map { .toggleSort }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
         addButton.rx.tap
             .map { AppStep.createSchedule }
             .bind(to: reactor.steps)
+            .disposed(by: disposeBag)
+        
+        statisticsButton.rx.tap
+            .bind {
+                print("통계 버튼 탭함")
+            }
             .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
@@ -142,13 +165,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .combineLatest(
                 reactor.state.map(\.eventItems).distinctUntilChanged(),
                 reactor.state.map(\.filter).distinctUntilChanged(),
-                reactor.state.map(\.sortOrder).distinctUntilChanged()
+                reactor.state.map(\.sortOrder).distinctUntilChanged(),
+                reactor.state.map(\.yearFilter).distinctUntilChanged()
             )
-            .map { items, filter, sortOrder in
+            .map { items, filter, sortOrder, yearFilter in
                 EventListSnapshotBuilder.build(input: .init(
                     allItems: items,
                     sortOrder: sortOrder,
                     filter: filter,
+                    yearFilter: yearFilter,
                     calendar: .current,
                     today: Date()
                 ))
@@ -162,14 +187,78 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             })
             .disposed(by: disposeBag)
         
-        // 버튼 아이콘 업데이터 (정렬 변화 반영)
-        reactor.state.map(\.sortOrder)
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] order in
-                self?.sortButton.image = UIImage(systemName: order == .newestFirst ? "arrow.up" : "arrow.down")
+        Observable
+            .combineLatest(
+                reactor.state.map(\.eventItems).distinctUntilChanged(),
+                reactor.state.map(\.sortOrder).distinctUntilChanged(),
+                reactor.state.map(\.yearFilter).distinctUntilChanged()
+            )
+            .subscribe(onNext: {
+                [weak self] items, sortOrder, yearFilter in
+                guard let self, let reactor = self.reactor else { return }
+                self.menuButton.menu = self.makeSortAndYearMenu(
+                    items: items,
+                    currentSort: sortOrder,
+                    currentYear: yearFilter,
+                    dispatcher: reactor.action
+                )
             })
             .disposed(by: disposeBag)
+    }
+}
+
+private extension EventListViewController {
+    /// 정렬/연도/설정 메뉴 생성
+    func makeSortAndYearMenu(
+        items: [EventItem],
+        currentSort: EventListSortOrder,
+        currentYear: Int?,
+        dispatcher: ActionSubject<EventListReactor.Action>
+    ) -> UIMenu {
+        // 1) 정렬 액션 (단일 선택처럼 체크)
+        let newest = UIAction(title: "최신 순", image: UIImage(systemName: "arrow.down.to.line")) { [weak dispatcher] _ in
+            dispatcher?.onNext(.setSortOrder(.newestFirst))
+        }
+        newest.state = (currentSort == .newestFirst) ? .on : .off
+        
+        let oldest = UIAction(title: "오래된 순", image: UIImage(systemName: "arrow.up.to.line")) { [weak dispatcher] _ in
+            dispatcher?.onNext(.setSortOrder(.oldestFirst))
+        }
+        oldest.state = (currentSort == .oldestFirst) ? .on : .off
+        
+        let sortMenu = UIMenu(title: "", options: .displayInline, children: [newest, oldest])
+        
+        // 2) 연도 목록 (실제 존재하는 연도만, 내림차순 정렬)
+        let years: [Int] = {
+            let yearsSet = Set(items.map { Calendar.current.component(.year, from: $0.startTime) })
+            return yearsSet.sorted(by: >)
+        }()
+        
+        // "모든 연도"
+        let allYears = UIAction(title: "모든 연도", image: UIImage(systemName: "tray.full")) { [weak dispatcher] _ in
+            dispatcher?.onNext(.setYearFilter(nil))
+        }
+        allYears.state = (currentYear == nil) ? .on : .off
+        
+        // 실제 연도 액션들
+        let yearActions: [UIAction] = years.map { year in
+            let action = UIAction(title: "\(year)년") { [weak dispatcher] _ in
+                dispatcher?.onNext(.setYearFilter(year))
+            }
+            action.state = (currentYear == year) ? .on : .off
+            return action
+        }
+        
+        let yearMenu = UIMenu(title: "", options: .displayInline, children: [allYears] + yearActions)
+        
+        // 3) 설정 화면으로
+        let goSettings = UIAction(title: "설정", image: UIImage(systemName: "gearshape.fill")) { [weak dispatcher] _ in
+            dispatcher?.onNext(.goSettings)
+        }
+        
+        
+        // 4) 최종 메뉴 (위에서부터 정렬 2개, 그 다음 연도들)
+        return UIMenu(title: "", children: [sortMenu, yearMenu, goSettings])
     }
 }
 

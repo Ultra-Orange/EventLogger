@@ -11,12 +11,10 @@ import UIKit
 public final class PillSegmentedControl: UIControl {
     // MARK: - Public API
 
-    /// 표시할 항목 텍스트 배열
     public var items: [String] {
         didSet { rebuildButtons() }
     }
 
-    /// 현재 선택된 인덱스
     public private(set) var selectedIndex: Int = 0 {
         didSet {
             if !isSettingUp {
@@ -26,13 +24,11 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    /// 외부에서 UISegmentedControl처럼 접근할 수 있도록 유지 (Rx 확장에서 사용)
     public var selectedSegmentIndex: Int {
         get { selectedIndex }
         set { setSelectedIndex(newValue, animated: false) }
     }
 
-    /// 바깥 알약 컨테이너 안쪽 여백
     public var contentInsets: NSDirectionalEdgeInsets = .init(top: 6, leading: 6, bottom: 6, trailing: 6) {
         didSet {
             stackTop?.constant = contentInsets.top
@@ -43,7 +39,6 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    /// 세그먼트 간 간격
     public var segmentSpacing: CGFloat = 6 {
         didSet {
             stackView.spacing = segmentSpacing
@@ -51,58 +46,77 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    /// 선택 캡슐 배경색
     public var capsuleBackgroundColor: UIColor = .systemBlue {
         didSet { selectionCapsuleView.backgroundColor = capsuleBackgroundColor }
     }
 
-    /// 선택 캡슐 외곽선 색
     public var capsuleBorderColor: UIColor = .systemBlue {
         didSet { selectionCapsuleView.layer.borderColor = capsuleBorderColor.cgColor }
     }
 
-    /// 선택 캡슐 외곽선 두께
     public var capsuleBorderWidth: CGFloat = 0 {
         didSet { selectionCapsuleView.layer.borderWidth = capsuleBorderWidth }
     }
-    
-    /// 선택 캡슐 섀도우 속성
-    public var capsuleShadowColor: UIColor = .primary500 {
+
+    public var capsuleShadowColor: UIColor = .white {
         didSet { selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor }
     }
+
     public var capsuleShadowOpacity: Float = 1.0 {
         didSet { selectionCapsuleView.layer.shadowOpacity = capsuleShadowOpacity }
     }
+
     public var capsuleShadowRadius: CGFloat = 6 {
         didSet { selectionCapsuleView.layer.shadowRadius = capsuleShadowRadius }
     }
+
     public var capsuleShadowOffset: CGSize = .zero {
         didSet { selectionCapsuleView.layer.shadowOffset = capsuleShadowOffset }
     }
 
-    /// 외곽선 색
     public var borderColor: UIColor = UIColor.systemBlue.withAlphaComponent(0.6) {
         didSet { layer.borderColor = borderColor.cgColor }
     }
 
-    /// 외곽선 두께
     public var borderWidth: CGFloat = 1.5 {
         didSet { layer.borderWidth = borderWidth }
     }
 
-    /// 비선택 텍스트 색
     public var normalTextColor: UIColor = .systemBlue {
         didSet { buttons.forEach { $0.setNeedsUpdateConfiguration() } }
     }
 
-    /// 선택 텍스트 색
     public var selectedTextColor: UIColor = .white {
         didSet { buttons.forEach { $0.setNeedsUpdateConfiguration() } }
     }
 
-    /// 폰트
-    public var font: UIFont = .systemFont(ofSize: 15, weight: .medium) {
+    public var normalFont: UIFont = .systemFont(ofSize: 15, weight: .regular) {
         didSet { buttons.forEach { $0.setNeedsUpdateConfiguration() } }
+    }
+
+    public var selectedFont: UIFont = .systemFont(ofSize: 15, weight: .semibold) {
+        didSet { buttons.forEach { $0.setNeedsUpdateConfiguration() } }
+    }
+
+    // 텍스트 섀도우 속성 (CALayer 기반)
+    public var normalTextShadowColor: UIColor? {
+        didSet { updateAllLabelShadows() }
+    }
+
+    public var selectedTextShadowColor: UIColor? {
+        didSet { updateAllLabelShadows() }
+    }
+
+    public var textShadowOpacity: Float = 0.6 {
+        didSet { updateAllLabelShadows() }
+    }
+
+    public var textShadowRadius: CGFloat = 2 {
+        didSet { updateAllLabelShadows() }
+    }
+
+    public var textShadowOffset: CGSize = .init(width: 1, height: 1) {
+        didSet { updateAllLabelShadows() }
     }
 
     // MARK: - Subviews
@@ -149,16 +163,13 @@ public final class PillSegmentedControl: UIControl {
     private func configureOnce() {
         backgroundColor = .clear
 
-        // 외곽 알약 스타일
         layer.masksToBounds = false
         layer.borderWidth = borderWidth
         layer.borderColor = borderColor.cgColor
-        
-        // 선택 캡슐
+
         selectionCapsuleView.backgroundColor = capsuleBackgroundColor
         selectionCapsuleView.layer.borderColor = capsuleBorderColor.cgColor
         selectionCapsuleView.layer.borderWidth = capsuleBorderWidth
-        // 섀도우 기본값
         selectionCapsuleView.layer.shadowColor = capsuleShadowColor.cgColor
         selectionCapsuleView.layer.shadowOpacity = capsuleShadowOpacity
         selectionCapsuleView.layer.shadowRadius = capsuleShadowRadius
@@ -167,7 +178,6 @@ public final class PillSegmentedControl: UIControl {
         selectionCapsuleView.isUserInteractionEnabled = false
         selectionCapsuleView.translatesAutoresizingMaskIntoConstraints = false
 
-        // 스택
         stackView.axis = .horizontal
         stackView.alignment = .fill
         stackView.distribution = .fillEqually
@@ -205,18 +215,27 @@ public final class PillSegmentedControl: UIControl {
             var configuration = UIButton.Configuration.plain()
             configuration.contentInsets = .init(top: 6, leading: 12, bottom: 6, trailing: 12)
             configuration.background.backgroundColor = .clear
-            configuration.attributedTitle = AttributedString(title, attributes: .init([.font: font]))
-            configuration.baseForegroundColor = (index == selectedIndex) ? selectedTextColor : normalTextColor
+
+            let isSelected = (index == selectedIndex)
+            configuration.attributedTitle = makeAttributedTitle(text: title, isSelected: isSelected)
+            configuration.baseForegroundColor = isSelected ? selectedTextColor : normalTextColor
             button.configuration = configuration
 
             button.configurationUpdateHandler = { [weak self] button in
                 guard let self = self,
                       let buttonIndex = self.buttons.firstIndex(of: button) else { return }
+
+                let isSelected = (buttonIndex == self.selectedIndex)
                 var updated = button.configuration ?? .plain()
-                updated.attributedTitle = AttributedString(self.items[buttonIndex], attributes: .init([.font: self.font]))
-                updated.baseForegroundColor = (buttonIndex == self.selectedIndex) ? self.selectedTextColor : self.normalTextColor
+                updated.attributedTitle = self.makeAttributedTitle(text: self.items[buttonIndex], isSelected: isSelected)
+                updated.baseForegroundColor = isSelected ? self.selectedTextColor : self.normalTextColor
                 updated.background.backgroundColor = .clear
                 button.configuration = updated
+
+                // titleLabel 섀도우 적용
+                if let label = button.titleLabel {
+                    self.applyTextLayerShadow(to: label, isSelected: isSelected)
+                }
             }
 
             button.addAction(UIAction { [weak self] _ in
@@ -278,14 +297,12 @@ public final class PillSegmentedControl: UIControl {
 
     // MARK: - Layout
 
-    public override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
 
-        // 원형률은 고정 16으로 통일 (상단/하단에서 중복 세팅 제거)
         layer.cornerRadius = 16
         selectionCapsuleView.layer.cornerRadius = 16
 
-        // shadowPath를 현재 캡슐 프레임에 맞게 갱신
         let path = UIBezierPath(roundedRect: selectionCapsuleView.bounds, cornerRadius: 16).cgPath
         selectionCapsuleView.layer.shadowPath = path
 
@@ -295,7 +312,7 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    public override var intrinsicContentSize: CGSize {
+    override public var intrinsicContentSize: CGSize {
         let buttonHeights = buttons.map { $0.intrinsicContentSize.height }
         let height = (buttonHeights.max() ?? 28) + contentInsets.top + contentInsets.bottom
         let totalButtonsWidth = buttons.reduce(0) { $0 + $1.intrinsicContentSize.width }
@@ -324,10 +341,29 @@ public final class PillSegmentedControl: UIControl {
         invalidateIntrinsicContentSize()
     }
 
-    private func animateStackFade() {
-        stackView.alpha = 0
-        UIView.animate(withDuration: 0.18) {
-            self.stackView.alpha = 1
+    // MARK: - Helpers
+
+    private func makeAttributedTitle(text: String, isSelected: Bool) -> AttributedString {
+        let font = isSelected ? selectedFont : normalFont
+        let ns = NSMutableAttributedString(string: text, attributes: [.font: font])
+        return AttributedString(ns)
+    }
+
+    private func applyTextLayerShadow(to label: UILabel, isSelected: Bool) {
+        label.layer.masksToBounds = false
+        label.layer.shadowColor = (isSelected ? selectedTextShadowColor?.cgColor : normalTextShadowColor?.cgColor)
+        label.layer.shadowOpacity = textShadowOpacity
+        label.layer.shadowRadius = textShadowRadius
+        label.layer.shadowOffset = textShadowOffset
+        label.layer.shouldRasterize = true
+        label.layer.rasterizationScale = UIScreen.main.scale
+    }
+
+    private func updateAllLabelShadows() {
+        for (i, button) in buttons.enumerated() {
+            if let label = button.titleLabel {
+                applyTextLayerShadow(to: label, isSelected: i == selectedIndex)
+            }
         }
     }
 }

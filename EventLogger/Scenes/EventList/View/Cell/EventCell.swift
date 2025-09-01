@@ -25,12 +25,12 @@ struct EventCell: View { // EventItem 통으로 받자
                     name: category.name,
                     color: Color(uiColor: category.color)
                 )
-                .padding(.bottom, 8)
+                .padding(.bottom, 14)
                 
                 VStack {
                     Text(item.title)
                         .font(Font(UIFont.font20Bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color(UIColor.neutral50))
                         .lineLimit(2)
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
@@ -42,43 +42,43 @@ struct EventCell: View { // EventItem 통으로 받자
                 
                 Text("\(DateFormatter.toDateString(item.startTime)) ∙ 시작 \(DateFormatter.toTimeString(item.startTime))")
                     .font(Font(UIFont.font13Regular))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color(UIColor.neutral50))
                     .padding(.bottom, 4)
                 
                 if let location = item.location, !location.isEmpty {
                     Text(location)
                         .font(Font(UIFont.font13Regular))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color(UIColor.neutral50))
                 }
                 
             }
             
             Spacer(minLength: 0)
             
-            Rectangle()
-                .fill(Color.gray.opacity(0.5))
-                .frame(width: 80, height: 80)
-                .background {
-                    if let uiImage = item.image {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    }
-                        
-                }
-                .cornerRadius(10)
+            if let uiImage = item.image {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(10)
+                    .clipped()
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit) // placeholder는 보통 fit
+                    .frame(width: 60, height: 60)
+                    .foregroundStyle(.gray)
+                    .cornerRadius(10)
+            }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 16)
         .background(Color.clear)
+//        .background(Color(UIColor.primary100).opacity(0.08))
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.40), lineWidth: 1)
+                .stroke(Color(UIColor.neutral50).opacity(0.40), lineWidth: 1)
         )
     }
 }
