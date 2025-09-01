@@ -149,7 +149,7 @@ class InfoItemView: UIView {
 
         artistsLabel.snp.makeConstraints {
             $0.top.equalTo(personIcon)
-            $0.leading.equalTo(personIcon.snp.trailing).offset(11)
+            $0.leading.equalTo(personIcon.snp.trailing).offset(12)
         }
 
         moneysignIcon.snp.makeConstraints {
