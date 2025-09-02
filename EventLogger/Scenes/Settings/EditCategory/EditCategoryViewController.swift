@@ -1,5 +1,5 @@
 //
-//  CategoryEditViewController.swift
+//  EditCategoryViewController.swift
 //  EventLogger
 //
 //  Created by Yoon on 8/31/25.
@@ -13,7 +13,7 @@ import SnapKit
 import SwiftUI
 import Then
 
-class CategoryEditViewController: BaseViewController<CategoryEditReactor> {
+class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
     // MARK: UI Component
     
     let addButton = UIButton(configuration: .bottomButton).then{
@@ -62,7 +62,7 @@ class CategoryEditViewController: BaseViewController<CategoryEditReactor> {
     
     // MARK: Binding
     
-    override func bind(reactor: CategoryEditReactor) {
+    override func bind(reactor: EditCategoryReactor) {
         reactor.state.map { $0.categories }
             .bind { [weak self] items in
                 guard let self else { return }
@@ -112,7 +112,7 @@ class CategoryEditViewController: BaseViewController<CategoryEditReactor> {
     
 }
 
-extension CategoryEditViewController {
+extension EditCategoryViewController {
     
     // 편집 모드
     override func setEditing(_ editing: Bool, animated: Bool) {
@@ -122,7 +122,7 @@ extension CategoryEditViewController {
     
     private func makeDataSource(_ collectionView: UICollectionView) -> UICollectionViewDiffableDataSource<Int, CategoryItem> {
         let deleteRelay = deleteCategoryRelay
-        let cellRegistration = UICollectionView.CellRegistration<CategoryEditCell, CategoryItem> { cell, indexPath, item in
+        let cellRegistration = UICollectionView.CellRegistration<EditCategoryCell, CategoryItem> { cell, indexPath, item in
             cell.configureCell(item: item)
             cell.accessories = [
                 .disclosureIndicator(displayed: .whenNotEditing, options: UICellAccessory.DisclosureIndicatorOptions(tintColor: .neutral50)),

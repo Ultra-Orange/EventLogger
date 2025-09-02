@@ -113,8 +113,8 @@ final class AppFlow: Flow {
     }
     
     private func navigateToCategoryEdit() -> FlowContributors {
-        let vc = CategoryEditViewController()
-        let reactor = CategoryEditReactor()
+        let vc = EditCategoryViewController()
+        let reactor = EditCategoryReactor()
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(

@@ -1,5 +1,5 @@
 //
-//  CategoryEditCell.swift
+//  EditCategoryCell.swift
 //  EventLogger
 //
 //  Created by Yoon on 9/2/25.
@@ -10,7 +10,7 @@ import UIKit
 import Then
 import SnapKit
 
-class CategoryEditCell: UICollectionViewListCell {
+class EditCategoryCell: UICollectionViewListCell {
     private let colorMark = UIView().then {
         $0.layer.cornerRadius = 6
     }

@@ -13,7 +13,7 @@ import RxFlow
 import RxRelay
 import RxSwift
 
-final class CategoryEditReactor: BaseReactor {
+final class EditCategoryReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case reloadCategories
