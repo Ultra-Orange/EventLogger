@@ -5,13 +5,14 @@
 //  Created by Yoon on 8/31/25.
 //
 
-
+import UIKit
 import ReactorKit
 import RxCocoa
 import RxSwift
 import SnapKit
-import SwiftUI
 import Then
+
+import Dependencies
 
 class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
     // MARK: UI Component
@@ -30,7 +31,9 @@ class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
     let collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewCompositionalLayout.list(using: UICollectionLayoutListConfiguration(appearance: .insetGrouped))
-    )
+    ).then {
+        $0.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
+    }
     
     lazy var dataSource = makeDataSource(collectionView)
     
@@ -63,6 +66,7 @@ class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
     // MARK: Binding
     
     override func bind(reactor: EditCategoryReactor) {
+          
         reactor.state.map { $0.categories }
             .bind { [weak self] items in
                 guard let self else { return }
@@ -96,20 +100,24 @@ class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
             .bind{}
             .disposed(by: disposeBag)
         
-        
         rx.viewWillAppear.map { _ in .reloadCategories }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         addButton.rx.tap
-            .bind {
-                print("tap")
-            }
+            .map { AppStep.createCategory }
+            .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
+        collectionView.rx.itemSelected
+            .withUnretained(self)
+            .bind { `self`, indexPath in
+                if let item = self.dataSource.itemIdentifier(for: indexPath) {
+                    reactor.steps.accept(AppStep.updateCategory(item))
+                }
+            }
+            .disposed(by: disposeBag)
     }
-    
-    
 }
 
 extension EditCategoryViewController {

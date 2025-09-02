@@ -5,7 +5,6 @@
 //  Created by Yoon on 9/2/25.
 //
 
-// StatisticsService.swift
 import Foundation
 
 enum StatsPeriod {

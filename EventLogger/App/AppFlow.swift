@@ -40,6 +40,10 @@ final class AppFlow: Flow {
             return navigateToSettings()
         case .categoryEdit:
             return navigateToCategoryEdit()
+        case .createCategory:
+            return navigateToCategoryDetail(mode: .create)
+        case let .updateCategory(item):
+            return navigateToCategoryDetail(mode: .update(item))
         }
     }
 
@@ -123,6 +127,19 @@ final class AppFlow: Flow {
                 withNextStepper: reactor
             )
         )
-        
     }
+    
+    private func navigateToCategoryDetail(mode: CategoryDetailReactor.Mode) -> FlowContributors {
+        let reactor = CategoryDetailReactor(mode: mode)
+        let vc = CategoryDetailViewController()
+        vc.reactor = reactor
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+    }
+
 }
