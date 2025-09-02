@@ -295,7 +295,6 @@ extension SwiftDataManager {
         }
         .sorted { $0.count > $1.count } // 이벤트 수 많은 순 정렬 (옵션)
     }
-    
 }
 
 enum SwiftDataMangerError: Error {

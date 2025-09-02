@@ -28,7 +28,7 @@ enum CategorySeeder {
                 position: index,
                 colorId: {
                     switch name {
-                    case "콘서트": 1
+                    case "콘서트": 2
                     case "페스티벌": 7
                     case "연극":  9
                     case "뮤지컬": 4
