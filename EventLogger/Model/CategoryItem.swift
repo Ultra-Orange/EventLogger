@@ -39,21 +39,35 @@ extension CategoryItem {
     }
 }
 
-// TODO: 컬러코드 완성되면 수정
 enum CategoryColor: Int, CaseIterable {
-    case red = 0
-    case blue = 1
-    case yellow = 2
-    case purple = 3
-    case green = 4
+    case code0 = 0
+    case code1 = 1
+    case code2 = 2
+    case code3 = 3
+    case code4 = 4
+    case code5 = 5
+    case code6 = 6
+    case code7 = 7
+    case code8 = 8
+    case code9 = 9
+    case code10 = 10
+    case code11 = 11
+ 
 
     var uiColor: UIColor {
         switch self {
-        case .red: return UIColor.systemRed
-        case .blue: return UIColor.systemBlue
-        case .yellow: return UIColor.systemYellow
-        case .purple: return UIColor.systemOrange
-        case .green: return UIColor.systemGreen
+        case .code0: return UIColor.category0
+        case .code1: return UIColor.category1
+        case .code2: return UIColor.category2
+        case .code3: return UIColor.category3
+        case .code4: return UIColor.category4
+        case .code5: return UIColor.category5
+        case .code6: return UIColor.category6
+        case .code7: return UIColor.category7
+        case .code8: return UIColor.category8
+        case .code9: return UIColor.category9
+        case .code10: return UIColor.category10
+        case .code11: return UIColor.category11
         }
     }
 }

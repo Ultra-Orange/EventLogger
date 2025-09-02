@@ -39,4 +39,17 @@ extension UIColor {
     static let primary700 = UIColor(red: 145/255, green: 60/255, blue: 3/255, alpha: 1.0)
     static let primary800 = UIColor(red: 95/255, green: 39/255, blue: 2/255, alpha: 1.0)
     static let primary900 = UIColor(red: 45/255, green: 19/255, blue: 1/255, alpha: 1.0)
+    
+    static let category0 = UIColor(red: 219/255, green: 0/255, blue: 56/255, alpha: 1.0)
+    static let category1 = UIColor(red: 255/255, green: 79/255, blue: 0/255, alpha: 1.0)
+    static let category2 = UIColor(red: 242/255, green: 61/255, blue: 135/255, alpha: 1.0)
+    static let category3 = UIColor(red: 222/255, green: 30/255, blue: 255/255, alpha: 1.0)
+    static let category4 = UIColor(red: 149/255, green: 97/255, blue: 255/255, alpha: 1.0)
+    static let category5 = UIColor(red: 21/255, green: 202/255, blue: 117/255, alpha: 1.0)
+    static let category6 = UIColor(red: 157/255, green: 189/255, blue: 254/255, alpha: 1.0)
+    static let category7 = UIColor(red: 0/255, green: 189/255, blue: 245/255, alpha: 1.0)
+    static let category8 = UIColor(red: 0/255, green: 98/255, blue: 169/255, alpha: 1.0)
+    static let category9 = UIColor(red: 255/255, green: 173/255, blue: 7/255, alpha: 1.0)
+    static let category10 = UIColor(red: 198/255, green: 123/255, blue: 85/255, alpha: 1.0)
+    static let category11 = UIColor(red: 128/255, green: 128/255, blue: 128/255, alpha: 1.0)
 }

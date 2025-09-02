@@ -80,8 +80,33 @@ struct SwiftDataManager {
         }
     }
     
+    // 카테고리 포지션 값 변경
+    func updateCategoriesPosition(_ items: [CategoryItem]) {
+        for (index, item) in items.enumerated() {
+            if let store = fetchOneCategoryStore(id: item.id) {
+                store.position = index
+            }
+        }
+        saveContext()
+    }
+    
     // Delete
-    func deleteCategory(id: UUID) {
+    func deleteCategory(id: UUID) throws {
+        
+        let allCategories = fetchAllCategories()
+        
+        // 조건 1) 카테고리가 하나만 남아있으면 삭제 불가
+        guard allCategories.count > 1 else {
+            throw SwiftDataMangerError.cannotDeleteLastCategory
+        }
+        
+        // 조건 2) 등록된 이벤트가 존재하는 카테고리는 삭제 불가
+        let stats = fetchCategoryStatistics()
+        if stats.contains(where: { $0.category.id == id && $0.count > 0 }) {
+            throw SwiftDataMangerError.cannotDeleteUsedCategory
+        }
+        
+        // 위 두 조건을 모두 통과해야 삭제진행
         if let target = fetchOneCategoryStore(id: id){
             modelContext.delete(target)
             saveContext()
@@ -270,6 +295,9 @@ extension SwiftDataManager {
         }
         .sorted { $0.count > $1.count } // 이벤트 수 많은 순 정렬 (옵션)
     }
-    
+}
 
+enum SwiftDataMangerError: Error {
+    case cannotDeleteUsedCategory
+    case cannotDeleteLastCategory
 }
