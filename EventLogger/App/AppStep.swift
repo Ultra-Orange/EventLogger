@@ -15,4 +15,5 @@ enum AppStep: Step {
     case locationSearch(String)
     case settings
     case categoryEdit
+    case statistics
 }

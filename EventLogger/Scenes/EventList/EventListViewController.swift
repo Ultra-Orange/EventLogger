@@ -83,7 +83,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     override func setupUI() {
-        view.backgroundColor = .black
+        view.backgroundColor = .appBackground
         
         view.addSubview(backgroundGradientView)
         backgroundGradientView.snp.makeConstraints {
@@ -146,9 +146,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .disposed(by: disposeBag)
         
         statisticsButton.rx.tap
-            .bind {
-                print("통계 버튼 탭함")
-            }
+            .map { AppStep.statistics }
+            .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
