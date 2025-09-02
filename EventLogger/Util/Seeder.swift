@@ -26,7 +26,16 @@ enum CategorySeeder {
                 id: UUID(),
                 name: name,
                 position: index,
-                colorId: index // 0~4
+                colorId: {
+                    switch name {
+                    case "콘서트": 1
+                    case "페스티벌": 7
+                    case "연극":  9
+                    case "뮤지컬": 4
+                    case "팬미팅": 5
+                    default: 11
+                    }
+                }()
             )
             modelContext.insert(store)
         }
