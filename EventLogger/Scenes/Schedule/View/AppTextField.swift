@@ -36,7 +36,7 @@ final class AppTextField: UITextField {
 
     private func configureDefault() {
         font = .font17Regular
-        backgroundColor = .systemGray5
+        backgroundColor = .neutral800
         layer.cornerRadius = 10
         autocapitalizationType = .none // 자동 대문자 변환 무시
         autocorrectionType = .no // 자동 수정 무시
