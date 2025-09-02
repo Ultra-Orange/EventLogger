@@ -5,7 +5,6 @@
 //  Created by Yoon on 9/2/25.
 //
 
-// StatisticsService.swift
 import Foundation
 
 enum StatsPeriod {
@@ -38,6 +37,7 @@ struct StatisticsService {
 
 extension StatisticsService {
     /// 2-1) 기간별 카테고리 통계
+    /// 기간을 입력하면 그 기간에 있는 카테고리 아이템, 그 카테고리의 횟수, 총 비용 리턴
     func categoryStats(for period: StatsPeriod) -> [CategoryStats] {
         let events = filteredEvents(for: period)
         let categories = manager.fetchAllCategories() // [CategoryItem]
@@ -58,6 +58,7 @@ extension StatisticsService {
     }
 
     /// 2-2) 기간별 아티스트 통계
+    /// 기간을 입력하면 그 기간에 있는 아티스트명, 그 아티스트 횟수, 그 아티스트에 쓴 총 비용 리턴
     func artistStats(for period: StatsPeriod) -> [ArtistStats] {
         let events = filteredEvents(for: period)
 
