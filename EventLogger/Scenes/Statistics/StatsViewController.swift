@@ -13,10 +13,7 @@ import SnapKit
 import Dependencies
 
 // MARK: - StatsViewController
-/// 역할:
-/// - 화면 구성(레이아웃/셀/헤더)
-/// - Reactor 바인딩(사용자 입력 → Action, State 변화 → UI 스냅샷)
-/// - UI에 필요한 문자열/색상 포맷팅
+
 final class StatsViewController: BaseViewController<StatsReactor> {
 
     @Dependency(\.swiftDataManager) var swiftDataManager
