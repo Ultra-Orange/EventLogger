@@ -20,11 +20,11 @@ extension UIImage.Configuration {
 
 // 색이랑 함께 넣을 수 있는 static 함수
 extension UIImage {
-    // SF심볼 디폴트
-    static func symbolDefault(
+    // SF심볼 + 화이트 (neutral50)
+    static func symbolWhite(
         named name: String,
         config: UIImage.SymbolConfiguration,
-        color: UIColor = .neutral50 // TODO: App Primary
+        color: UIColor = .neutral50 
     ) -> UIImage? {
         return UIImage(systemName: name)?
             .withConfiguration(config)
@@ -34,7 +34,7 @@ extension UIImage {
     // 취소버튼 용 config
     static func symbolXCircleFill(
         config: UIImage.SymbolConfiguration,
-        color: UIColor = .secondaryLabel // TODO: color조정
+        color: UIColor = .neutral50
     ) -> UIImage? {
         return UIImage(systemName: "x.circle.fill")?
             .withConfiguration(config)
