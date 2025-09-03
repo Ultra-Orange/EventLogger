@@ -8,9 +8,8 @@
 import UIKit
 
 class ColorChipBacgroundView: UICollectionReusableView {
-    
     static let identifier = "ColorChipBacgroundView"
-    
+
     override func willMove(toSuperview newSuperview: UIView?) {
         super.willMove(toSuperview: newSuperview)
         backgroundColor = .neutral800
