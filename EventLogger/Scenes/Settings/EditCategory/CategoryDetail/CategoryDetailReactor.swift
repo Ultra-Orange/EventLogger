@@ -13,10 +13,12 @@ import Foundation
 final class CategoryDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
+        case tapBottomButton(String?, Int)
     }
     
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
+        case setAlertMessage(String)
     }
     
     // View의 상태 정의 (현재 View의 상태값)
@@ -25,6 +27,7 @@ final class CategoryDetailReactor: BaseReactor {
         let navTitle: String
         let buttonTitle: String
         var selectedColorId: Int
+        @Pulse var alertMessage: String?
     }
     
     enum Mode {
@@ -78,16 +81,33 @@ final class CategoryDetailReactor: BaseReactor {
         @Dependency(\.swiftDataManager) var swiftDataManager
         switch action {
             
+        case let .tapBottomButton(name, colorId):
+            guard let name, !name.trimmingCharacters(in: .whitespaces).isEmpty else {
+                return .just(.setAlertMessage("빈 문자열은 저장할 수 없습니다."))
+            }
+            switch mode {
+            case .create:
+                swiftDataManager.insertCategory(name: name, colorId: colorId)
+                steps.accept(AppStep.backToCategoryList)
+                return .empty()
+            case let .update(item):
+                swiftDataManager.updateCategory(id: item.id, name: name, colorId: colorId)
+                steps.accept(AppStep.backToCategoryList)
+                return .empty()
+            }
         }
-        
     }
     
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
+        
         switch mutation {
+        case let .setAlertMessage(message):
+            newState.alertMessage = message
         }
+        
         return newState
     }
 }

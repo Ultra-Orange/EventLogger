@@ -33,7 +33,9 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
     lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: makeLayout()
-    )
+    ).then {
+        $0.backgroundColor = .clear
+    }
     
     lazy var dataSource = makeDataSource(collectionView)
        
@@ -72,6 +74,25 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
         
         // 초기값 세팅
         configureInitialState(reactor: reactor)
+        
+        bottomButton.rx.tap
+            .bind { [weak self] _ in
+                guard let self, let reactor = self.reactor else { return }
+                let title = self.textField.text ?? ""
+                let colorId = self.collectionView.indexPathsForSelectedItems?.first?.item ?? 0
+                reactor.action.onNext(.tapBottomButton(title, colorId))
+            }
+            .disposed(by: disposeBag)
+        
+        reactor.pulse(\.$alertMessage)
+            .withUnretained(self)
+            .flatMap { `self`, message in
+                UIAlertController.rx.alert(on: self, message: message, actions: [
+                    .action("확인", payload: ())
+                ])
+            }
+            .bind{}
+            .disposed(by: disposeBag)
     }
 }
 

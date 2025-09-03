@@ -26,8 +26,21 @@ struct SwiftDataManager {
     // MARK: Category 관련
     // CREATE
     
-    func insertCategory(category: CategoryItem) {
-        let storeCategory = category.toPersistent()
+    func insertCategory(name: String, colorId: Int) {
+        // 1) 현재 저장된 카테고리의 position 중 최대값 찾기
+        let categories = fetchAllCategories()
+        let maxPosition = categories.map { $0.position }.max() ?? -1
+        
+        // 2) 새로운 CategoryItem 생성
+        let newCategory = CategoryItem(
+            id: UUID(),
+            name: name,
+            position: maxPosition + 1,
+            colorId: colorId
+        )
+        
+        // 3) Persistent 모델로 변환 후 저장
+        let storeCategory = newCategory.toPersistent()
         modelContext.insert(storeCategory)
         saveContext()
     }
@@ -68,12 +81,11 @@ struct SwiftDataManager {
         }
     }
     
-    // UPDATE
-    func updateCategory(id: UUID, category: CategoryItem) {
+    // UPDATE   
+    func updateCategory(id: UUID, name: String, colorId: Int) {
         if let store = fetchOneCategoryStore(id: id) {
-            store.name = category.name
-            store.position = category.position
-            store.colorId = category.colorId
+            store.name = name
+            store.colorId = colorId
             saveContext()
         } else {
             print("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
@@ -110,6 +122,10 @@ struct SwiftDataManager {
         if let target = fetchOneCategoryStore(id: id){
             modelContext.delete(target)
             saveContext()
+            
+            // 삭제 직후 포지션 재정렬 (오동작 방지)
+            let updated = fetchAllCategories()
+            updateCategoriesPosition(updated)
         } else {
             print("해당 id에 일치하는 카테고리가 존재하지 않습니다.")
         }

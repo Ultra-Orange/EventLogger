@@ -78,8 +78,8 @@ struct CategoryMappingTests {
         )
         
         // CREATE
-        swiftDataManager.insertCategory(category: dummyItem1)
-        swiftDataManager.insertCategory(category: dummyItem2)
+        swiftDataManager.insertCategory(title: "테스트1", colorId: 0)
+        swiftDataManager.insertCategory(title: "테스트2", colorId: 1)
         
         // READ
         let fetchAll = swiftDataManager.fetchAllCategories()

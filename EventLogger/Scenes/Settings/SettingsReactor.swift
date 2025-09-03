@@ -39,7 +39,7 @@ final class SettingsReactor: BaseReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .tapCategoryControl:
-            steps.accept(AppStep.categoryEdit)
+            steps.accept(AppStep.categoryList)
             return .empty()
         }
     }

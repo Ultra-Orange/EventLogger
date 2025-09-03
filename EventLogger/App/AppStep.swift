@@ -14,7 +14,8 @@ enum AppStep: Step {
     case updateSchedule(EventItem)
     case locationSearch(String)
     case settings
-    case categoryEdit
+    case categoryList
     case createCategory
     case updateCategory(CategoryItem)
+    case backToCategoryList
 }

@@ -38,12 +38,15 @@ final class AppFlow: Flow {
             return navigateToLocationSearch(query: string)
         case .settings:
             return navigateToSettings()
-        case .categoryEdit:
-            return navigateToCategoryEdit()
+        case .categoryList:
+            return navigateToCategoryList()
         case .createCategory:
             return navigateToCategoryDetail(mode: .create)
         case let .updateCategory(item):
             return navigateToCategoryDetail(mode: .update(item))
+        case .backToCategoryList:
+            rootNav.popViewController(animated: true)
+            return .none
         }
     }
 
@@ -116,9 +119,9 @@ final class AppFlow: Flow {
         )
     }
     
-    private func navigateToCategoryEdit() -> FlowContributors {
-        let vc = EditCategoryViewController()
-        let reactor = EditCategoryReactor()
+    private func navigateToCategoryList() -> FlowContributors {
+        let vc = CategoryListViewController()
+        let reactor = CategoryListReactor()
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
