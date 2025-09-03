@@ -24,9 +24,11 @@ final class StatsTotalCell: UICollectionViewCell {
         vStack.spacing = 12
         
         [countBox, expenseBox].forEach {
-            $0.layer.cornerRadius = 12
-            $0.backgroundColor = .neutral700
-            $0.snp.makeConstraints { $0.height.greaterThanOrEqualTo(64) }
+            $0.layer.cornerRadius = 10
+            $0.backgroundColor = .neutral800 // 그라데이션으로 수정 필요
+            $0.snp.makeConstraints {
+                $0.height.greaterThanOrEqualTo(50)
+            }
         }
         
         container.addSubview(vStack)
