@@ -16,13 +16,13 @@ final class AppFlow: Flow {
     private let selectedLocationRelay = PublishRelay<String>()
     
     var root: Presentable { rootNav }
-
+    
     init(windowScene: UIWindowScene) {
         window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootNav
         window.makeKeyAndVisible()
     }
-
+    
     func navigate(to step: any Step) -> FlowContributors {
         guard let step = step as? AppStep else { return .none }
         switch step {
@@ -38,13 +38,19 @@ final class AppFlow: Flow {
             return navigateToLocationSearch(query: string)
         case .settings:
             return navigateToSettings()
-        case .categoryEdit:
-            return navigateToCategoryEdit()
+        case .categoryList:
+            return navigateToCategoryList()
+        case .createCategory:
+            return navigateToCategoryDetail(mode: .create)
+        case let .updateCategory(item):
+            return navigateToCategoryDetail(mode: .update(item))
+        case .backToCategoryList:
+            return backToCategoryList()
         case .statistics:
             return navigateToStatistics()
         }
     }
-
+    
     func navigateToEventList() -> FlowContributors {
         let vc = EventListViewController()
         let reactor = EventListReactor()
@@ -57,7 +63,7 @@ final class AppFlow: Flow {
             )
         )
     }
-
+    
     func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor(eventItem: eventItem)
@@ -116,7 +122,9 @@ final class AppFlow: Flow {
     
     private func navigateToCategoryEdit() -> FlowContributors {
         let vc = EditCategoryViewController()
-        let reactor = EditCategoryReactor()
+    private func navigateToCategoryList() -> FlowContributors {
+        let vc = CategoryListViewController()
+        let reactor = CategoryListReactor()
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
@@ -125,9 +133,25 @@ final class AppFlow: Flow {
                 withNextStepper: reactor
             )
         )
-        
     }
     
+    private func navigateToCategoryDetail(mode: CategoryDetailReactor.Mode) -> FlowContributors {
+        let reactor = CategoryDetailReactor(mode: mode)
+        let vc = CategoryDetailViewController()
+        vc.reactor = reactor
+        rootNav.pushViewController(vc, animated: true)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: reactor
+            )
+        )
+    }
+    
+    private func backToCategoryList() -> FlowContributors {
+      
+        rootNav.popViewController(animated: true)
+        return .none
     private func navigateToStatistics() -> FlowContributors {
         let vc = StatsViewController()
         let reactor = StatsReactor()
@@ -141,3 +165,4 @@ final class AppFlow: Flow {
         )
     }
 }
+

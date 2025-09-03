@@ -20,12 +20,10 @@ final class SettingsReactor: BaseReactor {
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
-    enum Mutation {
-    }
+    enum Mutation {}
 
     // View의 상태 정의 (현재 View의 상태값)
-    struct State {
-    }
+    struct State {}
 
     // 생성자에서 초기 상태 설정
     let initialState: State
@@ -39,7 +37,7 @@ final class SettingsReactor: BaseReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .tapCategoryControl:
-            steps.accept(AppStep.categoryEdit)
+            steps.accept(AppStep.categoryList)
             return .empty()
         }
     }
