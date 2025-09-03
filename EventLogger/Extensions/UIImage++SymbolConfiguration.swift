@@ -23,12 +23,11 @@ extension UIImage {
     // SF심볼 + 화이트 (neutral50)
     static func symbolWhite(
         named name: String,
-        config: UIImage.SymbolConfiguration,
-        color: UIColor = .neutral50 
+        config: UIImage.SymbolConfiguration
     ) -> UIImage? {
         return UIImage(systemName: name)?
             .withConfiguration(config)
-            .withTintColor(color, renderingMode: .alwaysOriginal)
+            .withTintColor(.neutral50, renderingMode: .alwaysOriginal)
     }
     
     // 취소버튼 용 config
