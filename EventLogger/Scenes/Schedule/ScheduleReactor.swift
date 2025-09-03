@@ -33,6 +33,7 @@ final class ScheduleReactor: BaseReactor {
         var categories: [CategoryItem]
     }
     
+    // TODO: 리팩토링 고려요소 원칙적으로 리액터는 뷰를 몰라야되니까 여기에 버튼타이틀은 어색하다!
     enum Mode {
         case create
         case update(EventItem)
