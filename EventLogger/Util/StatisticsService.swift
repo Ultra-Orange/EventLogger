@@ -44,10 +44,9 @@ struct StatisticsService {
 }
 
 extension StatisticsService {
-
     /// 기간별 카테고리 통계 (하위 상세 포함)
-    /// - 반환 배열은 **카운트 내림차순** 정렬.
-    /// - 내부의 하위 목록은 각각 **카운트/지출 내림차순** 정렬.
+    /// - 반환 배열 - 카운트 내림차순 정렬
+    /// - 내부의 하위 목록 - 각각 카운트/지출 내림차순 정렬
     func categoryStats(for period: StatsPeriod) -> [CategoryStats] {
         let events = filteredEvents(for: period)
         let categories = manager.fetchAllCategories()
@@ -67,7 +66,9 @@ extension StatisticsService {
             var agg = bucket[categoryId] ?? CatAgg()
             agg.count += 1
             agg.totalExpense += event.expense
-            // 아티스트별: 비용은 "각 아티스트에 동일 전가" (기존 로직 유지)
+            
+            // 아티스트별: 비용은 "각 아티스트에 동일하게"
+            // 그래서 아티스트 받아온 것들 다 합쳐서 총액을 쓸 수는 없음
             for name in event.artists {
                 agg.artistCount[name, default: 0] += 1
                 agg.artistExpense[name, default: 0] += event.expense
@@ -117,8 +118,8 @@ extension StatisticsService {
     }
 
     /// 기간별 아티스트 통계 (하위 상세 포함)
-    /// - Note: 반환 배열은 **카운트 내림차순** 정렬.
-    /// - 내부의 하위 목록은 각각 **카운트/지출 내림차순** 정렬.
+    /// - 반환 배열 - 카운트 내림차순 정렬.
+    /// - 내부의 하위 목록 - 각각 카운트/지출 내림차순 정렬.
     func artistStats(for period: StatsPeriod) -> [ArtistStats] {
         let events = filteredEvents(for: period)
         let categories = manager.fetchAllCategories()
@@ -158,7 +159,7 @@ extension StatisticsService {
                     }
                     return lhs.value > rhs.value
                 }
-                .compactMap { (categoryId, count) -> CategoryCountEntry? in
+                .compactMap { categoryId, count -> CategoryCountEntry? in
                     guard let category = catById[categoryId] else { return nil }
                     return CategoryCountEntry(category: category, count: count)
                 }
@@ -172,7 +173,7 @@ extension StatisticsService {
                     }
                     return lhs.value > rhs.value
                 }
-                .compactMap { (categoryId, expense) -> CategoryExpenseEntry? in
+                .compactMap { categoryId, expense -> CategoryExpenseEntry? in
                     guard let category = catById[categoryId] else { return nil }
                     return CategoryExpenseEntry(category: category, expense: expense)
                 }
@@ -230,7 +231,7 @@ extension StatisticsService {
 
         let years = month.keys.sorted(by: >)
         let rows: [HeatmapModel.Row] = years.map { y in
-            let counts = (1...12).map { month[y]?[$0] ?? 0 }
+            let counts = (1 ... 12).map { month[y]?[$0] ?? 0 }
             let yearLabel = "`" + String(y % 100) // 디자인 예시처럼 `25
             return .init(yearLabel: yearLabel, monthCounts: counts)
         }

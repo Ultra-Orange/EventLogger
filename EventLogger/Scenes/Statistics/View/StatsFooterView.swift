@@ -12,14 +12,14 @@ import UIKit
 final class HeatmapFooterView: UICollectionReusableView {
     static let elementKind = UICollectionView.elementKindSectionFooter
 
-    private let trailingContainer = UIView() // Heatmap에서만 사용
+    private let container = UIView() // Heatmap에서만 사용
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        addSubview(trailingContainer)
+        addSubview(container)
 
-        trailingContainer.snp.makeConstraints {
+        container.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
@@ -30,38 +30,59 @@ final class HeatmapFooterView: UICollectionReusableView {
     required init?(coder: NSCoder) { fatalError() }
 
     func configure(title: String, showLegend: Bool) {
-//        trailingContainer.subviews.forEach { $0.removeFromSuperview() }
-//        trailingContainer.isHidden = !showLegend
-//        if showLegend {
-//            buildLegend(in: trailingContainer)
-//        }
+        
     }
 
     private func buildLegend() {
-        let colors: [UIColor] = [
-            UIColor.neutral700, // 0회
-            UIColor.primary200, // 1~4
-            UIColor.primary300, // 5~8
-            UIColor.primary500 // 9+
-        ]
-        
         let stack = UIStackView().then {
             $0.axis = .horizontal
             $0.alignment = .fill
-            $0.distribution = .fillEqually
-            $0.spacing = 6
+            $0.distribution = .fill
+            $0.spacing = 12
         }
         
-        trailingContainer.addSubview(stack)
+        container.addSubview(stack)
         stack.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.leading.equalToSuperview()
         }
         
-        for color in colors {
-            let view = UIView()
-            view.backgroundColor = color
-            view.layer.cornerRadius = 2
-            stack.addArrangedSubview(view)
+        
+        let colorsAndTitle: [(UIColor, String)] = [
+            (UIColor.neutral700, "0회"),
+            (UIColor.primary200, "1~4회"),
+            (UIColor.primary300, "5~8회"),
+            (UIColor.primary500, "9회 이상")
+        ]
+        
+        for color in colorsAndTitle {
+            let colorStack = UIStackView().then {
+                $0.axis = .horizontal
+                $0.alignment = .center
+                $0.distribution = .fill
+                $0.spacing = 4
+            }
+            
+            let colorTile = UIView().then {
+                $0.backgroundColor = color.0
+                $0.layer.cornerRadius = 3
+            }
+            
+            let label = UILabel().then {
+                $0.text = color.1
+                $0.font = .font11Regular
+                $0.textColor = .neutral50
+            }
+            
+            colorTile.snp.makeConstraints {
+                $0.size.equalTo(12)
+            }
+            
+            colorStack.addArrangedSubview(colorTile)
+            colorStack.addArrangedSubview(label)
+            
+            stack.addArrangedSubview(colorStack)
+            
+            
         }
     }
 }

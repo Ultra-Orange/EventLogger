@@ -13,18 +13,27 @@ final class StatsRollupParentCell: UICollectionViewListCell {
     private let dotView = UIView().then {
         $0.layer.cornerRadius = 8
     }
+    
     private let titleLabel = UILabel().then {
         $0.font = .font17Regular
         $0.textColor = .neutral50
     }
+    
     private let valueLabel = UILabel().then {
         $0.font = .font17Regular
         $0.textColor = .neutral50
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
+    private let horizontalStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .center
+        $0.spacing = 8
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -42,11 +51,10 @@ final class StatsRollupParentCell: UICollectionViewListCell {
             $0.size.equalTo(16)
         }
         
-        let horizontalStack = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel]).then {
-            $0.axis = .horizontal
-            $0.alignment = .center
-            $0.spacing = 10
-        }
+        horizontalStack.addArrangedSubview(dotView)
+        horizontalStack.addArrangedSubview(titleLabel)
+        horizontalStack.addArrangedSubview(UIView())
+        horizontalStack.addArrangedSubview(valueLabel)
         
         contentView.addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
@@ -57,6 +65,7 @@ final class StatsRollupParentCell: UICollectionViewListCell {
     func configure(title: String, valueText: String, leftDotColor: UIColor?) {
         titleLabel.text = title
         valueLabel.text = valueText
+        
         if let color = leftDotColor {
             dotView.isHidden = false
             dotView.backgroundColor = color
