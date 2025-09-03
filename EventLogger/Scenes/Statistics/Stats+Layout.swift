@@ -1,0 +1,60 @@
+//
+//  Stats+Layout.swift
+//  EventLogger
+//
+//  Created by 김우성 on 9/3/25.
+//
+
+import UIKit
+
+extension StatsViewController {
+    func makeLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout { [weak self] sectionIndex, env in
+            guard let self, let section = self.dataSource?.snapshot().sectionIdentifiers[sectionIndex] else { return nil }
+            switch section {
+            case .menuBar:
+                // 얇은 한 줄
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                    heightDimension: .estimated(44)))
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                                 heightDimension: .estimated(44)),
+                                                               subitems: [item])
+                let sec = NSCollectionLayoutSection(group: group)
+                sec.contentInsets = .init(top: 0, leading: 20, bottom: 4, trailing: 20)
+                return sec
+            case .heatmap:
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                    heightDimension: .estimated(180)))
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                               heightDimension: .estimated(220)),
+                                                             subitems: [item])
+                let sec = NSCollectionLayoutSection(group: group)
+                sec.contentInsets = .init(top: 0, leading: 20, bottom: 8, trailing: 20)
+                // 헤더 추가
+                let header = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(32)),
+                    elementKind: StatsHeaderView.elementKind,
+                    alignment: .top)
+                sec.boundarySupplementaryItems = [header]
+                return sec
+            case .total:
+                let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                    heightDimension: .estimated(120)))
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                                                               heightDimension: .estimated(140)),
+                                                             subitems: [item])
+                let sec = NSCollectionLayoutSection(group: group)
+                sec.contentInsets = .init(top: 8, leading: 20, bottom: 8, trailing: 20)
+                return sec
+            case .categoryCount, .categoryExpense, .artistCount, .artistExpense:
+                var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+                config.backgroundColor = .clear
+                config.showsSeparators = true
+                config.headerMode = .supplementary
+                return NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
+            }
+        }
+        return layout
+    }
+}
