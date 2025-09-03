@@ -22,7 +22,6 @@ final class StatsReactor: BaseReactor {
         case setScope(Scope)          // 세그먼트 변경
         case pickYear(Int)            // 연도 선택
         case pickMonth(Int)           // 월 선택
-        case toggleParent(UUID)       // 폴딩/펼침 토글
         case refresh                  // 데이터 갱신 (외부에서 요청 가능)
     }
 
@@ -32,7 +31,6 @@ final class StatsReactor: BaseReactor {
         case setScope(Scope)
         case setSelectedYear(Int?)
         case setSelectedMonth(Int?)
-        case setExpandedParents(Set<UUID>)
         case setHeatmap(HeatmapModel)
     }
 
@@ -41,7 +39,6 @@ final class StatsReactor: BaseReactor {
         var scope: Scope = .year
         var selectedYear: Int?
         var selectedMonth: Int?
-        var expandedParents: Set<UUID> = []
         var activeYears: [String] = []       // 메뉴에 그릴 연도 목록
         var heatmap: HeatmapModel = .init(rows: [])
     }
@@ -100,11 +97,6 @@ final class StatsReactor: BaseReactor {
 
         case .pickMonth(let month):
             return .just(.setSelectedMonth(month))
-
-        case .toggleParent(let id):
-            var next = currentState.expandedParents
-            if next.contains(id) { next.remove(id) } else { next.insert(id) }
-            return .just(.setExpandedParents(next))
         }
     }
 
@@ -123,9 +115,6 @@ final class StatsReactor: BaseReactor {
 
         case .setSelectedMonth(let month):
             newState.selectedMonth = month
-
-        case .setExpandedParents(let set):
-            newState.expandedParents = set
 
         case .setHeatmap(let model):
             newState.heatmap = model

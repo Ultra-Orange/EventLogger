@@ -10,11 +10,9 @@ import SnapKit
 
 final class StatsRollupParentCell: UICollectionViewListCell {
     
-    var onTap: (() -> Void)?
     private let dotView = UIView()
     private let titleLabel = UILabel()
     private let valueLabel = UILabel()
-    private let chevron = UIImageView(image: UIImage(systemName: "chevron.down")?.withRenderingMode(.alwaysTemplate))
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,11 +26,6 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         contentConfiguration = config
         accessories = []
         
-        let container = UIStackView()
-        container.axis = .horizontal
-        container.spacing = 12
-        container.alignment = .center
-        
         dotView.snp.makeConstraints { $0.size.equalTo(10) }
         dotView.layer.cornerRadius = 5
         
@@ -43,25 +36,17 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         valueLabel.textColor = .neutral50
         valueLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         
-        chevron.tintColor = .neutral50
-        chevron.snp.makeConstraints { $0.size.equalTo(13) }
-        
-        let horizontalStack = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel, chevron]).then {
+        let horizontalStack = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel]).then {
             $0.axis = .horizontal
             $0.alignment = .center
             $0.spacing = 10
         }
         
         contentView.addSubview(horizontalStack)
-        horizontalStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(12)
-        }
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
-        contentView.addGestureRecognizer(tap)
+        horizontalStack.snp.makeConstraints { $0.edges.equalToSuperview().inset(12) }
     }
     
-    func configure(title: String, valueText: String, leftDotColor: UIColor?, expanded: Bool) {
+    func configure(title: String, valueText: String, leftDotColor: UIColor?) {
         titleLabel.text = title
         valueLabel.text = valueText
         if let color = leftDotColor {
@@ -70,8 +55,5 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         } else {
             dotView.isHidden = true
         }
-        chevron.transform = expanded ? CGAffineTransform(rotationAngle: .pi) : .identity
     }
-    
-    @objc private func tapped() { onTap?() }
 }

@@ -19,12 +19,8 @@ extension StatsViewController {
                 yearProvider: { reactor.currentState.activeYears },
                 selectedYear: state.selectedYear,
                 selectedMonth: state.selectedMonth,
-                onYearPicked: { [weak reactor] y in
-                    reactor?.action.onNext(.pickYear(y))
-                },
-                onMonthPicked: { [weak reactor] m in
-                    reactor?.action.onNext(.pickMonth(m))
-                }
+                onYearPicked: { [weak reactor] y in reactor?.action.onNext(.pickYear(y)) },
+                onMonthPicked: { [weak reactor] m in reactor?.action.onNext(.pickMonth(m)) }
             )
         }
 
@@ -36,23 +32,16 @@ extension StatsViewController {
             cell.configure(totalCount: model.totalCount, totalExpense: model.totalExpense)
         }
 
-        let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { [weak self] cell, _, model in
-            guard let self, let reactor = self.reactor else { return }
-            let expanded = reactor.currentState.expandedParents.contains(model.id)
+        let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { cell, _, model in
             cell.configure(title: model.title,
                            valueText: model.valueText,
-                           leftDotColor: model.leftDotColor,
-                           expanded: expanded)
-            cell.onTap = { [weak reactor] in
-                reactor?.action.onNext(.toggleParent(model.id))
-            }
+                           leftDotColor: model.leftDotColor)
         }
 
         let childReg = UICollectionView.CellRegistration<StatsRollupChildCell, RollupChild> { cell, _, model in
             cell.configure(title: model.title, valueText: model.valueText, leftDotColor: model.leftDotColor)
         }
 
-        // Diffable DataSource: 섹션/아이템 → 셀 매핑 규칙
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
             case .menu(let id):
@@ -68,7 +57,7 @@ extension StatsViewController {
             }
         }
 
-        // 1) Supplementary Registration (섹션 헤더)
+        // 1) Header Registration
         let headerReg = UICollectionView.SupplementaryRegistration<StatsHeaderView>(
             elementKind: StatsHeaderView.elementKind
         ) { [weak self] header, _, indexPath in
@@ -79,10 +68,21 @@ extension StatsViewController {
             header.configure(title: title, showLegend: section == .heatmap)
         }
 
-        // 2) Provider (헤더 공급자)
+        // 2) Footer Registration (HeatmapLegend)
+        let footerReg = UICollectionView.SupplementaryRegistration<HeatmapFooterView>(
+            elementKind: HeatmapFooterView.elementKind
+        ) { footer, _, _ in
+            footer.configure(title: "", showLegend: true)
+        }
+
+        // 3) Provider
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            guard kind == StatsHeaderView.elementKind else { return nil }
-            return collectionView.dequeueConfiguredReusableSupplementary(using: headerReg, for: indexPath)
+            if kind == StatsHeaderView.elementKind {
+                return collectionView.dequeueConfiguredReusableSupplementary(using: headerReg, for: indexPath)
+            } else if kind == HeatmapFooterView.elementKind {
+                return collectionView.dequeueConfiguredReusableSupplementary(using: footerReg, for: indexPath)
+            }
+            return nil
         }
     }
 }
