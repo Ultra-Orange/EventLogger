@@ -7,18 +7,30 @@
 
 import UIKit
 import SnapKit
+import Then
 
 final class StatsRollupParentCell: UICollectionViewListCell {
-    
-    private let dotView = UIView()
-    private let titleLabel = UILabel()
-    private let valueLabel = UILabel()
+    private let dotView = UIView().then {
+        $0.layer.cornerRadius = 8
+    }
+    private let titleLabel = UILabel().then {
+        $0.font = .font17Regular
+        $0.textColor = .neutral50
+    }
+    private let valueLabel = UILabel().then {
+        $0.font = .font17Regular
+        $0.textColor = .neutral50
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-    required init?(coder: NSCoder) { fatalError() }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
     
     private func setupUI() {
         var config = defaultContentConfiguration()
@@ -26,15 +38,9 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         contentConfiguration = config
         accessories = []
         
-        dotView.snp.makeConstraints { $0.size.equalTo(10) }
-        dotView.layer.cornerRadius = 5
-        
-        titleLabel.font = .font17Regular
-        titleLabel.textColor = .neutral50
-        
-        valueLabel.font = .font17Regular
-        valueLabel.textColor = .neutral50
-        valueLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        dotView.snp.makeConstraints {
+            $0.size.equalTo(16)
+        }
         
         let horizontalStack = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel]).then {
             $0.axis = .horizontal
@@ -43,7 +49,9 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         }
         
         contentView.addSubview(horizontalStack)
-        horizontalStack.snp.makeConstraints { $0.edges.equalToSuperview().inset(12) }
+        horizontalStack.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(12)
+        }
     }
     
     func configure(title: String, valueText: String, leftDotColor: UIColor?) {

@@ -19,8 +19,6 @@ struct StatisticsService {
     let manager: SwiftDataManager
     let calendar = Calendar(identifier: .gregorian)
 
-    // MARK: - Core accessors
-
     /// 기간에 맞는 이벤트만 필터링
     func filteredEvents(for period: StatsPeriod) -> [EventItem] {
         let events = manager.fetchAllEvents()
@@ -45,12 +43,10 @@ struct StatisticsService {
     }
 }
 
-// MARK: - 상위 집계(하위 포함): 카테고리 / 아티스트
-
 extension StatisticsService {
 
     /// 기간별 카테고리 통계 (하위 상세 포함)
-    /// - Note: 반환 배열은 **카운트 내림차순** 정렬.
+    /// - 반환 배열은 **카운트 내림차순** 정렬.
     /// - 내부의 하위 목록은 각각 **카운트/지출 내림차순** 정렬.
     func categoryStats(for period: StatsPeriod) -> [CategoryStats] {
         let events = filteredEvents(for: period)
@@ -66,17 +62,17 @@ extension StatisticsService {
         }
         var bucket: [UUID: CatAgg] = [:]
 
-        for e in events {
-            let cid = e.categoryId
-            var agg = bucket[cid] ?? CatAgg()
+        for event in events {
+            let categoryId = event.categoryId
+            var agg = bucket[categoryId] ?? CatAgg()
             agg.count += 1
-            agg.totalExpense += e.expense
+            agg.totalExpense += event.expense
             // 아티스트별: 비용은 "각 아티스트에 동일 전가" (기존 로직 유지)
-            for name in e.artists {
+            for name in event.artists {
                 agg.artistCount[name, default: 0] += 1
-                agg.artistExpense[name, default: 0] += e.expense
+                agg.artistExpense[name, default: 0] += event.expense
             }
-            bucket[cid] = agg
+            bucket[categoryId] = agg
         }
 
         // 모델 변환 + 정렬
@@ -162,9 +158,9 @@ extension StatisticsService {
                     }
                     return lhs.value > rhs.value
                 }
-                .compactMap { (cid, c) -> CategoryCountEntry? in
-                    guard let cat = catById[cid] else { return nil }
-                    return CategoryCountEntry(category: cat, count: c)
+                .compactMap { (categoryId, count) -> CategoryCountEntry? in
+                    guard let category = catById[categoryId] else { return nil }
+                    return CategoryCountEntry(category: category, count: count)
                 }
 
             let byExpense = agg.catExpense
@@ -176,9 +172,9 @@ extension StatisticsService {
                     }
                     return lhs.value > rhs.value
                 }
-                .compactMap { (cid, v) -> CategoryExpenseEntry? in
-                    guard let cat = catById[cid] else { return nil }
-                    return CategoryExpenseEntry(category: cat, expense: v)
+                .compactMap { (categoryId, expense) -> CategoryExpenseEntry? in
+                    guard let category = catById[categoryId] else { return nil }
+                    return CategoryExpenseEntry(category: category, expense: expense)
                 }
 
             results.append(
@@ -205,7 +201,7 @@ extension StatisticsService {
 // MARK: - 보조
 
 extension StatisticsService {
-    /// 이벤트가 존재하는 연도를 문자열 배열로 반환 (예: ["2025", "2024", ...])
+    /// 이벤트가 존재하는 연도를 문자열 배열로 반환 ("2025", "2024", ...)
     func activeYears(descending: Bool = true) -> [String] {
         let years = Set(manager.fetchAllEvents().map {
             calendar.component(.year, from: $0.startTime)
@@ -215,26 +211,26 @@ extension StatisticsService {
     }
 }
 
-// MARK: - Heatmap (UI 비침투 모델 생성)
+// MARK: - 잔디용 모델 생성
 
 extension StatisticsService {
     /// 전체 데이터로 HeatmapModel 생성 (연도 desc, 12개월)
     func buildHeatmapAll() -> HeatmapModel {
-        let cal = Calendar(identifier: .gregorian)
+        let calendar = Calendar(identifier: .gregorian)
         let all = manager.fetchAllEvents()
-        var m: [Int: [Int: Int]] = [:] // year → [month: count]
+        var month: [Int: [Int: Int]] = [:] // year → [month: count]
 
-        for e in all {
-            let y = cal.component(.year, from: e.startTime)
-            let mon = cal.component(.month, from: e.startTime)
-            var ym = m[y] ?? [:]
+        for event in all {
+            let y = calendar.component(.year, from: event.startTime)
+            let mon = calendar.component(.month, from: event.startTime)
+            var ym = month[y] ?? [:]
             ym[mon, default: 0] += 1
-            m[y] = ym
+            month[y] = ym
         }
 
-        let years = m.keys.sorted(by: >)
+        let years = month.keys.sorted(by: >)
         let rows: [HeatmapModel.Row] = years.map { y in
-            let counts = (1...12).map { m[y]?[$0] ?? 0 }
+            let counts = (1...12).map { month[y]?[$0] ?? 0 }
             let yearLabel = "`" + String(y % 100) // 디자인 예시처럼 `25
             return .init(yearLabel: yearLabel, monthCounts: counts)
         }
