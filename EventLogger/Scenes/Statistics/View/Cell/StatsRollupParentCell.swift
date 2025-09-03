@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 final class StatsRollupParentCell: UICollectionViewListCell {
+    
     var onTap: (() -> Void)?
     private let dotView = UIView()
     private let titleLabel = UILabel()
@@ -17,11 +18,11 @@ final class StatsRollupParentCell: UICollectionViewListCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setup()
+        setupUI()
     }
     required init?(coder: NSCoder) { fatalError() }
     
-    private func setup() {
+    private func setupUI() {
         var config = defaultContentConfiguration()
         config.text = nil
         contentConfiguration = config
@@ -35,23 +36,26 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         dotView.snp.makeConstraints { $0.size.equalTo(10) }
         dotView.layer.cornerRadius = 5
         
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.font = .font17Regular
         titleLabel.textColor = .neutral50
         
-        valueLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        valueLabel.font = .font17Regular
         valueLabel.textColor = .neutral50
         valueLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         
-        chevron.tintColor = .neutral300
-        chevron.snp.makeConstraints { $0.size.equalTo(14) }
+        chevron.tintColor = .neutral50
+        chevron.snp.makeConstraints { $0.size.equalTo(13) }
         
-        let h = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel, chevron])
-        h.axis = .horizontal
-        h.alignment = .center
-        h.spacing = 10
+        let horizontalStack = UIStackView(arrangedSubviews: [dotView, titleLabel, UIView(), valueLabel, chevron]).then {
+            $0.axis = .horizontal
+            $0.alignment = .center
+            $0.spacing = 10
+        }
         
-        contentView.addSubview(h)
-        h.snp.makeConstraints { $0.edges.equalToSuperview().inset(12) }
+        contentView.addSubview(horizontalStack)
+        horizontalStack.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(12)
+        }
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
         contentView.addGestureRecognizer(tap)
@@ -60,9 +64,9 @@ final class StatsRollupParentCell: UICollectionViewListCell {
     func configure(title: String, valueText: String, leftDotColor: UIColor?, expanded: Bool) {
         titleLabel.text = title
         valueLabel.text = valueText
-        if let c = leftDotColor {
+        if let color = leftDotColor {
             dotView.isHidden = false
-            dotView.backgroundColor = c
+            dotView.backgroundColor = color
         } else {
             dotView.isHidden = true
         }

@@ -9,7 +9,6 @@ import SnapKit
 import UIKit
 import Then
 
-// 2) Heatmap 셀
 final class HeatmapCell: UICollectionViewCell {
     private let heatmapView = HeatmapView().then {
         $0.backgroundColor = .neutral800

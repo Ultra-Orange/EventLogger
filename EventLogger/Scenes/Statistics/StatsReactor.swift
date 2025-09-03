@@ -80,8 +80,8 @@ final class StatsReactor: BaseReactor {
             var selectedYear: Int?
             var selectedMonth: Int? = nil
             if newScope == .year || newScope == .month {
-                if let firstYear = statisticsService.activeYears().first, let y = Int(firstYear) {
-                    selectedYear = y
+                if let firstYear = statisticsService.activeYears().first, let year = Int(firstYear) {
+                    selectedYear = year
                 } else {
                     selectedYear = Calendar.current.component(.year, from: Date())
                 }
@@ -95,11 +95,11 @@ final class StatsReactor: BaseReactor {
                 .just(.setActiveYears(years))
             ])
 
-        case .pickYear(let y):
-            return .just(.setSelectedYear(y))
+        case .pickYear(let year):
+            return .just(.setSelectedYear(year))
 
-        case .pickMonth(let m):
-            return .just(.setSelectedMonth(m))
+        case .pickMonth(let month):
+            return .just(.setSelectedMonth(month))
 
         case .toggleParent(let id):
             var next = currentState.expandedParents
@@ -115,14 +115,14 @@ final class StatsReactor: BaseReactor {
         case .setActiveYears(let years):
             newState.activeYears = years
 
-        case .setScope(let s):
-            newState.scope = s
+        case .setScope(let scope):
+            newState.scope = scope
 
-        case .setSelectedYear(let y):
-            newState.selectedYear = y
+        case .setSelectedYear(let year):
+            newState.selectedYear = year
 
-        case .setSelectedMonth(let m):
-            newState.selectedMonth = m
+        case .setSelectedMonth(let month):
+            newState.selectedMonth = month
 
         case .setExpandedParents(let set):
             newState.expandedParents = set
