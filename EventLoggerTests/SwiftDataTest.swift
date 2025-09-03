@@ -19,7 +19,7 @@ struct CategoryMappingTests {
             id: UUID(),
             name: "콘서트",
             position: 1,
-            colorId: CategoryColor.red.rawValue
+            colorId: 1
         )
 
         // When: Persistent로 변환 후 다시 Domain으로 복원
@@ -106,7 +106,7 @@ struct CategoryMappingTests {
         #expect(check?.position == 2)
         #expect(check?.colorId == 2)
         
-        swiftDataManager.deleteCategory(id: data1.id)
+        try swiftDataManager.deleteCategory(id: data1.id)
         #expect(swiftDataManager.fetchAllCategories().count == 1)
     }
     

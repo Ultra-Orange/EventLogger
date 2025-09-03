@@ -24,6 +24,7 @@ final class CategoryDetailReactor: BaseReactor {
         let categoryItem: CategoryItem?
         let navTitle: String
         let buttonTitle: String
+        var selectedColorId: Int
     }
     
     enum Mode {
@@ -49,6 +50,13 @@ final class CategoryDetailReactor: BaseReactor {
             case let .update(item): return item
             }
         }
+        
+        var selectedColorId : Int {
+            switch self {
+            case .create: return 0
+            case let .update(item): return item.colorId
+            }
+        }
     }
     
     let initialState: State
@@ -60,6 +68,7 @@ final class CategoryDetailReactor: BaseReactor {
             categoryItem: mode.cateogryItem,
             navTitle: mode.navTitle,
             buttonTitle: mode.buttonTitle,
+            selectedColorId: mode.selectedColorId
         )
     }
     

@@ -40,6 +40,25 @@ class EditCategoryViewController: BaseViewController<EditCategoryReactor> {
     let reorderCategoryRelay = PublishRelay<[CategoryItem]>()
     let deleteCategoryRelay = PublishRelay<CategoryItem>()
     
+    // TODO: 백 스와이프 해제애니메이션이 없이 바로 해제
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let selectedIndexPaths = collectionView.indexPathsForSelectedItems, let transitionCoordinator else {
+          return
+        }
+        transitionCoordinator.animate { [collectionView] _ in
+          for indexPath in selectedIndexPaths {
+            collectionView.deselectItem(at: indexPath, animated: true)
+          }
+        } completion: { [collectionView] context in
+          if context.isCancelled {
+            for indexPath in selectedIndexPaths {
+              collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+            }
+          }
+        }
+      }
+    
     // MARK: SetupUI
     
     override func setupUI() {
