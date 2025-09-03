@@ -9,7 +9,6 @@ import UIKit
 
 extension StatsViewController {
 
-    /// 컬렉션뷰의 "현재 화면"을 설명하는 스냅샷을 생성/적용
     func applySnapshot(animated: Bool) {
         guard let reactor = reactor, let dataSource = dataSource else { return }
         let state = reactor.currentState
@@ -47,8 +46,8 @@ extension StatsViewController {
         let (cnt, expense) = statisticsService.total(for: period)
         snapshot.appendItems([.total(.init(totalCount: cnt, totalExpense: expense))], toSection: .total)
 
-        // 6) 카테고리 Count/Expense
-        let categoryStats = statisticsService.categoryStats(for: period)
+        // 6) 카테고리 Count/Expense (하위 포함)
+        let categoryStats = statisticsService.categoryStats(for: period) // count desc
 
         let ccParents: [RollupParent] = categoryStats.map { cs in
             RollupParent(
@@ -59,13 +58,20 @@ extension StatsViewController {
                 type: .categoryCount
             )
         }
+
         appendRollup(
             parents: ccParents,
             makeChildren: { parent in
-                guard let cid = swiftDataManager.fetchAllCategories().first(where: { $0.name == parent.title })?.id else { return [] }
-                let byArtist = statisticsService.artistCountInCategory(for: period, categoryId: cid)
-                return byArtist.sorted(by: { $0.value > $1.value }).map {
-                    RollupChild(id: UUID(), parentId: parent.id, leftDotColor: nil, title: $0.key, valueText: "\($0.value)회")
+                // parent.title == category name
+                guard let cs = categoryStats.first(where: { $0.category.name == parent.title }) else { return [] }
+                return cs.topArtistsByCount.map {
+                    RollupChild(
+                        id: UUID(),
+                        parentId: parent.id,
+                        leftDotColor: nil,
+                        title: $0.name,
+                        valueText: "\($0.count)회"
+                    )
                 }
             },
             into: &snapshot,
@@ -83,41 +89,51 @@ extension StatsViewController {
                     type: .categoryExpense
                 )
             }
+
         appendRollup(
             parents: ceParents,
             makeChildren: { parent in
-                guard let cid = swiftDataManager.fetchAllCategories().first(where: { $0.name == parent.title })?.id else { return [] }
-                let byArtist = statisticsService.artistExpenseInCategory(for: period, categoryId: cid)
-                return byArtist.sorted(by: { $0.value > $1.value }).map {
-                    RollupChild(id: UUID(), parentId: parent.id, leftDotColor: nil, title: $0.key, valueText: KRWFormatter.shared.string($0.value))
+                guard let cs = categoryStats.first(where: { $0.category.name == parent.title }) else { return [] }
+                return cs.topArtistsByExpense.map {
+                    RollupChild(
+                        id: UUID(),
+                        parentId: parent.id,
+                        leftDotColor: nil,
+                        title: $0.name,
+                        valueText: KRWFormatter.shared.string($0.expense)
+                    )
                 }
             },
             into: &snapshot,
             section: .categoryExpense
         )
 
-        // 7) 아티스트 Count/Expense
-        let artistStats = statisticsService.artistStats(for: period)
+        // 7) 아티스트 Count/Expense (하위 포함)
+        let artistStats = statisticsService.artistStats(for: period) // count desc
 
         let acParents = artistStats.map { asv in
-            RollupParent(id: UUID(), title: asv.name, leftDotColor: nil, valueText: "\(asv.count)회", type: .artistCount)
+            RollupParent(
+                id: UUID(),
+                title: asv.name,
+                leftDotColor: nil,
+                valueText: "\(asv.count)회",
+                type: .artistCount
+            )
         }
+
         appendRollup(
             parents: acParents,
             makeChildren: { parent in
-                let byCategory = statisticsService.categoryCountForArtist(for: period, artistName: parent.title)
-                return byCategory
-                    .sorted(by: { $0.value > $1.value })
-                    .map { (cid, v) in
-                        let cat = swiftDataManager.fetchOneCategory(id: cid)
-                        return RollupChild(
-                            id: UUID(),
-                            parentId: parent.id,
-                            leftDotColor: cat?.color ?? .systemGray,
-                            title: cat?.name ?? "Unknown",
-                            valueText: "\(v)회"
-                        )
-                    }
+                guard let asv = artistStats.first(where: { $0.name == parent.title }) else { return [] }
+                return asv.topCategoriesByCount.map {
+                    RollupChild(
+                        id: UUID(),
+                        parentId: parent.id,
+                        leftDotColor: $0.category.color,
+                        title: $0.category.name,
+                        valueText: "\($0.count)회"
+                    )
+                }
             },
             into: &snapshot,
             section: .artistCount
@@ -134,22 +150,20 @@ extension StatsViewController {
                     type: .artistExpense
                 )
             }
+
         appendRollup(
             parents: aeParents,
             makeChildren: { parent in
-                let byCategory = statisticsService.categoryExpenseForArtist(for: period, artistName: parent.title)
-                return byCategory
-                    .sorted(by: { $0.value > $1.value })
-                    .map { (cid, v) in
-                        let cat = swiftDataManager.fetchOneCategory(id: cid)
-                        return RollupChild(
-                            id: UUID(),
-                            parentId: parent.id,
-                            leftDotColor: cat?.color ?? .systemGray,
-                            title: cat?.name ?? "Unknown",
-                            valueText: KRWFormatter.shared.string(v)
-                        )
-                    }
+                guard let asv = artistStats.first(where: { $0.name == parent.title }) else { return [] }
+                return asv.topCategoriesByExpense.map {
+                    RollupChild(
+                        id: UUID(),
+                        parentId: parent.id,
+                        leftDotColor: $0.category.color,
+                        title: $0.category.name,
+                        valueText: KRWFormatter.shared.string($0.expense)
+                    )
+                }
             },
             into: &snapshot,
             section: .artistExpense
