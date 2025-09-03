@@ -177,6 +177,7 @@ extension CategoryListViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Int, CategoryItem>()
         snapshot.appendSections([0])
         snapshot.appendItems(items, toSection: 0)
+        snapshot.reconfigureItems(items) // 다시 그리기
         dataSource.apply(snapshot)
     }
 }

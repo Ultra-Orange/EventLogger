@@ -16,13 +16,13 @@ final class AppFlow: Flow {
     private let selectedLocationRelay = PublishRelay<String>()
     
     var root: Presentable { rootNav }
-
+    
     init(windowScene: UIWindowScene) {
         window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootNav
         window.makeKeyAndVisible()
     }
-
+    
     func navigate(to step: any Step) -> FlowContributors {
         guard let step = step as? AppStep else { return .none }
         switch step {
@@ -45,11 +45,10 @@ final class AppFlow: Flow {
         case let .updateCategory(item):
             return navigateToCategoryDetail(mode: .update(item))
         case .backToCategoryList:
-            rootNav.popViewController(animated: true)
-            return .none
+            return backToCategoryList()
         }
     }
-
+    
     func navigateToEventList() -> FlowContributors {
         let vc = EventListViewController()
         let reactor = EventListReactor()
@@ -62,7 +61,7 @@ final class AppFlow: Flow {
             )
         )
     }
-
+    
     func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor(eventItem: eventItem)
@@ -144,5 +143,12 @@ final class AppFlow: Flow {
             )
         )
     }
-
+    
+    private func backToCategoryList() -> FlowContributors {
+      
+        rootNav.popViewController(animated: true)
+        return .none
+    }
+    
 }
+
