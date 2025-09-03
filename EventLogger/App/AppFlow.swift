@@ -120,8 +120,6 @@ final class AppFlow: Flow {
         )
     }
     
-    private func navigateToCategoryEdit() -> FlowContributors {
-        let vc = EditCategoryViewController()
     private func navigateToCategoryList() -> FlowContributors {
         let vc = CategoryListViewController()
         let reactor = CategoryListReactor()
@@ -149,9 +147,11 @@ final class AppFlow: Flow {
     }
     
     private func backToCategoryList() -> FlowContributors {
-      
+        
         rootNav.popViewController(animated: true)
         return .none
+    }
+    
     private func navigateToStatistics() -> FlowContributors {
         let vc = StatsViewController()
         let reactor = StatsReactor()
@@ -165,4 +165,3 @@ final class AppFlow: Flow {
         )
     }
 }
-
