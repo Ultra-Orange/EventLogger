@@ -11,43 +11,48 @@ extension StatsViewController {
     func configureDataSource() {
         // Cell registrations
         let menuReg = UICollectionView.CellRegistration<StatsMenuBarCell, UUID> { [weak self] cell, _, _ in
-            guard let self else { return }
+            guard let self, let reactor = self.reactor else { return }
+            let state = reactor.currentState
+
             cell.configure(
-                scope: self.currentScope,
-                yearProvider: { [weak self] in self?.statisticsService.activeYears() ?? [] },
-                selectedYear: self.selectedYear,
-                selectedMonth: self.selectedMonth,
-                onYearPicked: { [weak self] y in
-                    self?.selectedYear = y
-                    self?.applySnapshot(animated: true)
+                scope: state.scope,
+                yearProvider: { reactor.currentState.activeYears },
+                selectedYear: state.selectedYear,
+                selectedMonth: state.selectedMonth,
+                onYearPicked: { [weak reactor] y in
+                    reactor?.action.onNext(.pickYear(y))
                 },
-                onMonthPicked: { [weak self] m in
-                    self?.selectedMonth = m
-                    self?.applySnapshot(animated: true)
+                onMonthPicked: { [weak reactor] m in
+                    reactor?.action.onNext(.pickMonth(m))
                 }
             )
         }
-        
+
         let heatmapReg = UICollectionView.CellRegistration<HeatmapCell, HeatmapModel> { cell, _, model in
             cell.configure(model: model)
         }
-        
+
         let totalReg = UICollectionView.CellRegistration<StatsTotalCell, TotalModel> { cell, _, model in
             cell.configure(totalCount: model.totalCount, totalExpense: model.totalExpense)
         }
-        
+
         let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { [weak self] cell, _, model in
-            guard let self else { return }
+            guard let self, let reactor = self.reactor else { return }
+            let expanded = reactor.currentState.expandedParents.contains(model.id)
             cell.configure(title: model.title,
                            valueText: model.valueText,
                            leftDotColor: model.leftDotColor,
-                           expanded: self.expandedParents.contains(model.id))
+                           expanded: expanded)
+            cell.onTap = { [weak reactor] in
+                reactor?.action.onNext(.toggleParent(model.id))
+            }
         }
-        
+
         let childReg = UICollectionView.CellRegistration<StatsRollupChildCell, RollupChild> { cell, _, model in
             cell.configure(title: model.title, valueText: model.valueText, leftDotColor: model.leftDotColor)
         }
-        
+
+        // Diffable DataSource: 섹션/아이템 → 셀 매핑 규칙
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
             case .menu(let id):
@@ -62,8 +67,8 @@ extension StatsViewController {
                 return collectionView.dequeueConfiguredReusableCell(using: childReg, for: indexPath, item: model)
             }
         }
-        
-        // 1) Supplementary Registration
+
+        // 1) Supplementary Registration (섹션 헤더)
         let headerReg = UICollectionView.SupplementaryRegistration<StatsHeaderView>(
             elementKind: StatsHeaderView.elementKind
         ) { [weak self] header, _, indexPath in
@@ -74,7 +79,7 @@ extension StatsViewController {
             header.configure(title: title, showLegend: section == .heatmap)
         }
 
-        // 2) Provider
+        // 2) Provider (헤더 공급자)
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
             guard kind == StatsHeaderView.elementKind else { return nil }
             return collectionView.dequeueConfiguredReusableSupplementary(using: headerReg, for: indexPath)

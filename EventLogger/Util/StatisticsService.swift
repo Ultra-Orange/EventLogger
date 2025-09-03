@@ -149,3 +149,31 @@ extension StatisticsService {
         return sorted.map(String.init)
     }
 }
+
+// MARK: - 4) Heatmap (UI 비침투 모델 생성)
+
+extension StatisticsService {
+    /// 전체 데이터로 HeatmapModel 생성 (연도 desc, 12개월)
+    /// - Note: HeatmapModel은 UIKit 타입에 의존하지 않으므로 서비스에서 만들어도 UI 침투 아님.
+    func buildHeatmapAll() -> HeatmapModel {
+        let cal = Calendar(identifier: .gregorian)
+        let all = manager.fetchAllEvents()
+        var m: [Int: [Int: Int]] = [:] // year → [month: count]
+
+        for e in all {
+            let y = cal.component(.year, from: e.startTime)
+            let mon = cal.component(.month, from: e.startTime)
+            var ym = m[y] ?? [:]
+            ym[mon, default: 0] += 1
+            m[y] = ym
+        }
+
+        let years = m.keys.sorted(by: >)
+        let rows: [HeatmapModel.Row] = years.map { y in
+            let counts = (1...12).map { m[y]?[$0] ?? 0 }
+            let yearLabel = "`" + String(y % 100) // 디자인 예시처럼 `25
+            return .init(yearLabel: yearLabel, monthCounts: counts)
+        }
+        return .init(rows: rows)
+    }
+}

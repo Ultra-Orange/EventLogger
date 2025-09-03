@@ -15,11 +15,13 @@ enum Scope: Int {
 }
 
 // 1) UIMenu 버튼 섹션 셀
+/// - 이 셀은 "연도/월 선택 UI"만 담당.
+/// - 실제 상태 변경은 VC → Reactor로 흘러감(onYearPicked/onMonthPicked 클로저)
 final class StatsMenuBarCell: UICollectionViewCell {
     private let container = UIView()
     private let yearButton = UIButton(type: .system)
     private let monthButton = UIButton(type: .system)
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(container)
@@ -43,7 +45,7 @@ final class StatsMenuBarCell: UICollectionViewCell {
         monthButton.layer.cornerRadius = 13
     }
     required init?(coder: NSCoder) { fatalError() }
-    
+
     func configure(
         scope: Scope,
         yearProvider: () -> [String],
@@ -60,7 +62,7 @@ final class StatsMenuBarCell: UICollectionViewCell {
         }
         yearButton.menu = UIMenu(children: yearActions)
         yearButton.showsMenuAsPrimaryAction = true
-        
+
         switch scope {
         case .year:
             // 월 버튼 숨김, 연도만
