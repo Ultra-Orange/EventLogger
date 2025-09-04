@@ -24,7 +24,7 @@ extension StatsViewController {
             )
         }
 
-        let heatmapReg = UICollectionView.CellRegistration<HeatmapCell, HeatmapModel> { cell, _, model in
+        let heatmapReg = UICollectionView.CellRegistration<StatsHeatmapCell, HeatmapModel> { cell, _, model in
             cell.configure(model: model)
         }
 
@@ -58,14 +58,25 @@ extension StatsViewController {
         }
 
         // 1) Header Registration
-        let headerReg = UICollectionView.SupplementaryRegistration<StatsHeaderView>(
-            elementKind: StatsHeaderView.elementKind
+        let statsHeaderReg = UICollectionView.SupplementaryRegistration<ListHeaderView>(
+            elementKind: ListHeaderView.elementKind
         ) { [weak self] header, _, indexPath in
             guard let self,
                   let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section]
             else { return }
             let title = self.headerTitle(for: section) ?? ""
             header.configure(title: title, showLegend: section == .heatmap)
+        }
+        
+        let heatmapHeaderReg = UICollectionView.SupplementaryRegistration<HeatmapHeaderView>(
+            elementKind: HeatmapHeaderView.elementKind
+        ) { [weak self] header, _, indexPath in
+            guard let self,
+                  let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section],
+                  section == .heatmap
+            else { return }
+            let title = self.headerTitle(for: section) ?? ""
+            header.configure(title: title, showLegend: true)
         }
 
         // 2) Footer Registration (HeatmapLegend)
@@ -77,8 +88,10 @@ extension StatsViewController {
 
         // 3) Provider
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            if kind == StatsHeaderView.elementKind {
-                return collectionView.dequeueConfiguredReusableSupplementary(using: headerReg, for: indexPath)
+            if kind == ListHeaderView.elementKind {
+                return collectionView.dequeueConfiguredReusableSupplementary(using: statsHeaderReg, for: indexPath)
+            } else if kind == HeatmapHeaderView.elementKind {
+                return collectionView.dequeueConfiguredReusableSupplementary(using: heatmapHeaderReg, for: indexPath)
             } else if kind == HeatmapFooterView.elementKind {
                 return collectionView.dequeueConfiguredReusableSupplementary(using: footerReg, for: indexPath)
             }

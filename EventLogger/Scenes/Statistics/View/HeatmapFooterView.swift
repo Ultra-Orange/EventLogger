@@ -1,5 +1,5 @@
 //
-//  StatsFooterView.swift
+//  HeatmapFooterView.swift
 //  EventLogger
 //
 //  Created by 김우성 on 9/3/25.
@@ -7,10 +7,10 @@
 //
 import SnapKit
 import UIKit
+import Then
 
-// 섹션 헤더 뷰
 final class HeatmapFooterView: UICollectionReusableView {
-    static let elementKind = UICollectionView.elementKindSectionFooter
+    static let elementKind = "HeatmapFooterElementKind"
 
     private let container = UIView() // Heatmap에서만 사용
 

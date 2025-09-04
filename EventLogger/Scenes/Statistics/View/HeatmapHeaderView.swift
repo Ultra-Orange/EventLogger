@@ -1,8 +1,8 @@
 //
-//  StatsHeaderView.swift
+//  HeatmapHeaderView.swift
 //  EventLogger
 //
-//  Created by 김우성 on 9/3/25.
+//  Created by 김우성 on 9/4/25.
 //
 
 import SnapKit
@@ -10,11 +10,11 @@ import UIKit
 import Then
 
 // 섹션 헤더 뷰
-final class StatsHeaderView: UICollectionReusableView {
-    static let elementKind = UICollectionView.elementKindSectionHeader
+final class HeatmapHeaderView: UICollectionReusableView {
+    static let elementKind = "HeatmapHeaderElementKind"
 
     private let titleLabel = UILabel().then {
-        $0.font = .font13Regular
+        $0.font = .font17Semibold
         $0.textColor = .neutral50
     }
 
@@ -23,7 +23,7 @@ final class StatsHeaderView: UICollectionReusableView {
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
             $0.top.bottom.equalToSuperview().inset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview()
         }
     }
 
