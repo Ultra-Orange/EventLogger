@@ -150,8 +150,8 @@ extension StatsViewController {
     private final class DecorationView: UICollectionReusableView {
         let gradientLayer = CAGradientLayer().then {
             $0.colors = [UIColor.neutral700.withAlphaComponent(0.5).cgColor, UIColor.neutral800.withAlphaComponent(0.8).cgColor]
-            $0.startPoint = CGPoint(x: 0.0, y: 0.0)
-            $0.endPoint = CGPoint(x: 0.0, y: 1.0)
+            $0.startPoint = CGPoint(x: 0.25, y: 0.5)
+            $0.endPoint = CGPoint(x: 0.75, y: 0.5)
         }
         
         override init(frame: CGRect) {

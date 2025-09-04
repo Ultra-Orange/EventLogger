@@ -36,14 +36,43 @@ extension StatsViewController {
             cell.configure(totalExpense: model.totalExpense)
         }
 
-        let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { cell, _, model in
+        let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { [weak self] cell, _, model in
+            guard let self = self else { return }
             cell.configure(title: model.title,
                            valueText: model.valueText,
                            leftDotColor: model.leftDotColor)
+            
+            // chevron (expanded 여부에 따라 up/down)
+            let isExpanded = self.expandedParentIDs.contains(model.id)
+            cell.setChevron(expanded: isExpanded, animated: false)
+
+            
+            // 터치 중 하이라이트만 적용되고 선택 잔상은 남지 않도록
+            cell.automaticallyUpdatesBackgroundConfiguration = false
+            cell.configurationUpdateHandler = { cell, state in
+                var bg = UIBackgroundConfiguration.listGroupedCell()
+                if state.isHighlighted || state.isSelected {
+                    bg.backgroundColor = UIColor.neutral700.withAlphaComponent(0.55)
+                } else {
+                    bg.backgroundColor = .clear
+                }
+                (cell as? StatsRollupParentCell)?.backgroundConfiguration = bg
+            }
         }
 
         let childReg = UICollectionView.CellRegistration<StatsRollupChildCell, RollupChild> { cell, _, model in
             cell.configure(title: model.title, valueText: model.valueText, leftDotColor: model.leftDotColor)
+            
+            cell.automaticallyUpdatesBackgroundConfiguration = false
+            cell.configurationUpdateHandler = { cell, state in
+                var bg = UIBackgroundConfiguration.listGroupedCell()
+                if state.isHighlighted || state.isSelected {
+                    bg.backgroundColor = UIColor.neutral700.withAlphaComponent(0.45)
+                } else {
+                    bg.backgroundColor = .clear
+                }
+                (cell as? StatsRollupChildCell)?.backgroundConfiguration = bg
+            }
         }
 
         let titleReg = UICollectionView.CellRegistration<StatsTitleCell, String> { cell, _, title in

@@ -9,6 +9,8 @@ import UIKit
 
 extension StatsViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
         guard let dataSource = dataSource,
               let item = dataSource.itemIdentifier(for: indexPath) else { return }
 
@@ -26,6 +28,7 @@ extension StatsViewController: UICollectionViewDelegate {
         let pid = parent.id
         let children = (childrenCache[pid] ?? [])
         let childItems = children.map { StatsItem.rollupChild($0) }
+        let parentItem = StatsItem.rollupParent(parent)
 
         if expandedParentIDs.contains(pid) {
             // 접기: 자식 삭제
@@ -33,10 +36,6 @@ extension StatsViewController: UICollectionViewDelegate {
             expandedParentIDs.remove(pid)
         } else {
             // 펼치기: 부모 바로 뒤에 자식 삽입
-            // 스냅샷 내 '현재' 부모 아이템을 찾아야 한다.
-            // Hashable 동등성으로 찾기 위해 동일 값의 아이템을 빌드
-            let parentItem = StatsItem.rollupParent(parent)
-            // 안전하게 afterItem 대상이 스냅샷에 존재하는지 확인
             if snapshot.indexOfItem(parentItem) != nil {
                 snapshot.insertItems(childItems, afterItem: parentItem)
                 expandedParentIDs.insert(pid)
@@ -47,6 +46,7 @@ extension StatsViewController: UICollectionViewDelegate {
                 expandedParentIDs.insert(pid)
             }
         }
+        snapshot.reconfigureItems([parentItem]) // chevron 갱신 (cellRegistration의 액세서리 재계산 유도)
 
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
