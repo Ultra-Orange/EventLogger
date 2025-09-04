@@ -72,6 +72,7 @@ final class EventDetailReactor: BaseReactor {
                 .flatMap { [calendarService] granted -> Single<Void> in
                     if granted {
                         return calendarService.save(eventItem: item)
+                            .map { _ in () } // TODO: 구조 리팩터링
                     } else {
                         // 접근 거부
                         self.saveOutcome.accept(.denied)

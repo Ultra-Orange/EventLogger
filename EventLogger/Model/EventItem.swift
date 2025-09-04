@@ -20,6 +20,7 @@ struct EventItem: Hashable {
     var expense: Double // TODO: 토털은 원화변환
     var currency: Currency // TODO: MVP까지는 KRW단일
     var memo: String // 메모
+    var calendarEventId: String? // 달력이벤트 idenfier
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -43,7 +44,8 @@ extension EventItem {
             artists: artists,
             expense: expense,
             currency: currency.rawValue,
-            memo: memo
+            memo: memo,
+            calendarEventId: calendarEventId
         )
     }
 }

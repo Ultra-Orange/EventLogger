@@ -15,7 +15,7 @@ protocol CalendarServicing {
     /// 캘린더 접근 권한 요청 (결정된 상태라면 즉시 리턴)
     func requestAccess() -> Single<Bool>
     /// EventItem을 기본 캘린더에 저장
-    func save(eventItem: EventItem) -> Single<Void>
+    func save(eventItem: EventItem) -> Single<String>
 }
 
 // MARK: 구현
@@ -58,11 +58,12 @@ final class CalendarService: CalendarServicing {
         }
     }
 
-    func save(eventItem: EventItem) -> Single<Void> {
+    func save(eventItem: EventItem) -> Single<String> {
         return Single.create { [store] single in
             // 캘린더(기본 캘린더)에 이벤트 생성
             let event = EKEvent(eventStore: store)
-            print(event.eventIdentifier)
+            // TODO: identifer 활용한 리팩토링
+//            print(event.eventIdentifier)
             event.calendar = store.defaultCalendarForNewEvents
 
             event.title = eventItem.title
@@ -83,7 +84,7 @@ final class CalendarService: CalendarServicing {
 
             do {
                 try store.save(event, span: .thisEvent, commit: true)
-                single(.success(()))
+                single(.success(event.eventIdentifier))
             } catch {
                 single(.failure(error))
             }

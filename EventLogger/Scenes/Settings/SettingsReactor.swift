@@ -15,6 +15,7 @@ import RxRelay
 import RxSwift
 import UIKit
 import UserNotifications
+import EventKit
 
 final class SettingsReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -23,34 +24,41 @@ final class SettingsReactor: BaseReactor {
         case togglePushNotification(Bool)
         case refreshPushStatus
         case openSystemSettings
+        case toggleCalendarAutoSave(Bool)
+        case refreshCalendarStatus
     }
-
+    
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setPushEnabled(Bool)
         case showDeniedAlert(String)
+        case setCalendarEnabled(Bool)
     }
-
+    
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         var pushEnabled: Bool
+        var calendarEnabled: Bool
         @Pulse var alertMessage: String?
     }
-
+    
     // TODO: 리팩토링 요소 있음, notificationService 관련
+    // TODO: 캘린더 권한 묻는 시점 리팩토링
     @Dependency(\.settingsService) var settingsService
     @Dependency(\.notificationService) var notificationService
-
+    @Dependency(\.calendarService) var calendarService
+    
     // 생성자에서 초기 상태 설정
     let initialState: State
-
+    
     init() {
         @Dependency(\.settingsService) var settingsService
         initialState = State(
-            pushEnabled: settingsService.pushNotificationEnabled
+            pushEnabled: settingsService.pushNotificationEnabled,
+            calendarEnabled: settingsService.autoSaveToCalendar
         )
     }
-
+    
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {
@@ -87,8 +95,8 @@ final class SettingsReactor: BaseReactor {
             return Observable.create { observer in
                 UNUserNotificationCenter.current().getNotificationSettings { settings in
                     let isGranted = (settings.authorizationStatus == .authorized
-                        || settings.authorizationStatus == .provisional
-                        || settings.authorizationStatus == .ephemeral)
+                                     || settings.authorizationStatus == .provisional
+                                     || settings.authorizationStatus == .ephemeral)
                     observer.onNext(.setPushEnabled(isGranted && self.settingsService.pushNotificationEnabled))
                     observer.onCompleted()
                 }
@@ -99,9 +107,29 @@ final class SettingsReactor: BaseReactor {
                 UIApplication.shared.open(url)
             }
             return .empty()
+        case let .toggleCalendarAutoSave(isOn):
+            if isOn {
+                return calendarService.requestAccess().asObservable()
+                    .map { granted in
+                        if granted {
+                            self.settingsService.autoSaveToCalendar = true
+                            return .setCalendarEnabled(true)
+                        } else {
+                            self.settingsService.autoSaveToCalendar = false
+                            return .showDeniedAlert("캘린더 접근 권한이 꺼져 있습니다.\n설정 > 캘린더에서 허용해주세요.")
+                        }
+                    }
+            } else {
+                settingsService.autoSaveToCalendar = false
+                return .just(.setCalendarEnabled(false))
+            }
+        case .refreshCalendarStatus:
+            let status = EKEventStore.authorizationStatus(for: .event)
+            let isGranted = (status == .fullAccess || status == .writeOnly)
+            return .just(.setCalendarEnabled(isGranted && self.settingsService.autoSaveToCalendar))
         }
     }
-
+    
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {
@@ -111,6 +139,8 @@ final class SettingsReactor: BaseReactor {
             newState.pushEnabled = isAble
         case let .showDeniedAlert(message):
             newState.alertMessage = message
+        case let .setCalendarEnabled(isAble):
+            newState.calendarEnabled = isAble
         }
         return newState
     }
@@ -126,8 +156,8 @@ extension SettingsReactor {
             notificationService.cancelNotification(id: event.id.uuidString)
             notificationService.scheduleNotification(
                 id: event.id.uuidString,
-                title: event.title,
-                body: "내일은 이벤트에 참가하는 날입니다!",
+                title: "\(event.title)+✨",
+                body: "내일은 기다리고 기다리던 이벤트 D-DAY 🎉",
                 date: event.startTime
             )
         }
