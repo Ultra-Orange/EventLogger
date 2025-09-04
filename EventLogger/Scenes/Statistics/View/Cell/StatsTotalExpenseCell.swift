@@ -28,11 +28,12 @@ final class StatsTotalExpenseCell: UICollectionViewCell {
         contentView.addSubview(expenseBox)
         
         expenseBox.snp.makeConstraints {
+            $0.edges.equalToSuperview()
             $0.height.greaterThanOrEqualTo(50)
         }
     }
     
-    func configure(totalCount: Int, totalExpense: Double) {
+    func configure(totalExpense: Double) {
         expenseBox.setValue(KRWFormatter.shared.string(totalExpense))
     }
 }

@@ -53,7 +53,8 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     enum StatsSection: Hashable {
         case menuBar
         case heatmap
-        case total
+        case totalCount
+        case totalExpense
         case categoryCountHeader
         case categoryCount
         case categoryExpenseHeader
@@ -68,7 +69,8 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         case title(String)
         case menu(UUID)
         case heatmap(HeatmapModel)
-        case total(TotalModel)
+        case totalCount(TotalModel)
+        case totalExpense(TotalModel)
         case rollupParent(RollupParent)
         case rollupChild(RollupChild)
     }
@@ -183,7 +185,8 @@ extension StatsViewController {
         switch section {
         case .menuBar: return nil
         case .heatmap: return "참여 캘린더"
-        case .total:   return nil
+        case .totalCount:   return nil
+        case .totalExpense:   return nil
         case .categoryCount:   return "카테고리별 참여 횟수"
         case .categoryExpense: return "카테고리별 지출"
         case .artistCount:     return "아티스트별 참여 횟수"

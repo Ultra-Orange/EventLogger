@@ -17,9 +17,9 @@ extension StatsViewController {
 
         // 1) 섹션 구성
         if state.scope == .year || state.scope == .month {
-            snapshot.appendSections([.menuBar, .total, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
+            snapshot.appendSections([.menuBar, .totalCount, .totalExpense, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
         } else { // .all
-            snapshot.appendSections([.heatmap, .total, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
+            snapshot.appendSections([.heatmap, .totalCount, .totalExpense, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
         }
 
         // 2) 메뉴바
@@ -44,7 +44,9 @@ extension StatsViewController {
 
         // 5) 총합
         let (cnt, expense) = statisticsService.total(for: period)
-        snapshot.appendItems([.total(.init(totalCount: cnt, totalExpense: expense))], toSection: .total)
+        snapshot.appendItems([.totalCount(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalCount)
+        snapshot.appendItems([.totalExpense(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalExpense)
+
 
         // 6) 카테고리 Count/Expense (하위 포함)
         let categoryStats = statisticsService.categoryStats(for: period) // count desc

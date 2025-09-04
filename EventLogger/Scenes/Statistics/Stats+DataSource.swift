@@ -28,8 +28,12 @@ extension StatsViewController {
             cell.configure(model: model)
         }
 
-        let totalReg = UICollectionView.CellRegistration<StatsTotalCell, TotalModel> { cell, _, model in
-            cell.configure(totalCount: model.totalCount, totalExpense: model.totalExpense)
+        let totalCountReg = UICollectionView.CellRegistration<StatsTotalCountCell, TotalModel> { cell, _, model in
+            cell.configure(totalCount: model.totalCount)
+        }
+        
+        let totalExpenseReg = UICollectionView.CellRegistration<StatsTotalExpenseCell, TotalModel> { cell, _, model in
+            cell.configure(totalExpense: model.totalExpense)
         }
 
         let parentReg = UICollectionView.CellRegistration<StatsRollupParentCell, RollupParent> { cell, _, model in
@@ -53,8 +57,10 @@ extension StatsViewController {
                 return collectionView.dequeueConfiguredReusableCell(using: menuReg, for: indexPath, item: id)
             case .heatmap(let model):
                 return collectionView.dequeueConfiguredReusableCell(using: heatmapReg, for: indexPath, item: model)
-            case .total(let model):
-                return collectionView.dequeueConfiguredReusableCell(using: totalReg, for: indexPath, item: model)
+            case .totalCount(let model):
+                return collectionView.dequeueConfiguredReusableCell(using: totalCountReg, for: indexPath, item: model)
+            case .totalExpense(let model):
+                return collectionView.dequeueConfiguredReusableCell(using: totalExpenseReg, for: indexPath, item: model)
             case .rollupParent(let model):
                 return collectionView.dequeueConfiguredReusableCell(using: parentReg, for: indexPath, item: model)
             case .rollupChild(let model):

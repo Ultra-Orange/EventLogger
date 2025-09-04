@@ -14,14 +14,13 @@ final class StatBoxView: UIView {
         $0.axis = .horizontal
         $0.spacing = 8
         $0.alignment = .center
+        $0.distribution = .equalSpacing
     }
     
     private let titleLabel = UILabel().then {
         $0.font = .font17Regular
         $0.textColor = .neutral50
     }
-    
-    private let spacer = UIView()
 
     private let valueLabel = UILabel().then {
         $0.font = .font28Bold
@@ -34,7 +33,6 @@ final class StatBoxView: UIView {
         
         addSubview(stackView)
         stackView.addArrangedSubview(titleLabel)
-        stackView.addArrangedSubview(spacer)
         stackView.addArrangedSubview(valueLabel)
         
         stackView.snp.makeConstraints {

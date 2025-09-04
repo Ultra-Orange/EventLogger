@@ -87,14 +87,14 @@ extension StatsViewController {
                 section.boundarySupplementaryItems = [header, footer]
                 return section
                 
-            case .total: // 완료
+            case .totalCount: // 완료
                 let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
-                                      heightDimension: .estimated(120))
+                                      heightDimension: .estimated(50))
                 )
                 let group = NSCollectionLayoutGroup.vertical(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
-                                      heightDimension: .estimated(120)),
+                                      heightDimension: .estimated(50)),
                     subitems: [item]
                 )
                 
@@ -103,6 +103,24 @@ extension StatsViewController {
                 section.decorationItems = [decorationItem]
                 
                 return section
+                
+            case .totalExpense: // 완료
+                let item = NSCollectionLayoutItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(50))
+                )
+                let group = NSCollectionLayoutGroup.vertical(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(50)),
+                    subitems: [item]
+                )
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
+                section.decorationItems = [decorationItem]
+                
+                return section
+                
                 
             case .categoryCount, .categoryExpense, .artistCount, .artistExpense:
                 var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
