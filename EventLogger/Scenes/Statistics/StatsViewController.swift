@@ -46,6 +46,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: makeLayout()).then {
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = true
+        $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     }
 
     // MARK: Diffable
@@ -53,13 +54,18 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         case menuBar
         case heatmap
         case total
+        case categoryCountHeader
         case categoryCount
+        case categoryExpenseHeader
         case categoryExpense
+        case artistCountHeader
         case artistCount
+        case artistExpenseHeader
         case artistExpense
     }
 
     enum StatsItem: Hashable {
+        case title(String)
         case menu(UUID)
         case heatmap(HeatmapModel)
         case total(TotalModel)
@@ -182,6 +188,7 @@ extension StatsViewController {
         case .categoryExpense: return "카테고리별 지출"
         case .artistCount:     return "아티스트별 참여 횟수"
         case .artistExpense:   return "아티스트별 지출"
+        default: return nil
         }
     }
 }

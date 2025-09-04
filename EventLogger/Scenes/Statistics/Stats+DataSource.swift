@@ -42,8 +42,13 @@ extension StatsViewController {
             cell.configure(title: model.title, valueText: model.valueText, leftDotColor: model.leftDotColor)
         }
 
+        let titleReg = UICollectionView.CellRegistration<StatsTitleCell, String> { cell, _, title in
+            cell.configure(title: title)
+        }
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
+            case .title(let title):
+                return collectionView.dequeueConfiguredReusableCell(using: titleReg, for: indexPath, item: title)
             case .menu(let id):
                 return collectionView.dequeueConfiguredReusableCell(using: menuReg, for: indexPath, item: id)
             case .heatmap(let model):
@@ -58,16 +63,6 @@ extension StatsViewController {
         }
 
         // 1) Header Registration
-        let statsHeaderReg = UICollectionView.SupplementaryRegistration<ListHeaderView>(
-            elementKind: ListHeaderView.elementKind
-        ) { [weak self] header, _, indexPath in
-            guard let self,
-                  let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section]
-            else { return }
-            let title = self.headerTitle(for: section) ?? ""
-            header.configure(title: title, showLegend: section == .heatmap)
-        }
-        
         let heatmapHeaderReg = UICollectionView.SupplementaryRegistration<HeatmapHeaderView>(
             elementKind: HeatmapHeaderView.elementKind
         ) { [weak self] header, _, indexPath in
@@ -87,10 +82,8 @@ extension StatsViewController {
         }
 
         // 3) Provider
-        dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            if kind == ListHeaderView.elementKind {
-                return collectionView.dequeueConfiguredReusableSupplementary(using: statsHeaderReg, for: indexPath)
-            } else if kind == HeatmapHeaderView.elementKind {
+        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+            if kind == HeatmapHeaderView.elementKind {
                 return collectionView.dequeueConfiguredReusableSupplementary(using: heatmapHeaderReg, for: indexPath)
             } else if kind == HeatmapFooterView.elementKind {
                 return collectionView.dequeueConfiguredReusableSupplementary(using: footerReg, for: indexPath)

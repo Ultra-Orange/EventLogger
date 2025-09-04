@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 final class StatsRollupChildCell: UICollectionViewListCell {
-    private let dotView = UIView().then {
+    private let dotView = UIView().then { // 일단 가려놓자
         $0.layer.cornerRadius = 4
     }
     
@@ -41,6 +41,8 @@ final class StatsRollupChildCell: UICollectionViewListCell {
     }
     
     private func setupUI() {
+        backgroundView = UIView()
+        
         dotView.snp.makeConstraints {
             $0.size.equalTo(8)
         }
@@ -52,22 +54,25 @@ final class StatsRollupChildCell: UICollectionViewListCell {
         horizontalStack.addArrangedSubview(valueLabel)
         
         horizontalStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 24, bottom: 6, right: 12))
+            $0.top.bottom.equalToSuperview().inset(4)
+            $0.leading.equalToSuperview().inset(40)
+            $0.trailing.equalToSuperview().inset(16)
         }
         
-        backgroundConfiguration = UIBackgroundConfiguration.listGroupedCell()
+//        backgroundConfiguration = UIBackgroundConfiguration.listGroupedCell()
     }
     
     func configure(title: String, valueText: String, leftDotColor: UIColor?) {
         titleLabel.text = title
         valueLabel.text = valueText
         
-        if let color = leftDotColor {
-            dotView.isHidden = false
-            dotView.backgroundColor = color
-        } else {
-            dotView.isHidden = true
-        }
+        dotView.isHidden = true
+//        if let color = leftDotColor {
+//            dotView.isHidden = false
+//            dotView.backgroundColor = color
+//        } else {
+//            dotView.isHidden = true
+//        }
     }
 }
 

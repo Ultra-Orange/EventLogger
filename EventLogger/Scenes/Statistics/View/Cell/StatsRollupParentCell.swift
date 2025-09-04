@@ -10,6 +10,12 @@ import SnapKit
 import Then
 
 final class StatsRollupParentCell: UICollectionViewListCell {
+    private let horizontalStack = UIStackView().then {
+        $0.axis = .horizontal
+        $0.alignment = .center
+        $0.spacing = 8
+    }
+    
     private let dotView = UIView().then {
         $0.layer.cornerRadius = 8
     }
@@ -25,16 +31,11 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
-    private let horizontalStack = UIStackView().then {
-        $0.axis = .horizontal
-        $0.alignment = .center
-        $0.spacing = 8
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         setupUI()
+        backgroundView = UIView()
     }
     
     required init?(coder: NSCoder) {
@@ -58,7 +59,8 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         
         contentView.addSubview(horizontalStack)
         horizontalStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(12)
+            $0.top.bottom.equalToSuperview().inset(13)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
     }
     
@@ -73,4 +75,10 @@ final class StatsRollupParentCell: UICollectionViewListCell {
             dotView.isHidden = true
         }
     }
+}
+
+#Preview {
+    let cell = StatsRollupParentCell()
+    cell.configure(title: "페스티벌", valueText: "1회", leftDotColor: .appBlue)
+    return cell
 }

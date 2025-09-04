@@ -17,9 +17,9 @@ extension StatsViewController {
 
         // 1) 섹션 구성
         if state.scope == .year || state.scope == .month {
-            snapshot.appendSections([.menuBar, .total, .categoryCount, .categoryExpense, .artistCount, .artistExpense])
+            snapshot.appendSections([.menuBar, .total, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
         } else { // .all
-            snapshot.appendSections([.heatmap, .total, .categoryCount, .categoryExpense, .artistCount, .artistExpense])
+            snapshot.appendSections([.heatmap, .total, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
         }
 
         // 2) 메뉴바
@@ -49,6 +49,8 @@ extension StatsViewController {
         // 6) 카테고리 Count/Expense (하위 포함)
         let categoryStats = statisticsService.categoryStats(for: period) // count desc
 
+        snapshot.appendItems([.title("카테고리별 참여 횟수")], toSection: .categoryCountHeader)
+
         let ccParents: [RollupParent] = categoryStats.map { cs in
             RollupParent(
                 id: UUID(),
@@ -77,6 +79,8 @@ extension StatsViewController {
             into: &snapshot,
             section: .categoryCount
         )
+
+        snapshot.appendItems([.title("카테고리별 지출")], toSection: .categoryExpenseHeader)
 
         let ceParents: [RollupParent] = categoryStats
             .sorted(by: { $0.totalExpense > $1.totalExpense })
@@ -111,6 +115,8 @@ extension StatsViewController {
         // 7) 아티스트 Count/Expense (하위 포함)
         let artistStats = statisticsService.artistStats(for: period) // count desc
 
+        snapshot.appendItems([.title("아티스트별 참여 횟수")], toSection: .artistCountHeader)
+
         let acParents = artistStats.map { asv in
             RollupParent(
                 id: UUID(),
@@ -138,6 +144,8 @@ extension StatsViewController {
             into: &snapshot,
             section: .artistCount
         )
+
+        snapshot.appendItems([.title("아티스트별 지출")], toSection: .artistExpenseHeader)
 
         let aeParents = artistStats
             .sorted(by: { $0.totalExpense > $1.totalExpense })
