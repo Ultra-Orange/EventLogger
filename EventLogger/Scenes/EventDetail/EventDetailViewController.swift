@@ -65,7 +65,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     override func setupUI() {
         view.backgroundColor = .systemBackground
         // 네비게이션 영역
-        title = "Event Logger"
+        title = "이벤트 상세"
         navigationItem.rightBarButtonItem = moreButton
         
         // UIMenu & Action

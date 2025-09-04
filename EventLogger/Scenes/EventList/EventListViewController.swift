@@ -259,7 +259,7 @@ private extension EventListViewController {
         
         
         // 4) 최종 메뉴 (위에서부터 정렬 2개, 그 다음 연도들)
-        return UIMenu(title: "", children: [sortMenu, yearMenu, goSettings])
+        return UIMenu(title: "", children: [goSettings, sortMenu, yearMenu])
     }
 }
 
