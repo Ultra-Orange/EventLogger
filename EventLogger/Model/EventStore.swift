@@ -38,6 +38,7 @@ final class EventStore {
     var expense: Double
     var currency: String
     var memo: String
+    var calendarEventId: String?
     
     init(
         id: UUID = UUID(),
@@ -50,7 +51,8 @@ final class EventStore {
         artists: [String] = [],
         expense: Double = 0,
         currency: String,
-        memo: String
+        memo: String,
+        calendarEventId: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -62,7 +64,7 @@ final class EventStore {
         self.expense = expense
         self.currency = currency
         self.memo = memo
-
+        self.calendarEventId = calendarEventId
     }
     
 
@@ -84,7 +86,8 @@ extension EventStore {
             artists: orderedNames,
             expense: expense,
             currency: Currency(rawValue: currency) ?? .KRW,
-            memo: memo
+            memo: memo,
+            calendarEventId: calendarEventId
         )
     }
 }

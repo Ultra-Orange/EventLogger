@@ -20,6 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } catch {
             assertionFailure("기본 카테고리 시딩 실패: \(error.localizedDescription)")
         }
+        
 
 //        prepareDependencies{
 //        }

@@ -165,8 +165,8 @@ extension CategoryListViewController {
             reorderCategoryRelay.accept(updatedItems)
         }
 
-        let dataSource = UICollectionViewDiffableDataSource<Int, CategoryItem>(collectionView: collectionView) { collectionView, indexPath, text in
-            collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: text)
+        let dataSource = UICollectionViewDiffableDataSource<Int, CategoryItem>(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         dataSource.reorderingHandlers = reorderingHandlers
 

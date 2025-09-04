@@ -25,9 +25,9 @@ struct StatisticsService {
         switch period {
         case .all:
             return events
-        case .year(let y):
+        case let .year(y):
             return events.filter { calendar.component(.year, from: $0.startTime) == y }
-        case .yearMonth(let y, let m):
+        case let .yearMonth(y, m):
             return events.filter {
                 let d = calendar.dateComponents([.year, .month], from: $0.startTime)
                 return d.year == y && d.month == m

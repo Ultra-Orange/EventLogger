@@ -15,7 +15,7 @@ enum CategorySeeder {
 //        let didSetup = UserDefaults.standard.bool(forKey: UDKey.didSetupDefaultCategories.rawValue)
         @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
         var didSetup: Bool
-        
+
         // UserDefaults에 실행기록이 없으면
         guard !didSetup else { return }
 
@@ -30,7 +30,7 @@ enum CategorySeeder {
                     switch name {
                     case "콘서트": 2
                     case "페스티벌": 7
-                    case "연극":  9
+                    case "연극": 9
                     case "뮤지컬": 4
                     case "팬미팅": 5
                     default: 11

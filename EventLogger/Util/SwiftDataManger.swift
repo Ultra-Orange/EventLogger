@@ -214,6 +214,7 @@ struct SwiftDataManager {
         store.startTime = event.startTime
         store.endTime = event.endTime
         store.location = event.location
+        store.calendarEventId = event.calendarEventId
 
         // [String] → [ArtistStore]
         var artistStores: [ArtistStore] = []
