@@ -65,7 +65,7 @@ extension StatsViewController {
                     subitems: [item]
                 )
                 let section = NSCollectionLayoutSection(group: group)
-                section.contentInsets = .init(top: 10, leading: 0, bottom: 10, trailing: 0)
+                section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
                 section.decorationItems = [decorationItem]
                 return section
                 
