@@ -13,28 +13,8 @@ import UIKit
 
 enum CategorySeeder {
     
-    /// 시드 스키마를 바꾸면 이 숫자만 +1 하면 됩니다.
-    static let seedVersion = 1
-    
-    @MainActor
     static func runIfNeeded(modelContext: ModelContext) throws {
         
-        // 0) 계정 단위(iCloud KVS)로 이미 시드했다면 종료
-        if SeedKVS.version() >= seedVersion {
-            return
-        }
-        
-        // 1) DB에 카테고리가 있는지 '1건만' 빠르게 확인
-        var fd = FetchDescriptor<CategoryStore>()
-        fd.fetchLimit = 1
-        let existing = try modelContext.fetch(fd)
-        guard existing.isEmpty else {
-            // 이미 데이터가 있으면, 계정 플래그만 맞춰두고 종료
-            SeedKVS.markSeeded(version: seedVersion)
-            return
-        }
-        
-        // 2) 시드 삽입
         let names = ["콘서트", "페스티벌", "연극", "뮤지컬", "팬미팅"]
         
         for (index, name) in names.enumerated() {
@@ -58,7 +38,8 @@ enum CategorySeeder {
         
         try modelContext.save()
         
-        // 3) 계정 단위 완료 플래그 기록
-        SeedKVS.markSeeded(version: seedVersion)
+        @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
+        var didSetupDefaultCategories: Bool
+        didSetupDefaultCategories = true
     }
 }
