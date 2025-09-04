@@ -23,15 +23,16 @@ struct HeatmapModel: Hashable {
 final class HeatmapView: UIView {
     // 레이아웃 상수 한 곳에서 관리
     struct Metrics {
-        static let topPadding: CGFloat = 12                 // 최상단 여백 (헤더 위)
+        static let topPadding: CGFloat = 10                 // 최상단 여백 (헤더 위)
         static let headerHeight: CGFloat = 16               // "1~12" 헤더 라벨 높이
-        static let headerBottomSpacing: CGFloat = 8         // 헤더와 첫 행 사이 간격
-        static let bottomPadding: CGFloat = 12
-        static let leftYearWidth: CGFloat = 36
-        static let hSpacing: CGFloat = 6    // 월 칸 사이 간격 (12개)
-        static let vSpacing: CGFloat = 6    // 행 간격
-        static let minCellHeight: CGFloat = 18
-        static let horizontalContentInset: CGFloat = 24 // 좌우 총 여백(= 12 + 12)
+        static let headerBottomSpacing: CGFloat = 7         // 헤더와 첫 행 사이 간격
+        static let bottomPadding: CGFloat = 10
+        
+        static let leftYearWidth: CGFloat = 25
+        static let hSpacing: CGFloat = 8.5    // 월 칸 사이 간격 (12개)
+        static let vSpacing: CGFloat = 8.5    // 행 간격
+        static let minCellHeight: CGFloat = 16
+        static let horizontalContentInset: CGFloat = 20 // 좌우 총 여백(= 10 + 10)
         static let monthCount = 12
         static let cornerRadius: CGFloat = 4
     }
@@ -138,8 +139,8 @@ final class HeatmapView: UIView {
         for row in model.rows {
             let label = UILabel().then {
                 $0.text = row.yearLabel
-                $0.textColor = .neutral200
-                $0.font = .systemFont(ofSize: 13, weight: .medium)
+                $0.textColor = .neutral50
+                $0.font = .font12Regular
                 $0.textAlignment = .right
                 $0.adjustsFontSizeToFitWidth = true
                 $0.minimumScaleFactor = 0.8
