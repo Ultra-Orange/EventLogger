@@ -11,6 +11,10 @@ extension StatsViewController {
 
     func applySnapshot(animated: Bool) {
         guard let reactor = reactor, let dataSource = dataSource else { return }
+        
+        // 스냅샷을 다시 그릴 때마다 캐시 초기화
+        resetRollupCaches()
+        
         let state = reactor.currentState
 
         var snapshot = NSDiffableDataSourceSnapshot<StatsSection, StatsItem>()
@@ -208,7 +212,7 @@ extension StatsViewController {
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
 
-    /// 펼침/접힘 제거: 항상 부모 다음에 자식을 이어 붙입니다.
+    /// '처음에는 숨김' + '펼쳐진 부모만 자식 표시' 지원
     func appendRollup(
         parents: [RollupParent],
         makeChildren: (RollupParent) -> [RollupChild],
@@ -217,10 +221,19 @@ extension StatsViewController {
     ) {
         var items: [StatsItem] = []
         for p in parents {
+            // 부모는 항상 추가
             items.append(.rollupParent(p))
-            let children = makeChildren(p).map { StatsItem.rollupChild($0) }
-            items.append(contentsOf: children)
+
+            // 캐시에 자식 준비 (토글 시 재사용)
+            let children = makeChildren(p)
+            childrenCache[p.id] = children
+
+            // 이미 펼쳐진 부모라면(예: 스냅샷 재적용 시 유지하고 싶을 때) 자식도 같이 추가
+            if expandedParentIDs.contains(p.id) {
+                items.append(contentsOf: children.map { .rollupChild($0) })
+            }
         }
         snapshot.appendItems(items, toSection: section)
     }
 }
+

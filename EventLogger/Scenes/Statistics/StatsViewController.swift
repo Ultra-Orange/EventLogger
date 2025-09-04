@@ -81,6 +81,19 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 
     var dataSource: UICollectionViewDiffableDataSource<StatsSection, StatsItem>!
 
+    // 어떤 부모가 펼쳐져 있는지 추적
+    var expandedParentIDs = Set<UUID>()
+    
+    // parentId -> 자식들 캐시 (스냅샷 생성 시 계산 / 토글 시 삽입·삭제에 재사용)
+    var childrenCache: [UUID: [RollupChild]] = [:]
+    
+    // 스냅샷 재구성 시 캐시 초기화
+    func resetRollupCaches() {
+        expandedParentIDs.removeAll()
+        childrenCache.removeAll()
+    }
+
+    
     // MARK: - Lifecycle
 
     override func setupUI() {
@@ -107,6 +120,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         }
 
         configureDataSource()
+        collectionView.delegate = self // 셀 탭 감지를 위해 델리게이트 설정
     }
 
     override func bind(reactor: StatsReactor) {
@@ -160,6 +174,8 @@ extension StatsViewController {
         case artistExpense
     }
 }
+
+
 
 // MARK: - Utilities
 final class KRWFormatter {
