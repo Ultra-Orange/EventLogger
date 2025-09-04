@@ -104,6 +104,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
+        navigationItem.backButtonDisplayMode = .minimal
+        
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         
         navigationItem.rightBarButtonItems = [menuButton, addButton, statisticsButton]

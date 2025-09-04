@@ -66,6 +66,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
     
     override func setupUI() {
+        
+        
         view.backgroundColor = .systemBackground
         
         // 스크롤 뷰

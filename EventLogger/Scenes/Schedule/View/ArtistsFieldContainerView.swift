@@ -30,7 +30,7 @@ final class ArtistsFieldContainerView: UIView {
         $0.placeholderColor = .neutral50
         $0.cornerRadius = 10
 
-//        $0.tintColor = .systemOrange
+        $0.tintColor = .primary500
         $0.textColor = .neutral50
         $0.selectedColor = UIColor(red: 145.0 / 255.0, green: 60.0 / 255.0, blue: 3.0 / 255.0, alpha: 1.0)
         $0.selectedTextColor = .neutral50
