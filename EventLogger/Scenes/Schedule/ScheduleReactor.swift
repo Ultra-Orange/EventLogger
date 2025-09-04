@@ -6,10 +6,10 @@
 //
 
 import Dependencies
+import Foundation
 import ReactorKit
 import RxFlow
 import RxRelay
-import Foundation
 import RxSwift
 
 final class ScheduleReactor: BaseReactor {
@@ -33,6 +33,7 @@ final class ScheduleReactor: BaseReactor {
         var categories: [CategoryItem]
     }
     
+    // TODO: 리팩토링 고려요소 원칙적으로 리액터는 뷰를 몰라야되니까 여기에 버튼타이틀은 어색하다!
     enum Mode {
         case create
         case update(EventItem)
@@ -43,6 +44,7 @@ final class ScheduleReactor: BaseReactor {
             case .update: return "일정 수정"
             }
         }
+        
         var buttonTitle: String {
             switch self {
             case .create: return "등록하기"
@@ -60,10 +62,10 @@ final class ScheduleReactor: BaseReactor {
     
     let initialState: State
     let mode: Mode
-
     
     @Dependency(\.settingsService) private var settingsService
     @Dependency(\.calendarService) private var calendarService
+    @Dependency(\.notificationService) private var notificationService
     
     private let disposeBag = DisposeBag()
     
@@ -91,7 +93,7 @@ final class ScheduleReactor: BaseReactor {
             switch mode {
             case .create:
                 let item = EventItem(
-                    id: UUID(),  //  새 id 생성
+                    id: UUID(), //  새 id 생성
                     title: payload.title,
                     categoryId: payload.categoryId,
                     image: payload.image,
@@ -105,12 +107,13 @@ final class ScheduleReactor: BaseReactor {
                 )
                 swiftDataManager.insertEventItem(item)
                 autoSaveToCalendarIfNeeded(item)
+                schedulePushNotificationIfNeeded(item)
                 steps.accept(AppStep.eventList)
                 return .empty()
                 
             case let .update(oldItem):
                 let updated = EventItem(
-                    id: oldItem.id,   // 기존 id 유지
+                    id: oldItem.id, // 기존 id 유지
                     title: payload.title,
                     categoryId: payload.categoryId,
                     image: payload.image,
@@ -123,6 +126,7 @@ final class ScheduleReactor: BaseReactor {
                     memo: payload.memo
                 )
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
+                schedulePushNotificationIfNeeded(updated)
                 steps.accept(AppStep.eventList)
                 return .empty()
             }
@@ -144,14 +148,34 @@ final class ScheduleReactor: BaseReactor {
 // MARK: - Private helpers
 
 private extension ScheduleReactor {
+    // TODO: 순서 효율적으로 리팩토링 -> 달력에 추가 우선 2번 DB쓰지 않게
     func autoSaveToCalendarIfNeeded(_ item: EventItem) {
         guard settingsService.autoSaveToCalendar else { return }
-
+        
         calendarService.requestAccess()
-            .flatMap { [calendarService] granted -> Single<Void> in
+            .flatMap { [calendarService] granted -> Single<String> in
                 granted ? calendarService.save(eventItem: item) : .never()
             }
-            .subscribe() // 저장 잘 됐는지 안됐는지 결과는 무시
+            .subscribe(onSuccess: { identifier in
+                @Dependency(\.swiftDataManager) var swiftDataManager
+                var updated = item
+                updated.calendarEventId = identifier
+                swiftDataManager.updateEvent(id: updated.id, event: updated)
+            })
             .disposed(by: disposeBag)
+    }
+    
+    func schedulePushNotificationIfNeeded(_ item: EventItem) {
+        // 스위치 off -> 알림 없음
+        guard settingsService.pushNotificationEnabled else { return }
+        // 기존 예약 삭제
+        notificationService.cancelNotification(id: item.id.uuidString)
+        
+        notificationService.scheduleNotification(
+            id: item.id.uuidString,
+            title: "\(item.title)+✨",
+            body: "내일은 기다리고 기다리던 이벤트 D-DAY 🎉",
+            date: item.startTime
+        )
     }
 }

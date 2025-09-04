@@ -33,7 +33,9 @@ struct UserSetting<T> { // Wrapper로 쌀 내용
 
 // 유저 디폴트 키값을 String 형태로 저장
 enum UDKey {
-    static let didSetupDefaultCategories = "didSetupDefaultCategories" // 최초 실행시
+    static let didSetupDefaultCategories = "didSetupDefaultCategories" // 최초 실행 체크
+    static let pushNotificationEnabled = "pushNotificationEnabled" // 푸쉬알림 허용 체크
+    static let autoSaveToCalendar = "settings.autoSaveToCalendar" // 캘린더 오토세이브
 }
 
 /*
