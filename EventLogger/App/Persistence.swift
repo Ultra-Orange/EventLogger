@@ -13,11 +13,20 @@ enum Persistence {
             let models: [any PersistentModel.Type] = [
                 CategoryStore.self,
                 EventStore.self,
+                ArtistStore.self,
             ]
             let schema = Schema(models)
-            return try ModelContainer(for: schema)
+            
+            let config = ModelConfiguration(
+                "Default",
+                cloudKitDatabase: .automatic // CloudKit 자동 동기화
+            )
+            return try ModelContainer(for: schema, configurations: config)
         } catch {
-            fatalError(error.localizedDescription)
+            let pretty = "\(error) | \(String(reflecting: error))"
+              assertionFailure("❌ ModelContainer init failed: \(pretty)")
+              fatalError(pretty) // 임시
+//            fatalError(error.localizedDescription)
         }
     }()
 }

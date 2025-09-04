@@ -112,8 +112,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     override func bind(reactor: EventListReactor) {
-        let categories = reactor.currentState.categories
-        print(categories)
+        
         
         loadViewIfNeeded()
         

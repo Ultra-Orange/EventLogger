@@ -13,19 +13,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let coordinator = FlowCoordinator()
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-
+        
+        // 개발단계에서 초기화하려면 KVS값 지우는코드 강제 실행 필요,
+//        SeedKVS.resetSeedFlags()
+        
+        // iCloud KVS 최신값 동기화
+        NSUbiquitousKeyValueStore.default.synchronize()
+        print("KVS seedVersion =", SeedKVS.version())
+        
         @Dependency(\.modelContext) var modelContext
         do {
             try CategorySeeder.runIfNeeded(modelContext: modelContext)
+            print("✅ Seed checked")
         } catch {
             assertionFailure("기본 카테고리 시딩 실패: \(error.localizedDescription)")
         }
-        
-
-//        prepareDependencies{
-//        }
 
         let appFlow = AppFlow(windowScene: windowScene)
+        
         coordinator.coordinate(
             flow: appFlow,
             with: OneStepper(withSingleStep: AppStep.eventList)
