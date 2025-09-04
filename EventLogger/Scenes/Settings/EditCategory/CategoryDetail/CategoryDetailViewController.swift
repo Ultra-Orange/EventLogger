@@ -17,10 +17,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
 
     private let textField = AppTextField()
 
-    private let bottomButton = UIButton(configuration: .bottomButton).then {
-        $0.layer.cornerRadius = 10
-        $0.clipsToBounds = true
-    }
+    private let bottomButton = GlowButton(title: "")
 
     // MARK: CollectionView
 
@@ -69,11 +66,17 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
     override func bind(reactor: CategoryDetailReactor) {
         // 상단 타이틀 & 하단 버튼
         title = reactor.currentState.navTitle
-        bottomButton.configuration?.title = reactor.currentState.buttonTitle
+        bottomButton.setTitle(reactor.currentState.buttonTitle, for: .normal)
 
         // 초기값 세팅
         configureInitialState(reactor: reactor)
 
+        let isNameValid = textField.rx.text
+            .orEmpty
+            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .distinctUntilChanged()
+            .share(replay: 1)
+        
         bottomButton.rx.tap
             .bind { [weak self] _ in
                 guard let self, let reactor = self.reactor else { return }

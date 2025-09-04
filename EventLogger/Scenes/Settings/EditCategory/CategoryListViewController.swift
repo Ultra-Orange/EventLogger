@@ -17,9 +17,7 @@ import Dependencies
 class CategoryListViewController: BaseViewController<CategoryListReactor> {
     // MARK: UI Component
 
-    let addButton = UIButton(configuration: .bottomButton).then {
-        $0.configuration?.title = "추가하기"
-    }
+    let addButton = GlowButton(title: "추가하기")
 
     let tmpLabel = UILabel().then {
         $0.text = "여기에 카테고리 편집 추가"

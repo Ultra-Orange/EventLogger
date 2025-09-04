@@ -46,10 +46,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let expenseFieldView = ExpenseFieldContainerView()
     private let memoFieldView = MemoFieldContainerView()
     
-    private let bottomButton = UIButton(configuration: .bottomButton).then {
-        $0.layer.cornerRadius = 10
-        $0.clipsToBounds = true
-    }
+    private let bottomButton = GlowButton(title: "")
     
     private let selectedLocationRelay: PublishRelay<String>
     
@@ -166,10 +163,22 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func bind(reactor: ScheduleReactor) {
         // 상단 타이틀 & 하단 버튼
         title = reactor.currentState.navTitle
-        bottomButton.configuration?.title = reactor.currentState.buttonTitle
+        bottomButton.setTitle(reactor.currentState.buttonTitle, for: .normal)
         
         // 초기값 세팅
         configureInitialState(reactor: reactor)
+        
+        // 제목 입력에 따라 버튼 활성/비활성
+        let isTitleValid = inputTitleView.textField.rx.text
+            .orEmpty
+            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .distinctUntilChanged()
+            .share(replay: 1)
+        
+        // 버튼 활성 바인딩 (UIButton은 isEnabled=false면 탭 이벤트도 막힘)
+        isTitleValid
+            .bind(to: bottomButton.rx.isEnabled)
+            .disposed(by: disposeBag)
         
         // 장소 선택 바인딩
         reactor.state.map { $0.selectedLocation }
