@@ -273,7 +273,7 @@
 				CODE_SIGN_ENTITLEMENTS = EventLogger/EventLogger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LW9AR5U74A;
+				DEVELOPMENT_TEAM = L3AQFAK9MY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EventLogger/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "이벤트 로거";
@@ -290,7 +290,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.housedone.EventLogger;
+				PRODUCT_BUNDLE_IDENTIFIER = com.UltraOrange.EventLogger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -310,7 +310,7 @@
 				CODE_SIGN_ENTITLEMENTS = EventLogger/EventLogger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = LW9AR5U74A;
+				DEVELOPMENT_TEAM = L3AQFAK9MY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = EventLogger/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "이벤트 로거";
@@ -327,7 +327,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = net.housedone.EventLogger;
+				PRODUCT_BUNDLE_IDENTIFIER = com.UltraOrange.EventLogger;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
