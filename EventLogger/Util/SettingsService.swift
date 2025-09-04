@@ -7,14 +7,15 @@
 
 import Foundation
 
-protocol SettingsServicing {
+protocol SettingsServicing: AnyObject {
     var autoSaveToCalendar: Bool { get set }
+    var pushNotificationEnabled: Bool { get set }
 }
 
-struct SettingsService: SettingsServicing {
+final class SettingsService: SettingsServicing {
     private let defaults: UserDefaults
     private let autoSaveKey = "settings.autoSaveToCalendar"
-    
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         // 기본값이 없을 경우 false로 초기화
@@ -22,10 +23,18 @@ struct SettingsService: SettingsServicing {
             defaults.set(false, forKey: autoSaveKey)
         }
     }
-    
+
     var autoSaveToCalendar: Bool {
         get { defaults.bool(forKey: autoSaveKey) }
         set { defaults.set(newValue, forKey: autoSaveKey) }
+    }
+
+    @UserSetting(key: UDKey.pushNotificationEnabled, defaultValue: false)
+    private var pushNotificationKey: Bool
+
+    var pushNotificationEnabled: Bool {
+        get { pushNotificationKey }
+        set { pushNotificationKey = newValue }
     }
 }
 

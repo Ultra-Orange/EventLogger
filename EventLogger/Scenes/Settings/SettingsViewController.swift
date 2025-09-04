@@ -169,5 +169,39 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
             .map { _ in .tapCategoryControl }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
+
+        // 스위치 -> 액션
+        pushNoticeSwitch.rx.isOn
+            .skip(1) // 초기 값 바인딩 무시
+            .map { SettingsReactor.Action.togglePushNotification($0) }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // 상태 → 스위치
+        reactor.state.map { $0.pushEnabled }
+            .bind(to: pushNoticeSwitch.rx.isOn)
+            .disposed(by: disposeBag)
+
+        // 권한 요청 Alert
+        reactor.pulse(\.$alertMessage)
+            .withUnretained(self)
+            .flatMap { `self`, message in
+                UIAlertController.rx.alert(on: self, title: "알림 권한 필요", message: message, actions: [
+                    .cancel("확인"),
+                    .action("설정으로 이동", payload: .openSystemSettings),
+                ])
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // 뷰 로드시 푸쉬버튼 상태 리프레쉬
+        Observable
+            .merge(
+                rx.viewWillAppear.map { _ in },
+                NotificationCenter.default.rx.notification(UIApplication.didBecomeActiveNotification).map { _ in }
+            )
+            .map { _ in .refreshPushStatus }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
 }

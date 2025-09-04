@@ -6,10 +6,10 @@
 //
 
 import Dependencies
+import Foundation
 import ReactorKit
 import RxFlow
 import RxRelay
-import Foundation
 import RxSwift
 
 final class ScheduleReactor: BaseReactor {
@@ -18,12 +18,12 @@ final class ScheduleReactor: BaseReactor {
         case selectLocation(String)
         case sendEventPayload(EventPayload)
     }
-    
+
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setLocation(String)
     }
-    
+
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         let eventItem: EventItem?
@@ -32,25 +32,26 @@ final class ScheduleReactor: BaseReactor {
         var selectedLocation: String = ""
         var categories: [CategoryItem]
     }
-    
+
     // TODO: 리팩토링 고려요소 원칙적으로 리액터는 뷰를 몰라야되니까 여기에 버튼타이틀은 어색하다!
     enum Mode {
         case create
         case update(EventItem)
-        
+
         var navTitle: String {
             switch self {
             case .create: return "새 일정 등록"
             case .update: return "일정 수정"
             }
         }
+
         var buttonTitle: String {
             switch self {
             case .create: return "등록하기"
             case .update: return "수정하기"
             }
         }
-        
+
         var eventItem: EventItem? {
             switch self {
             case .create: return nil
@@ -58,20 +59,20 @@ final class ScheduleReactor: BaseReactor {
             }
         }
     }
-    
+
     let initialState: State
     let mode: Mode
 
-    
     @Dependency(\.settingsService) private var settingsService
     @Dependency(\.calendarService) private var calendarService
-    
+    @Dependency(\.notificationService) private var notificationService
+
     private let disposeBag = DisposeBag()
-    
+
     init(mode: Mode) {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let categories = swiftDataManager.fetchAllCategories()
-        
+
         self.mode = mode
         initialState = State(
             eventItem: mode.eventItem,
@@ -80,7 +81,7 @@ final class ScheduleReactor: BaseReactor {
             categories: categories
         )
     }
-    
+
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {
@@ -92,7 +93,7 @@ final class ScheduleReactor: BaseReactor {
             switch mode {
             case .create:
                 let item = EventItem(
-                    id: UUID(),  //  새 id 생성
+                    id: UUID(), //  새 id 생성
                     title: payload.title,
                     categoryId: payload.categoryId,
                     image: payload.image,
@@ -106,12 +107,13 @@ final class ScheduleReactor: BaseReactor {
                 )
                 swiftDataManager.insertEventItem(item)
                 autoSaveToCalendarIfNeeded(item)
+                schedulePushNotificationIfNeeded(item)
                 steps.accept(AppStep.eventList)
                 return .empty()
-                
+
             case let .update(oldItem):
                 let updated = EventItem(
-                    id: oldItem.id,   // 기존 id 유지
+                    id: oldItem.id, // 기존 id 유지
                     title: payload.title,
                     categoryId: payload.categoryId,
                     image: payload.image,
@@ -124,12 +126,13 @@ final class ScheduleReactor: BaseReactor {
                     memo: payload.memo
                 )
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
+                schedulePushNotificationIfNeeded(updated)
                 steps.accept(AppStep.eventList)
                 return .empty()
             }
         }
     }
-    
+
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {
@@ -154,5 +157,19 @@ private extension ScheduleReactor {
             }
             .subscribe() // 저장 잘 됐는지 안됐는지 결과는 무시
             .disposed(by: disposeBag)
+    }
+
+    func schedulePushNotificationIfNeeded(_ item: EventItem) {
+        // 스위치 off -> 알림 없음
+        guard settingsService.pushNotificationEnabled else { return }
+        // 기존 예약 삭제
+        notificationService.cancelNotification(id: item.id.uuidString)
+
+        notificationService.scheduleNotification(
+            id: item.id.uuidString,
+            title: item.title,
+            body: "내일은 이벤트에 참가하는 날입니다!",
+            date: item.startTime
+        )
     }
 }

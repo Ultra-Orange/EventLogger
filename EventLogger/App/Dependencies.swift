@@ -30,6 +30,11 @@ extension DependencyValues {
         get { self[SettingsServiceKey.self] }
         set { self[SettingsServiceKey.self] = newValue }
     }
+    
+    var notificationService: NotificationServicing {
+        get { self[NotificationServiceKey.self] }
+        set { self[NotificationServiceKey.self] = newValue }
+    }
 }
 
 // MARK: ModelContext
@@ -66,6 +71,12 @@ private enum CalendarServiceKey: DependencyKey {
 private enum SettingsServiceKey: DependencyKey {
     static var liveValue: SettingsServicing = SettingsService()
     static var testValue: SettingsServicing = SettingsService() // 테스트용 만들 필요
+}
+
+// MARK: Notification Service
+private enum NotificationServiceKey: DependencyKey {
+    static var liveValue: NotificationServicing = NotificationService()
+    static var testValue: NotificationServicing = NotificationService() // 테스트용
 }
 
 extension ModelContext: @unchecked @retroactive Sendable {}

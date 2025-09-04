@@ -23,9 +23,9 @@ struct StatisticsService {
         switch period {
         case .all:
             return events
-        case .year(let y):
+        case let .year(y):
             return events.filter { calendar.component(.year, from: $0.startTime) == y }
-        case .yearMonth(let y, let m):
+        case let .yearMonth(y, m):
             return events.filter {
                 let d = calendar.dateComponents([.year, .month], from: $0.startTime)
                 return d.year == y && d.month == m
@@ -33,7 +33,6 @@ struct StatisticsService {
         }
     }
 }
-
 
 extension StatisticsService {
     /// 2-1) 기간별 카테고리 통계
@@ -74,7 +73,6 @@ extension StatisticsService {
             .sorted { $0.count > $1.count }
     }
 }
-
 
 extension StatisticsService {
     /// 이벤트가 존재하는 연도를 문자열 배열로 반환 (예: ["2025", "2024", ...])
