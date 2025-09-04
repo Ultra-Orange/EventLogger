@@ -66,9 +66,26 @@ final class StatsReactor: BaseReactor {
         case .viewDidLoad, .refresh:
             // 진입/새로고침 시 연도 목록과 히트맵 초기화
             let years = statisticsService.activeYears()
+            // 기본 연도/월 결정: .year, .month 스코프에서는 반드시 연/월을 세팅
+            let currentYear = Calendar.current.component(.year, from: Date())
+            let firstActiveYear = years.first.flatMap(Int.init)
+            let defaultYear: Int? = {
+                // 초기 scope는 .year 이므로 nil 이면 안 됨
+                switch currentState.scope {
+                case .all:   return nil
+                case .year, .month:
+                    return firstActiveYear ?? currentYear
+                }
+            }()
+            
+            let defaultMonth: Int? = (currentState.scope == .month) ? 1 : nil
+            
             let heatmap = statisticsService.buildHeatmapAll()
+            
             return .concat([
                 .just(.setActiveYears(years)),
+                .just(.setSelectedYear(defaultYear)),
+                .just(.setSelectedMonth(defaultMonth)),
                 .just(.setHeatmap(heatmap))
             ])
 

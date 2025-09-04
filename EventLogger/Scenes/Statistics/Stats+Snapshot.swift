@@ -64,11 +64,19 @@ extension StatsViewController {
 
         // 4) 기간
         let period: StatsPeriod = {
+            let currentYear = Calendar.current.component(.year, from: Date())
+            let fallbackYear = state.activeYears.first.flatMap(Int.init) ?? currentYear
+
             switch state.scope {
-            case .all: return .all
-            case .year: return .year(state.selectedYear ?? Calendar.current.component(.year, from: Date()))
-            case .month: return .yearMonth(year: state.selectedYear ?? Calendar.current.component(.year, from: Date()),
-                                           month: state.selectedMonth ?? 1)
+            case .all:
+                return .all
+            case .year:
+                return .year(state.selectedYear ?? fallbackYear)
+            case .month:
+                return .yearMonth(
+                    year: state.selectedYear ?? fallbackYear,
+                    month: state.selectedMonth ?? 1
+                )
             }
         }()
 
