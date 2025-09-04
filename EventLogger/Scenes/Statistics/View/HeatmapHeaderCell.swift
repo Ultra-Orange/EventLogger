@@ -1,5 +1,5 @@
 //
-//  HeatmapHeaderView.swift
+//  HeatmapHeaderCell.swift
 //  EventLogger
 //
 //  Created by 김우성 on 9/4/25.
@@ -10,8 +10,7 @@ import UIKit
 import Then
 
 // 섹션 헤더 뷰
-final class HeatmapHeaderView: UICollectionReusableView {
-    static let elementKind = "HeatmapHeaderElementKind"
+final class HeatmapHeaderCell: UICollectionViewCell {
 
     private let titleLabel = UILabel().then {
         $0.font = .font17Semibold
@@ -20,17 +19,16 @@ final class HeatmapHeaderView: UICollectionReusableView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(titleLabel)
+        contentView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(8)
-            $0.leading.trailing.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    func configure(title: String, showLegend: Bool) {
+    func configure(title: String) {
         titleLabel.text = title
     }
 }

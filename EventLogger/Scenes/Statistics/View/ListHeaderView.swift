@@ -22,7 +22,7 @@ final class ListHeaderView: UICollectionReusableView {
         super.init(frame: frame)
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(8)
+            $0.top.bottom.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(16)
         }
     }

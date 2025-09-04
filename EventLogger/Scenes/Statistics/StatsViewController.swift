@@ -52,7 +52,9 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     // MARK: Diffable
     enum StatsSection: Hashable {
         case menuBar
+        case heatmapHeader
         case heatmap
+        case heatmapFooter
         case totalCount
         case totalExpense
         case categoryCountHeader
@@ -68,7 +70,9 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     enum StatsItem: Hashable {
         case title(String)
         case menu(UUID)
+        case heatmapHeaderTitle(String)
         case heatmap(HeatmapModel)
+        case heatmapLegend(UUID)
         case totalCount(TotalModel)
         case totalExpense(TotalModel)
         case rollupParent(RollupParent)
@@ -184,7 +188,8 @@ extension StatsViewController {
     func headerTitle(for section: StatsSection) -> String? {
         switch section {
         case .menuBar: return nil
-        case .heatmap: return "참여 캘린더"
+        case .heatmapHeader: return "참여 캘린더"
+        case .heatmap: return nil
         case .totalCount:   return nil
         case .totalExpense:   return nil
         case .categoryCount:   return "카테고리별 참여 횟수"

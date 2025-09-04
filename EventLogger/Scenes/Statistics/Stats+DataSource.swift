@@ -49,14 +49,27 @@ extension StatsViewController {
         let titleReg = UICollectionView.CellRegistration<StatsTitleCell, String> { cell, _, title in
             cell.configure(title: title)
         }
+        
+        let heatmapHeaderReg = UICollectionView.CellRegistration<HeatmapHeaderCell, String> { cell, _, title in
+            cell.configure(title: title)
+        }
+        
+        let legendReg = UICollectionView.CellRegistration<HeatmapFooterCell, UUID> { cell, _, _ in
+            cell.configure()
+        }
+        
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
             case .title(let title):
                 return collectionView.dequeueConfiguredReusableCell(using: titleReg, for: indexPath, item: title)
             case .menu(let id):
                 return collectionView.dequeueConfiguredReusableCell(using: menuReg, for: indexPath, item: id)
+            case .heatmapHeaderTitle(let title):
+                return collectionView.dequeueConfiguredReusableCell(using: heatmapHeaderReg, for: indexPath, item: title)
             case .heatmap(let model):
                 return collectionView.dequeueConfiguredReusableCell(using: heatmapReg, for: indexPath, item: model)
+            case .heatmapLegend(let id):
+                return collectionView.dequeueConfiguredReusableCell(using: legendReg, for: indexPath, item: id)
             case .totalCount(let model):
                 return collectionView.dequeueConfiguredReusableCell(using: totalCountReg, for: indexPath, item: model)
             case .totalExpense(let model):
@@ -68,33 +81,6 @@ extension StatsViewController {
             }
         }
 
-        // 1) Header Registration
-        let heatmapHeaderReg = UICollectionView.SupplementaryRegistration<HeatmapHeaderView>(
-            elementKind: HeatmapHeaderView.elementKind
-        ) { [weak self] header, _, indexPath in
-            guard let self,
-                  let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section],
-                  section == .heatmap
-            else { return }
-            let title = self.headerTitle(for: section) ?? ""
-            header.configure(title: title, showLegend: true)
-        }
-
-        // 2) Footer Registration (HeatmapLegend)
-        let footerReg = UICollectionView.SupplementaryRegistration<HeatmapFooterView>(
-            elementKind: HeatmapFooterView.elementKind
-        ) { footer, _, _ in
-            footer.configure(title: "", showLegend: true)
-        }
-
-        // 3) Provider
-        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
-            if kind == HeatmapHeaderView.elementKind {
-                return collectionView.dequeueConfiguredReusableSupplementary(using: heatmapHeaderReg, for: indexPath)
-            } else if kind == HeatmapFooterView.elementKind {
-                return collectionView.dequeueConfiguredReusableSupplementary(using: footerReg, for: indexPath)
-            }
-            return nil
-        }
+        dataSource.supplementaryViewProvider = nil
     }
 }

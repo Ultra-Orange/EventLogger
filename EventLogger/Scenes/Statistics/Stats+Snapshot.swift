@@ -17,9 +17,27 @@ extension StatsViewController {
 
         // 1) 섹션 구성
         if state.scope == .year || state.scope == .month {
-            snapshot.appendSections([.menuBar, .totalCount, .totalExpense, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
+            snapshot.appendSections(
+                [
+                    .menuBar,
+                    .totalCount, .totalExpense,
+                    .categoryCountHeader, .categoryCount,
+                    .categoryExpenseHeader, .categoryExpense,
+                    .artistCountHeader, .artistCount,
+                    .artistExpenseHeader, .artistExpense
+                ]
+            )
         } else { // .all
-            snapshot.appendSections([.heatmap, .totalCount, .totalExpense, .categoryCountHeader, .categoryCount, .categoryExpenseHeader, .categoryExpense, .artistCountHeader, .artistCount, .artistExpenseHeader, .artistExpense])
+            snapshot.appendSections(
+                [
+                    .heatmapHeader, .heatmap, .heatmapFooter,
+                    .totalCount, .totalExpense,
+                    .categoryCountHeader, .categoryCount,
+                    .categoryExpenseHeader, .categoryExpense,
+                    .artistCountHeader, .artistCount,
+                    .artistExpenseHeader, .artistExpense
+                ]
+            )
         }
 
         // 2) 메뉴바
@@ -28,8 +46,16 @@ extension StatsViewController {
         }
 
         // 3) 히트맵
+        if snapshot.sectionIdentifiers.contains(.heatmapHeader) {
+            snapshot.appendItems([.heatmapHeaderTitle("활동 리포트")], toSection: .heatmapHeader)
+        }
+        
         if snapshot.sectionIdentifiers.contains(.heatmap) {
             snapshot.appendItems([.heatmap(reactor.currentState.heatmap)], toSection: .heatmap)
+        }
+        
+        if snapshot.sectionIdentifiers.contains(.heatmapFooter) {
+            snapshot.appendItems([.heatmapLegend(UUID())], toSection: .heatmapFooter)
         }
 
         // 4) 기간

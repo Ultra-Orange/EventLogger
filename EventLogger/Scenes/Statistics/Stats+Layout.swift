@@ -26,20 +26,6 @@ extension StatsViewController {
             let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: "decoration")
             
             switch section {
-            case .categoryCountHeader, .categoryExpenseHeader, .artistCountHeader, .artistExpenseHeader:
-                let item = NSCollectionLayoutItem(
-                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
-                                      heightDimension: .estimated(18))
-                )
-                let group = NSCollectionLayoutGroup.horizontal(
-                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
-                                      heightDimension: .estimated(18)),
-                    subitems: [item]
-                )
-                let section = NSCollectionLayoutSection(group: group)
-                // section.contentInsets = .init(top: 10, leading: 20, bottom: 0, trailing: 20)
-                return section
-
             case .menuBar: // 완료
                 let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
@@ -52,6 +38,20 @@ extension StatsViewController {
                 )
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = .init(top: 10, leading: 20, bottom: 0, trailing: 20)
+                return section
+                
+            case .heatmapHeader:
+                let item = NSCollectionLayoutItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(17))
+                )
+                let group = NSCollectionLayoutGroup.vertical(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(17)),
+                    subitems: [item]
+                )
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = .init(top: 24, leading: 0, bottom: 0, trailing: 0)
                 return section
                 
             case .heatmap:
@@ -67,24 +67,20 @@ extension StatsViewController {
                 let section = NSCollectionLayoutSection(group: group)
                 section.contentInsets = .init(top: 10, leading: 0, bottom: 10, trailing: 0)
                 section.decorationItems = [decorationItem]
+                return section
                 
-                // 헤더
-                let header = NSCollectionLayoutBoundarySupplementaryItem(
+            case .heatmapFooter:
+                let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
-                                      heightDimension: .estimated(22)),
-                    elementKind: HeatmapHeaderView.elementKind,
-                    alignment: .top
+                                      heightDimension: .estimated(13))
                 )
-                
-                // 푸터
-                let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                let group = NSCollectionLayoutGroup.vertical(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
                                       heightDimension: .estimated(13)),
-                    elementKind: HeatmapFooterView.elementKind,
-                    alignment: .bottom
+                    subitems: [item]
                 )
-                
-                section.boundarySupplementaryItems = [header, footer]
+                let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = .init(top: -10, leading: 0, bottom: 10, trailing: 0)
                 return section
                 
             case .totalCount: // 완료
@@ -121,13 +117,26 @@ extension StatsViewController {
                 
                 return section
                 
+            case .categoryCountHeader, .categoryExpenseHeader, .artistCountHeader, .artistExpenseHeader:
+                let item = NSCollectionLayoutItem(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(18))
+                )
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: .init(widthDimension: .fractionalWidth(1.0),
+                                      heightDimension: .estimated(18)),
+                    subitems: [item]
+                )
+                let section = NSCollectionLayoutSection(group: group)
+                 section.contentInsets = .init(top: 10, leading: 0, bottom: -10, trailing: 0)
+                return section
                 
             case .categoryCount, .categoryExpense, .artistCount, .artistExpense:
                 var config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
                 config.showsSeparators = true
 
                 let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: env)
-                section.contentInsets = .init(top: 8, leading: 0, bottom: 10, trailing: 0)
+                section.contentInsets = .init(top: 0, leading: 0, bottom: 0, trailing: 0)
                 section.decorationItems = [decorationItem]
                 section.contentInsetsReference = .layoutMargins
                 return section

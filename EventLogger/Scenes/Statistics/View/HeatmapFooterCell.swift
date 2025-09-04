@@ -1,5 +1,5 @@
 //
-//  HeatmapFooterView.swift
+//  HeatmapFooterCell.swift
 //  EventLogger
 //
 //  Created by 김우성 on 9/3/25.
@@ -9,27 +9,23 @@ import SnapKit
 import UIKit
 import Then
 
-final class HeatmapFooterView: UICollectionReusableView {
-    static let elementKind = "HeatmapFooterElementKind"
+final class HeatmapFooterCell: UICollectionViewCell {
 
-    private let container = UIView() // Heatmap에서만 사용
+    private let container = UIView()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        addSubview(container)
-
+        contentView.addSubview(container)
         container.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
         buildLegend()
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    func configure(title: String, showLegend: Bool) {
+    func configure() {
         
     }
 
@@ -44,6 +40,7 @@ final class HeatmapFooterView: UICollectionReusableView {
         container.addSubview(stack)
         stack.snp.makeConstraints {
             $0.leading.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
         }
         
         
@@ -81,8 +78,6 @@ final class HeatmapFooterView: UICollectionReusableView {
             colorStack.addArrangedSubview(label)
             
             stack.addArrangedSubview(colorStack)
-            
-            
         }
     }
 }
