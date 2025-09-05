@@ -79,6 +79,8 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     // MARK: SetupUI
     
     override func setupUI() {
+        navigationItem.backButtonDisplayMode = .minimal
+        
         view.backgroundColor = .systemBackground
         title = "설정"
         
