@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Period
+
 enum StatsPeriod {
     case all
     case year(Int)
@@ -15,11 +17,11 @@ enum StatsPeriod {
 
 struct StatisticsService {
     let manager: SwiftDataManager
-    private let calendar = Calendar(identifier: .gregorian)
+    let calendar = Calendar(identifier: .gregorian)
 
-    // 공통: 기간에 맞는 이벤트만 필터링
-    private func filteredEvents(for period: StatsPeriod) -> [EventItem] {
-        let events = manager.fetchAllEvents() // SwiftData → Domain 변환 재사용
+    /// 기간에 맞는 이벤트만 필터링
+    func filteredEvents(for period: StatsPeriod) -> [EventItem] {
+        let events = manager.fetchAllEvents()
         switch period {
         case .all:
             return events
@@ -32,55 +34,207 @@ struct StatisticsService {
             }
         }
     }
+
+    /// 해당 기간 총합(횟수/비용)
+    func total(for period: StatsPeriod) -> (count: Int, expense: Double) {
+        let evts = filteredEvents(for: period)
+        let totalExpense = evts.reduce(0) { $0 + $1.expense }
+        return (evts.count, totalExpense)
+    }
 }
 
 extension StatisticsService {
-    /// 2-1) 기간별 카테고리 통계
+    /// 기간별 카테고리 통계 (하위 상세 포함)
+    /// - 반환 배열 - 카운트 내림차순 정렬
+    /// - 내부의 하위 목록 - 각각 카운트/지출 내림차순 정렬
     func categoryStats(for period: StatsPeriod) -> [CategoryStats] {
         let events = filteredEvents(for: period)
-        let categories = manager.fetchAllCategories() // [CategoryItem]
+        let categories = manager.fetchAllCategories()
+        let catById: [UUID: CategoryItem] = Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0) })
 
-        // categoryId → (count, totalExpense)
-        var bucket: [UUID: (count: Int, total: Double)] = [:]
-        for e in events {
-            let cur = bucket[e.categoryId] ?? (0, 0)
-            bucket[e.categoryId] = (cur.count + 1, cur.total + e.expense)
+        // categoryId → (count, totalExpense, artistCount[name], artistExpense[name])
+        struct CatAgg {
+            var count: Int = 0
+            var totalExpense: Double = 0
+            var artistCount: [String: Int] = [:]
+            var artistExpense: [String: Double] = [:]
+        }
+        var bucket: [UUID: CatAgg] = [:]
+
+        for event in events {
+            let categoryId = event.categoryId
+            var agg = bucket[categoryId] ?? CatAgg()
+            agg.count += 1
+            agg.totalExpense += event.expense
+            
+            // 아티스트별: 비용은 "각 아티스트에 동일하게"
+            // 그래서 아티스트 받아온 것들 다 합쳐서 총액을 쓸 수는 없음
+            for name in event.artists {
+                agg.artistCount[name, default: 0] += 1
+                agg.artistExpense[name, default: 0] += event.expense
+            }
+            bucket[categoryId] = agg
         }
 
-        // 결과를 CategoryItem과 매핑 (등록된 카테고리 중 집계가 있는 것만)
-        return categories.compactMap { cat in
-            guard let v = bucket[cat.id] else { return nil }
-            return CategoryStats(category: cat, count: v.count, totalExpense: v.total)
+        // 모델 변환 + 정렬
+        var results: [CategoryStats] = []
+        results.reserveCapacity(bucket.count)
+
+        for (cid, agg) in bucket {
+            guard let cat = catById[cid] else { continue }
+
+            let byCount = agg.artistCount
+                .sorted { lhs, rhs in
+                    if lhs.value == rhs.value { return lhs.key < rhs.key }
+                    return lhs.value > rhs.value
+                }
+                .map { ArtistCountEntry(name: $0.key, count: $0.value) }
+
+            let byExpense = agg.artistExpense
+                .sorted { lhs, rhs in
+                    if lhs.value == rhs.value { return lhs.key < rhs.key }
+                    return lhs.value > rhs.value
+                }
+                .map { ArtistExpenseEntry(name: $0.key, expense: $0.value) }
+
+            results.append(
+                CategoryStats(
+                    category: cat,
+                    count: agg.count,
+                    totalExpense: agg.totalExpense,
+                    topArtistsByCount: byCount,
+                    topArtistsByExpense: byExpense
+                )
+            )
         }
-        .sorted { $0.count > $1.count } // 필요시 정렬 기준 변경 가능
+
+        // 상위 정렬: 카운트 desc, 동률이면 지출 desc, 그 다음 이름
+        results.sort {
+            if $0.count != $1.count { return $0.count > $1.count }
+            if $0.totalExpense != $1.totalExpense { return $0.totalExpense > $1.totalExpense }
+            return $0.category.name < $1.category.name
+        }
+        return results
     }
 
-    /// 2-2) 기간별 아티스트 통계
+    /// 기간별 아티스트 통계 (하위 상세 포함)
+    /// - 반환 배열 - 카운트 내림차순 정렬.
+    /// - 내부의 하위 목록 - 각각 카운트/지출 내림차순 정렬.
     func artistStats(for period: StatsPeriod) -> [ArtistStats] {
         let events = filteredEvents(for: period)
+        let categories = manager.fetchAllCategories()
+        let catById: [UUID: CategoryItem] = Dictionary(uniqueKeysWithValues: categories.map { ($0.id, $0) })
 
-        // artistName → (count, totalExpense)
-        var bucket: [String: (count: Int, total: Double)] = [:]
+        // artistName → (count, totalExpense, catCount[catId], catExpense[catId])
+        struct ArtAgg {
+            var count: Int = 0
+            var totalExpense: Double = 0
+            var catCount: [UUID: Int] = [:]
+            var catExpense: [UUID: Double] = [:]
+        }
+        var bucket: [String: ArtAgg] = [:]
+
         for e in events {
             for name in e.artists {
-                let cur = bucket[name] ?? (0, 0)
-                bucket[name] = (cur.count + 1, cur.total + e.expense)
+                var agg = bucket[name] ?? ArtAgg()
+                agg.count += 1
+                agg.totalExpense += e.expense
+                agg.catCount[e.categoryId, default: 0] += 1
+                agg.catExpense[e.categoryId, default: 0] += e.expense
+                bucket[name] = agg
             }
         }
 
-        return bucket
-            .map { ArtistStats(name: $0.key, count: $0.value.count, totalExpense: $0.value.total) }
-            .sorted { $0.count > $1.count }
+        // 모델 변환 + 정렬
+        var results: [ArtistStats] = []
+        results.reserveCapacity(bucket.count)
+
+        for (name, agg) in bucket {
+            let byCount = agg.catCount
+                .sorted { lhs, rhs in
+                    if lhs.value == rhs.value {
+                        let lName = catById[lhs.key]?.name ?? ""
+                        let rName = catById[rhs.key]?.name ?? ""
+                        return lName < rName
+                    }
+                    return lhs.value > rhs.value
+                }
+                .compactMap { categoryId, count -> CategoryCountEntry? in
+                    guard let category = catById[categoryId] else { return nil }
+                    return CategoryCountEntry(category: category, count: count)
+                }
+
+            let byExpense = agg.catExpense
+                .sorted { lhs, rhs in
+                    if lhs.value == rhs.value {
+                        let lName = catById[lhs.key]?.name ?? ""
+                        let rName = catById[rhs.key]?.name ?? ""
+                        return lName < rName
+                    }
+                    return lhs.value > rhs.value
+                }
+                .compactMap { categoryId, expense -> CategoryExpenseEntry? in
+                    guard let category = catById[categoryId] else { return nil }
+                    return CategoryExpenseEntry(category: category, expense: expense)
+                }
+
+            results.append(
+                ArtistStats(
+                    name: name,
+                    count: agg.count,
+                    totalExpense: agg.totalExpense,
+                    topCategoriesByCount: byCount,
+                    topCategoriesByExpense: byExpense
+                )
+            )
+        }
+
+        // 상위 정렬: 카운트 desc, 동률이면 지출 desc, 그 다음 이름
+        results.sort {
+            if $0.count != $1.count { return $0.count > $1.count }
+            if $0.totalExpense != $1.totalExpense { return $0.totalExpense > $1.totalExpense }
+            return $0.name < $1.name
+        }
+        return results
     }
 }
 
+// MARK: - 보조
+
 extension StatisticsService {
-    /// 이벤트가 존재하는 연도를 문자열 배열로 반환 (예: ["2025", "2024", ...])
+    /// 이벤트가 존재하는 연도를 문자열 배열로 반환 ("2025", "2024", ...)
     func activeYears(descending: Bool = true) -> [String] {
         let years = Set(manager.fetchAllEvents().map {
             calendar.component(.year, from: $0.startTime)
         })
         let sorted = descending ? years.sorted(by: >) : years.sorted()
         return sorted.map(String.init)
+    }
+}
+
+// MARK: - 잔디용 모델 생성
+
+extension StatisticsService {
+    /// 전체 데이터로 HeatmapModel 생성 (연도 desc, 12개월)
+    func buildHeatmapAll() -> HeatmapModel {
+        let calendar = Calendar(identifier: .gregorian)
+        let all = manager.fetchAllEvents()
+        var month: [Int: [Int: Int]] = [:] // year → [month: count]
+
+        for event in all {
+            let y = calendar.component(.year, from: event.startTime)
+            let mon = calendar.component(.month, from: event.startTime)
+            var ym = month[y] ?? [:]
+            ym[mon, default: 0] += 1
+            month[y] = ym
+        }
+
+        let years = month.keys.sorted(by: >)
+        let rows: [HeatmapModel.Row] = years.map { y in
+            let counts = (1 ... 12).map { month[y]?[$0] ?? 0 }
+            let yearLabel = "`" + String(y % 100) // 디자인 예시처럼 `25
+            return .init(yearLabel: yearLabel, monthCounts: counts)
+        }
+        return .init(rows: rows)
     }
 }

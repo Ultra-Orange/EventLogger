@@ -19,7 +19,7 @@ struct CategoryBadgeView: View {
             .padding(.vertical, 4)
             .background(color)
             .clipShape(Capsule())
-            .shadow(color: color, radius: 10, x: 0, y: 0)
+//            .shadow(color: color, radius: 10, x: 0, y: 0)
             .overlay(
                 Capsule()
                     .stroke(Color.gray.opacity(0.70), lineWidth: 1)
