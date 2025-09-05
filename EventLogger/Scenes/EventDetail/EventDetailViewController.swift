@@ -39,6 +39,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         $0.backgroundColor = .systemGray6
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
+        $0.contentMode = .scaleAspectFit
     }
 
     private let titleLabel = UILabel().then {
