@@ -5,10 +5,10 @@
 //  Created by 김우성 on 9/5/25.
 //
 
+import Dependencies
 import SnapKit
 import Then
 import UIKit
-import Dependencies
 
 // 정보 카드 부분 뷰
 class InfoItemView: UIView {
@@ -50,6 +50,7 @@ class InfoItemView: UIView {
         setupUI()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -74,9 +75,7 @@ class InfoItemView: UIView {
         }
         buttonStackView.addArrangedSubview(addCalendarButton)
         buttonStackView.addArrangedSubview(findDirectionsButton)
-        
-    }
-    
+     }
     
     private func makeInfoHStack(icon: String, value: String) -> UIStackView {
         let iconImageView = UIImageView(image: UIImage(systemName: icon, withConfiguration: .font17Regular)).then {
@@ -108,7 +107,7 @@ class InfoItemView: UIView {
         let categories = swiftDataManager.fetchAllCategories()
         
         let date = DateFormatter.toDateString(eventItem.startTime)
-        let categoryName = categories.first{ $0.id == eventItem.categoryId }?.name ?? ""
+        let categoryName = categories.first { $0.id == eventItem.categoryId }?.name ?? ""
         let time = "시작 \(DateFormatter.toTimeString(eventItem.startTime)) / 종료 \(DateFormatter.toTimeString(eventItem.endTime)) 예정"
         let location = eventItem.location ?? ""
         let artists = eventItem.artists.joined(separator: ", ")
