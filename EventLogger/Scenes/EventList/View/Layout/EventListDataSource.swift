@@ -54,13 +54,10 @@ final class EventListDataSource {
             }()
             guard let event else { return }
             let fetchedCategory = swiftDataManager.fetchOneCategory(id: event.categoryId)
-//            if let category = fetchedCategory {
-//                self.category = category
-//                self.categoryColor = swiftDataManager.colorForCategory(category.id)
                 
             cell.contentConfiguration = UIHostingConfiguration {
                 if let fetchedCategory {
-                    EventCell(item: event, category: fetchedCategory)
+                    EventCell(item: event, category: fetchedCategory).id(UUID()) // 데이터가 동일해도 항상 새로 그려짐
                 }
             }.margins(.all, 0)
             cell.backgroundConfiguration = nil

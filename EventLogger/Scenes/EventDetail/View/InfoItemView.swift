@@ -38,6 +38,7 @@ class InfoItemView: UIView {
 
     private let artistsLabel = UILabel().then {
         $0.font = .font17Regular
+        $0.numberOfLines = 0
     }
 
     private let expenseLabel = UILabel().then {
@@ -190,10 +191,11 @@ class InfoItemView: UIView {
         artistsLabel.snp.makeConstraints {
             $0.top.equalTo(personIcon)
             $0.leading.equalTo(personIcon.snp.trailing).offset(12)
+            $0.trailing.equalToSuperview().inset(10)
         }
 
         moneysignIcon.snp.makeConstraints {
-            $0.top.equalTo(personIcon.snp.bottom).offset(16)
+            $0.top.equalTo(artistsLabel.snp.bottom).offset(16)
             $0.leading.equalToSuperview().offset(20)
         }
 

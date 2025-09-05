@@ -164,7 +164,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         // State -> Snapshot
         Observable
             .combineLatest(
-                reactor.state.map(\.eventItems).distinctUntilChanged(),
+                reactor.state.map(\.eventItems),
                 reactor.state.map(\.filter).distinctUntilChanged(),
                 reactor.state.map(\.sortOrder).distinctUntilChanged(),
                 reactor.state.map(\.yearFilter).distinctUntilChanged()
