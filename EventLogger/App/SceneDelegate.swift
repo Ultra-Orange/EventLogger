@@ -21,10 +21,10 @@ class AppStepper: Stepper {
     func readyToEmitSteps() {
         @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
         var didSetupDefaultCategories: Bool
-        if didSetupDefaultCategories { // 카테고리가 시딩이 되어있으면
-            steps.accept(AppStep.eventList)
-            return
-        }
+//        if didSetupDefaultCategories { // 카테고리가 시딩이 되어있으면
+//            steps.accept(AppStep.eventList)
+//            return
+//        }
         // 최초 실행시 카테고리 시딩
         let notification = NSPersistentCloudKitContainer.eventChangedNotification
         NotificationCenter.default.rx.notification(notification).take(1)
@@ -57,10 +57,18 @@ class AppStepper: Stepper {
     
     func probeCloudPresence(recordType: String) async throws -> Bool {
       let container = CKContainer(identifier: "iCloud.UltraOrange.EventLogger")
-      let db = container.privateCloudDatabase
-      let zones = try await db.allRecordZones()
+        let predicate = NSPredicate(value: true)
+            let query = CKQuery(recordType: "CD_CategoryStore", predicate: predicate)
+            do {
+                let items = (try await container.privateCloudDatabase.records(matching: query)).matchResults
+                return items.isEmpty
+            } catch {
+                print(error)
+                return false
+                // this is for the answer's simplicity,
+                // but obviously you should handle errors accordingly.
+            }
       
-      return false
     }
     
     func checkIfDataExists(completion: @escaping (Bool) -> Void) {
@@ -100,8 +108,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         coordinator.coordinate(
             flow: appFlow,
-            with: AppStepper()
-//            with: OneStepper(withSingleStep: AppStep.eventList)
+//            with: AppStepper()
+            with: OneStepper(withSingleStep: AppStep.eventList)
         )
     }
     
