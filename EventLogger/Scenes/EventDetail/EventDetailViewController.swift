@@ -39,6 +39,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         $0.backgroundColor = .systemGray6
         $0.layer.cornerRadius = 12
         $0.clipsToBounds = true
+        $0.contentMode = .scaleAspectFit
     }
 
     private let titleLabel = UILabel().then {
@@ -65,7 +66,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     override func setupUI() {
         view.backgroundColor = .systemBackground
         // 네비게이션 영역
-        title = "Event Logger"
+        title = "이벤트 상세"
         navigationItem.rightBarButtonItem = moreButton
         
         // UIMenu & Action

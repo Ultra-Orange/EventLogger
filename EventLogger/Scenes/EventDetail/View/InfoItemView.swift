@@ -38,6 +38,7 @@ class InfoItemView: UIView {
 
     private let artistsLabel = UILabel().then {
         $0.font = .font17Regular
+        $0.numberOfLines = 0
     }
 
     private let expenseLabel = UILabel().then {
@@ -46,21 +47,61 @@ class InfoItemView: UIView {
 
     // MARK: SF Symbol
 
-    private let calendarIcon = UIImageView(image: UIImage(systemName: "calendar", withConfiguration: .font17Regular))
-    private let tagIcon = UIImageView(image: UIImage(systemName: "tag", withConfiguration: .font17Regular))
-    private let clockIcon = UIImageView(image: UIImage(systemName: "clock", withConfiguration: .font17Regular))
-    private let mapPinIcon = UIImageView(image: UIImage(systemName: "mappin.and.ellipse", withConfiguration: .font17Regular))
-    private let personIcon = UIImageView(image: UIImage(systemName: "person", withConfiguration: .font17Regular))
-    private let moneysignIcon = UIImageView(image: UIImage(systemName: "wonsign.circle", withConfiguration: .font17Regular))
+    private let calendarIcon = UIImageView(image: UIImage(
+        systemName: "calendar",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
+
+    private let tagIcon = UIImageView(image: UIImage(
+        systemName: "tag",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
+
+    private let clockIcon = UIImageView(image: UIImage(
+        systemName: "clock",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
+
+    private let mapPinIcon = UIImageView(image: UIImage(
+        systemName: "mappin.and.ellipse",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
+
+    private let personIcon = UIImageView(image: UIImage(
+        systemName: "person",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
+
+    private let moneysignIcon = UIImageView(image: UIImage(
+        systemName: "wonsign.circle",
+        withConfiguration: .font17Regular
+    )).then {
+        $0.tintColor = .primary500
+    }
 
     // MARK: Button
 
     let addCalendarButton = UIButton(configuration: .defaultButton).then {
         $0.configuration?.title = "캘린더에 추가"
+        $0.configuration?.baseBackgroundColor = .primary500
     }
 
     let findDirectionsButton = UIButton(configuration: .defaultColorReversed).then {
         $0.configuration?.title = "길 찾기"
+        $0.configuration?.baseForegroundColor = .primary500
+        $0.configuration?.background.backgroundColor = .clear
+        $0.configuration?.background.strokeColor = .primary500
+        $0.configuration?.background.strokeWidth = 1
     }
 
     // MARK: StackView
@@ -150,10 +191,11 @@ class InfoItemView: UIView {
         artistsLabel.snp.makeConstraints {
             $0.top.equalTo(personIcon)
             $0.leading.equalTo(personIcon.snp.trailing).offset(12)
+            $0.trailing.equalToSuperview().inset(10)
         }
 
         moneysignIcon.snp.makeConstraints {
-            $0.top.equalTo(personIcon.snp.bottom).offset(16)
+            $0.top.equalTo(artistsLabel.snp.bottom).offset(16)
             $0.leading.equalToSuperview().offset(20)
         }
 

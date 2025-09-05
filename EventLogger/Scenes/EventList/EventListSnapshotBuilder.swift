@@ -82,6 +82,7 @@ enum EventListSnapshotBuilder {
         snapshot.appendSections(sections)
         for s in sections {
             snapshot.appendItems(itemsForSection[s] ?? [], toSection: s)
+            snapshot.reconfigureItems(itemsForSection[s] ?? [])
         }
         
         return Output(

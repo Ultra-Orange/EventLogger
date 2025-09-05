@@ -18,4 +18,5 @@ enum AppStep: Step {
     case createCategory
     case updateCategory(CategoryItem)
     case backToCategoryList
+    case statistics
 }

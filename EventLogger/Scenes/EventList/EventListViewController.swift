@@ -83,7 +83,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     override func setupUI() {
-        view.backgroundColor = .black
+        view.backgroundColor = .appBackground
         
         view.addSubview(backgroundGradientView)
         backgroundGradientView.snp.makeConstraints {
@@ -103,6 +103,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+        
+        navigationItem.backButtonDisplayMode = .minimal
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
         
@@ -145,9 +147,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .disposed(by: disposeBag)
         
         statisticsButton.rx.tap
-            .bind {
-                print("통계 버튼 탭함")
-            }
+            .map { AppStep.statistics }
+            .bind(to: reactor.steps)
             .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
@@ -162,7 +163,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         // State -> Snapshot
         Observable
             .combineLatest(
-                reactor.state.map(\.eventItems).distinctUntilChanged(),
+                reactor.state.map(\.eventItems),
                 reactor.state.map(\.filter).distinctUntilChanged(),
                 reactor.state.map(\.sortOrder).distinctUntilChanged(),
                 reactor.state.map(\.yearFilter).distinctUntilChanged()
@@ -257,7 +258,7 @@ private extension EventListViewController {
         
         
         // 4) 최종 메뉴 (위에서부터 정렬 2개, 그 다음 연도들)
-        return UIMenu(title: "", children: [sortMenu, yearMenu, goSettings])
+        return UIMenu(title: "", children: [goSettings, sortMenu, yearMenu])
     }
 }
 
