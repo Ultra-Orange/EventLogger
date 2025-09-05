@@ -14,7 +14,8 @@ final class CategoryDropDownButton: UIView {
     private(set) var selectedCategory: CategoryItem?
     
     let selectionRelay = PublishRelay<CategoryItem>()
-    
+    let newCategoryRelay = PublishRelay<Void>()
+
     private let button = UIButton(type: .system).then {
         var config = UIButton.Configuration.filled()
         config.title = "선택하세요"
@@ -26,7 +27,6 @@ final class CategoryDropDownButton: UIView {
         $0.configuration = config
         $0.contentHorizontalAlignment = .leading
         $0.showsMenuAsPrimaryAction = true
-        $0.changesSelectionAsPrimaryAction = true
     }
     
     private lazy var categoryMenu: UIMenu = {
@@ -57,9 +57,6 @@ final class CategoryDropDownButton: UIView {
     func configure(categories: [CategoryItem], initial: CategoryItem? = nil) {
         self.categories = categories
         // 카테고리 비어있을 경우 방어로직(테스트 때 필요)
-        guard !categories.isEmpty else {
-            return
-        }
         selectedCategory = initial ?? categories.first
         
         rebuildMenu() // 메뉴 다시 구성
@@ -67,15 +64,23 @@ final class CategoryDropDownButton: UIView {
     }
     
     private func rebuildMenu() {
+        let categoryActions = categories.map { choice in
+            makeAction(for: choice, isSelected: choice == selectedCategory)
+        }
+        let newCategoryAction = newCategoryAction()
         button.menu = UIMenu(
             title: "",
-            options: [.singleSelection],
-            children: categories.map { choice in
-                makeAction(for: choice, isSelected: choice == selectedCategory)
-            }
+            options: .displayInline,
+            children: categoryActions + [newCategoryAction]
         )
     }
-    
+
+    private func newCategoryAction() -> UIAction {
+        return UIAction(title: "새 카테고리 추가", state: .off) { [newCategoryRelay] _ in
+            newCategoryRelay.accept(())
+        }
+    }
+
     private func makeAction(for category: CategoryItem, isSelected: Bool) -> UIAction {
         let image = UIImage.circle(diameter: 12, color: category.color)
         let state: UIMenuElement.State = isSelected ? .on : .off

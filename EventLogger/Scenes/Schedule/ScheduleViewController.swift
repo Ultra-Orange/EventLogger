@@ -268,6 +268,23 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 reactor.action.onNext(.sendEventPayload(payload))
             }
             .disposed(by: disposeBag)
+
+        reactor.state.map(\.categories)
+            .distinctUntilChanged()
+            .bind { [categoryFieldView] categories in
+                categoryFieldView.configure(categories: categories, initial: categoryFieldView.selectedCategory)
+            }
+            .disposed(by: disposeBag)
+
+        rx.viewWillAppear
+            .map { _ in .reloadCategories }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        categoryFieldView.categoryMenuButton.newCategoryRelay
+            .map { .newCategory }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
     }
     
     private func configureInitialState(reactor: ScheduleReactor) {
