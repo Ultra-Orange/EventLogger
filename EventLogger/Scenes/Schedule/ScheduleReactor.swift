@@ -129,9 +129,17 @@ final class ScheduleReactor: BaseReactor {
                     artists: payload.artists,
                     expense: payload.expense,
                     currency: payload.currency,
-                    memo: payload.memo
+                    memo: payload.memo,
+                    calendarEventId: oldItem.calendarEventId // 캘린더이벤트 id는 유지
                 )
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
+                
+                if settingsService.autoSaveToCalendar {
+                    calendarService.update(eventItem: updated)
+                        .subscribe()
+                        .disposed(by: disposeBag)
+                }
+                
                 schedulePushNotificationIfNeeded(updated)
                 steps.accept(AppStep.eventList)
                 return .empty()
