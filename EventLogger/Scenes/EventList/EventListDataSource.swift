@@ -30,6 +30,9 @@ final class EventListDataSource {
     
     func apply(_ snapshot: NSDiffableDataSourceSnapshot<EventListSection, EventListDSItem>, animated: Bool) {
         dataSource.apply(snapshot, animatingDifferences: animated)
+        
+        let isEmpty = snapshot.itemIdentifiers.isEmpty
+        collectionView?.backgroundView?.isHidden = !isEmpty
     }
     
     func eventItem(at indexPath: IndexPath) -> EventItem? {

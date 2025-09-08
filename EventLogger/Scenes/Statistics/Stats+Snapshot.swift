@@ -8,13 +8,12 @@
 import UIKit
 
 extension StatsViewController {
-
     func applySnapshot(animated: Bool) {
         guard let reactor = reactor, let dataSource = dataSource else { return }
-        
+
         // 스냅샷을 다시 그릴 때마다 캐시 초기화
         resetRollupCaches()
-        
+
         let state = reactor.currentState
 
         var snapshot = NSDiffableDataSourceSnapshot<StatsSection, StatsItem>()
@@ -53,11 +52,11 @@ extension StatsViewController {
         if snapshot.sectionIdentifiers.contains(.heatmapHeader) {
             snapshot.appendItems([.heatmapHeaderTitle("활동 리포트")], toSection: .heatmapHeader)
         }
-        
+
         if snapshot.sectionIdentifiers.contains(.heatmap) {
             snapshot.appendItems([.heatmap(reactor.currentState.heatmap)], toSection: .heatmap)
         }
-        
+
         if snapshot.sectionIdentifiers.contains(.heatmapFooter) {
             snapshot.appendItems([.heatmapLegend(UUID())], toSection: .heatmapFooter)
         }
@@ -82,9 +81,22 @@ extension StatsViewController {
 
         // 5) 총합
         let (cnt, expense) = statisticsService.total(for: period)
+        
+//        if cnt == 0 {
+//            collectionView.backgroundView?.isHidden = false
+//            collectionView.showsVerticalScrollIndicator = false
+//            
+//            // 비어있는 스냅샷 적용 (아이템/섹션 0개여야 backgroundView가 보입니다)
+//            let empty = NSDiffableDataSourceSnapshot<StatsSection, StatsItem>()
+//            dataSource.apply(empty, animatingDifferences: animated)
+//            return
+//        } else {
+//            collectionView.backgroundView?.isHidden = true
+//            collectionView.showsVerticalScrollIndicator = true
+//        }
+        
         snapshot.appendItems([.totalCount(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalCount)
         snapshot.appendItems([.totalExpense(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalExpense)
-
 
         // 6) 카테고리 Count/Expense (하위 포함)
         let categoryStats = statisticsService.categoryStats(for: period) // count desc
@@ -244,4 +256,3 @@ extension StatsViewController {
         snapshot.appendItems(items, toSection: section)
     }
 }
-

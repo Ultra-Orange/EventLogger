@@ -50,6 +50,34 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     }
     
+    private let emptyView = UIView().then {
+        $0.backgroundColor = .clear
+    }
+
+    private let emptyStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.alignment = .center
+        $0.distribution = .fill
+        $0.spacing = 10
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    private let emptyTitleLabel = UILabel().then {
+        $0.text = "보여드릴 통계가 없어요"
+        $0.textColor = .neutral50
+        $0.font = .font20Bold
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+
+    private let emptyValueLabel = UILabel().then {
+        $0.text = "일정을 등록하면 통계를 보여드릴 수 있어요"
+        $0.textColor = .neutral50
+        $0.font = .font17Regular
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+    
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
     // MARK: Diffable
@@ -117,13 +145,27 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         }
 
         view.addSubview(collectionView)
+        collectionView.backgroundView = emptyView
+        emptyView.isHidden = true
         collectionView.snp.makeConstraints {
             $0.top.equalTo(segmentedControl.snp.bottom).offset(12)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+        
+        setupEmptyView()
 
         configureDataSource()
         collectionView.delegate = self // 셀 탭 감지를 위해 델리게이트 설정
+    }
+    
+    private func setupEmptyView() {
+        emptyView.addSubview(emptyStackView)
+        emptyStackView.addArrangedSubview(emptyTitleLabel)
+        emptyStackView.addArrangedSubview(emptyValueLabel)
+        
+        emptyStackView.snp.makeConstraints {
+            $0.center.equalTo(view.safeAreaLayoutGuide)
+        }
     }
 
     override func bind(reactor: StatsReactor) {
