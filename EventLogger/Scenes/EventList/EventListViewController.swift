@@ -41,7 +41,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: EventListLayout.makeLayout()).then {
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout()).then {
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = true
     }
@@ -153,7 +153,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
-            .compactMap { [weak self] indexPath -> EventItem? in
+            .compactMap { [weak self] indexPath in
                 self?.collectionView.deselectItem(at: indexPath, animated: true)
                 return self?.dataSource.eventItem(at: indexPath)
             }

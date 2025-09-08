@@ -8,8 +8,6 @@
 import UIKit
 
 extension StatsViewController {
-    
-    
     func makeLayout() -> UICollectionViewLayout {
         let configuration = UICollectionViewCompositionalLayoutConfiguration().then {
             $0.contentInsetsReference = .layoutMargins
@@ -128,7 +126,7 @@ extension StatsViewController {
                     subitems: [item]
                 )
                 let section = NSCollectionLayoutSection(group: group)
-                 section.contentInsets = .init(top: 10, leading: 0, bottom: -10, trailing: 0)
+                section.contentInsets = .init(top: 10, leading: 0, bottom: -10, trailing: 0)
                 return section
                 
             case .categoryCount, .categoryExpense, .artistCount, .artistExpense:
@@ -161,10 +159,10 @@ extension StatsViewController {
             layer.addSublayer(gradientLayer)
         }
         
+        @available(*, unavailable)
         required init?(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
-        
         
         override func layoutSubviews() {
             super.layoutSubviews()
@@ -172,5 +170,4 @@ extension StatsViewController {
             gradientLayer.frame = bounds
         }
     }
-
 }
