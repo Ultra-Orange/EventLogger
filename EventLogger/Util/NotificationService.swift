@@ -15,6 +15,7 @@ protocol NotificationServicing {
     func scheduleNotification(id: String, title: String, body: String, date: Date)
 }
 
+// TODO: 앱 실행 최초로 와야한다 -> 동기화가 그래야 됨
 final class NotificationService: NotificationServicing {
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
         UNUserNotificationCenter.current().requestAuthorization(

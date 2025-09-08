@@ -16,6 +16,7 @@ import SwiftData
 import SwiftUI
 import Then
 import UIKit
+import CoreData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
@@ -49,6 +50,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let bottomButton = GlowButton(title: "")
     
     private let selectedLocationRelay: PublishRelay<String>
+    
+    let notification = NSPersistentCloudKitContainer.eventChangedNotification
     
     // MARK: LifeCycle
     
@@ -291,10 +294,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
         
-        rx.viewWillAppear
-            .map { _ in .reloadCategories }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+
+        Observable.merge(
+            rx.viewWillAppear.map{ _ in },
+            NotificationCenter.default.rx.notification(notification).map{ _ in }
+        )
+        .map { _ in .reloadCategories }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
         
         categoryFieldView.categoryMenuButton.newCategoryRelay
             .map { .newCategory }
