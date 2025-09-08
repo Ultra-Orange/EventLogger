@@ -2,95 +2,28 @@
 //  InfoItemView.swift
 //  EventLogger
 //
-//  Created by Yoon on 8/22/25.
+//  Created by 김우성 on 9/5/25.
 //
 
+import Dependencies
 import SnapKit
 import Then
 import UIKit
-import Dependencies
 
 // 정보 카드 부분 뷰
 class InfoItemView: UIView {
-    // 정보 영역 컨테이너 뷰
     private let infoCardView = UIView().then {
         $0.backgroundColor = .systemGray6
         $0.layer.cornerRadius = 12
     }
-
-    // MARK: Label
-
-    private let dateLabel = UILabel().then {
-        $0.font = .font17Regular
+    
+    private let infoVStack = UIStackView().then {
+        $0.axis = .vertical
+        $0.spacing = 16
+        $0.alignment = .leading
+        $0.distribution = .fill
     }
-
-    private let categoryLabel = UILabel().then {
-        $0.font = .font17Regular
-    }
-
-    private let timelabel = UILabel().then {
-        $0.font = .font17Regular
-    }
-
-    private let locationLabel = UILabel().then {
-        $0.font = .font17Regular
-    }
-
-    private let artistsLabel = UILabel().then {
-        $0.font = .font17Regular
-        $0.numberOfLines = 0
-    }
-
-    private let expenseLabel = UILabel().then {
-        $0.font = .font17Regular
-    }
-
-    // MARK: SF Symbol
-
-    private let calendarIcon = UIImageView(image: UIImage(
-        systemName: "calendar",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    private let tagIcon = UIImageView(image: UIImage(
-        systemName: "tag",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    private let clockIcon = UIImageView(image: UIImage(
-        systemName: "clock",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    private let mapPinIcon = UIImageView(image: UIImage(
-        systemName: "mappin.and.ellipse",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    private let personIcon = UIImageView(image: UIImage(
-        systemName: "person",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    private let moneysignIcon = UIImageView(image: UIImage(
-        systemName: "wonsign.circle",
-        withConfiguration: .font17Regular
-    )).then {
-        $0.tintColor = .primary500
-    }
-
-    // MARK: Button
-
+    
     let addCalendarButton = UIButton(configuration: .defaultButton).then {
         $0.configuration?.title = "캘린더에 추가"
         $0.configuration?.baseBackgroundColor = .primary500
@@ -103,142 +36,88 @@ class InfoItemView: UIView {
         $0.configuration?.background.strokeColor = .primary500
         $0.configuration?.background.strokeWidth = 1
     }
-
-    // MARK: StackView
-
+    
     private let buttonStackView = UIStackView().then {
         $0.axis = .horizontal
         $0.spacing = 16
         $0.alignment = .fill
         $0.distribution = .fillEqually
     }
-
-    // MARK: init
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        // 뷰 주입
+        
+        setupUI()
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupUI() {
         addSubview(infoCardView)
-        infoCardView.addSubview(dateLabel)
-        infoCardView.addSubview(categoryLabel)
-        infoCardView.addSubview(timelabel)
-        infoCardView.addSubview(locationLabel)
-        infoCardView.addSubview(artistsLabel)
-        infoCardView.addSubview(expenseLabel)
-        infoCardView.addSubview(calendarIcon)
-        infoCardView.addSubview(tagIcon)
-        infoCardView.addSubview(clockIcon)
-        infoCardView.addSubview(mapPinIcon)
-        infoCardView.addSubview(personIcon)
-        infoCardView.addSubview(moneysignIcon)
-
+        infoCardView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        infoCardView.addSubview(infoVStack)
+        infoVStack.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview().inset(16)
+        }
+        
+        infoCardView.addSubview(buttonStackView)
+        buttonStackView.snp.makeConstraints {
+            $0.top.equalTo(infoVStack.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(42)
+            $0.bottom.equalToSuperview().inset(16)
+        }
         buttonStackView.addArrangedSubview(addCalendarButton)
         buttonStackView.addArrangedSubview(findDirectionsButton)
-
-        infoCardView.addSubview(buttonStackView)
-
-        // 오토 레이아웃
-        infoCardView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
+     }
+    
+    private func makeInfoHStack(icon: String, value: String) -> UIStackView {
+        let iconImageView = UIImageView(image: UIImage(systemName: icon, withConfiguration: .font17Regular)).then {
+            $0.tintColor = .primary500
+            
+            // SF Symbol의 가로폭이 달라지는 문제를 해결하기 위해 명시적으로 크기 고정
+            $0.snp.makeConstraints { make in
+                make.width.equalTo(20)
+                make.height.equalTo(20)
+            }
         }
-
-        calendarIcon.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(20)
-            $0.leading.equalToSuperview().offset(20)
+        
+        let titleLabel = UILabel().then {
+            $0.text = value
+            $0.font = .font17Regular
+            $0.numberOfLines = 0
         }
-
-        dateLabel.snp.makeConstraints {
-            $0.top.equalTo(calendarIcon)
-            $0.leading.equalTo(calendarIcon.snp.trailing).offset(10)
+        
+        let hStack = UIStackView(arrangedSubviews: [iconImageView, titleLabel]).then {
+            $0.axis = .horizontal
+            $0.spacing = 10
+            $0.alignment = .top
         }
-
-        tagIcon.snp.makeConstraints {
-            $0.top.equalTo(calendarIcon.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-        }
-
-        categoryLabel.snp.makeConstraints {
-            $0.top.equalTo(tagIcon)
-            $0.leading.equalTo(tagIcon.snp.trailing).offset(8)
-        }
-
-        clockIcon.snp.makeConstraints {
-            $0.top.equalTo(tagIcon.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-        }
-
-        timelabel.snp.makeConstraints {
-            $0.top.equalTo(clockIcon)
-            $0.leading.equalTo(clockIcon.snp.trailing).offset(11)
-        }
-
-        mapPinIcon.snp.makeConstraints {
-            $0.top.equalTo(clockIcon.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-        }
-
-        locationLabel.snp.makeConstraints {
-            $0.top.equalTo(mapPinIcon)
-            $0.leading.equalTo(mapPinIcon.snp.trailing).offset(12)
-        }
-
-        personIcon.snp.makeConstraints {
-            $0.top.equalTo(mapPinIcon.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-        }
-
-        artistsLabel.snp.makeConstraints {
-            $0.top.equalTo(personIcon)
-            $0.leading.equalTo(personIcon.snp.trailing).offset(12)
-            $0.trailing.equalToSuperview().inset(10)
-        }
-
-        moneysignIcon.snp.makeConstraints {
-            $0.top.equalTo(artistsLabel.snp.bottom).offset(16)
-            $0.leading.equalToSuperview().offset(20)
-        }
-
-        expenseLabel.snp.makeConstraints {
-            $0.top.equalTo(moneysignIcon)
-            $0.leading.equalTo(moneysignIcon.snp.trailing).offset(11)
-        }
-
-        buttonStackView.snp.makeConstraints {
-            $0.top.equalTo(moneysignIcon.snp.bottom).offset(20)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(39)
-            $0.bottom.equalToSuperview().offset(-20)
-        }
+        return hStack
     }
-
-    // 리액터에 바인딩 되는 값 주입
+    
     func configureView(eventItem: EventItem) {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let categories = swiftDataManager.fetchAllCategories()
-        let categoryName = categories.first{ $0.id == eventItem.categoryId }?.name
         
-        dateLabel.text = DateFormatter.toDateString(eventItem.startTime)
-        categoryLabel.text = categoryName
-        timelabel.text = makeTimeLabel(startTime: eventItem.startTime, endTime: eventItem.endTime)
-        locationLabel.text = eventItem.location
-        artistsLabel.text = makeArtistsLabel(eventItem.artists)
-        expenseLabel.text = "\(eventItem.expense.formatted(.number))원"
+        let date = DateFormatter.toDateString(eventItem.startTime)
+        let categoryName = categories.first { $0.id == eventItem.categoryId }?.name ?? ""
+        let time = "시작 \(DateFormatter.toTimeString(eventItem.startTime)) / 종료 \(DateFormatter.toTimeString(eventItem.endTime)) 예정"
+        let location = eventItem.location ?? ""
+        let artists = eventItem.artists.joined(separator: ", ")
+        let expense = "\(eventItem.expense.formatted(.number))원"
         
-    }
-
-    // 시간 라벨 String 리턴
-    private func makeTimeLabel(startTime: Date, endTime: Date) -> String {
-        "시작 \(DateFormatter.toTimeString(startTime)) / 종료 \(DateFormatter.toTimeString(endTime)) 예정"
-    }
-
-    // Artists 배열 String화
-    private func makeArtistsLabel(_ artists: [String]) -> String {
-        return artists.joined(separator: ", ")
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "calendar", value: date))
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "tag", value: categoryName))
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "clock", value: time))
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "mappin.and.ellipse", value: location))
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "person", value: artists))
+        infoVStack.addArrangedSubview(makeInfoHStack(icon: "wonsign.circle", value: expense))
     }
 }
