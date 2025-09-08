@@ -166,11 +166,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     // MARK: Binding
     
     override func bind(reactor: SettingsReactor) {
-        
-        @Dependency(\.swiftDataManager) var swiftDataManager
-        let events = swiftDataManager.fetchAllEvents()
-        print(events.first?.calendarEventId ?? "nil")
-        
+                
         // 카테고리 관리 탭 제스쳐
         categoryControlBackground.rx.tapGesture()
             .when(.recognized)

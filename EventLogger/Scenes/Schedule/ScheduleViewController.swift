@@ -16,6 +16,7 @@ import SwiftData
 import SwiftUI
 import Then
 import UIKit
+import CoreData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
@@ -49,6 +50,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     private let bottomButton = GlowButton(title: "")
     
     private let selectedLocationRelay: PublishRelay<String>
+    
+    let notification = NSPersistentCloudKitContainer.eventChangedNotification
     
     // MARK: LifeCycle
     
@@ -243,11 +246,28 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             })
             .disposed(by: disposeBag)
         
+        // TODO: State쪽에서 처리해야함
+        var characterSets = CharacterSet.decimalDigits
+        characterSets.insert(".")
+        
+        let expenseRelay = BehaviorRelay<Double>(value: 0)
+        expenseFieldView.textField.rx.text.orEmpty
+            .map { $0.components(separatedBy: characterSets.inverted).joined() }
+            .map { Double($0) ?? 0 }
+            .bind(to: expenseRelay)
+            .disposed(by: disposeBag)
+        
+        expenseRelay
+            .map { $0 == .zero ? "" : $0.formatted(.number) }
+            .distinctUntilChanged()
+            .bind(to: expenseFieldView.textField.rx.text)
+            .disposed(by: disposeBag)
+        
         // 하단버튼 탭
         bottomButton.rx.tap
-            .bind { [weak self] _ in
+            .withLatestFrom(expenseRelay)
+            .bind { [weak self] expense in
                 guard let self, let reactor = self.reactor else { return }
-
                 let payload = EventPayload(
                     title: inputTitleView.textField.text ?? "",
                     categoryId: categoryFieldView.selectedCategory?.id ?? UUID(),
@@ -255,18 +275,37 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                     startTime: dateRangeFieldView.startDate,
                     endTime: dateRangeFieldView.endDate,
                     location: reactor.currentState.selectedLocation.isEmpty
-                        ? nil
-                        : reactor.currentState.selectedLocation,
+                    ? nil
+                    : reactor.currentState.selectedLocation,
                     artists: artistsFieldView.tagsField.tags.map(\.text),
-                    expense: NumberFormatter().then {
-                        $0.numberStyle = .decimal
-                    }.number(from: expenseFieldView.textField.text ?? "")?.doubleValue ?? 0,
+                    expense: expense,
                     currency: .KRW, // MVP 기준 고정
                     memo: memoFieldView.textView.text ?? ""
                 )
-
+                
                 reactor.action.onNext(.sendEventPayload(payload))
             }
+            .disposed(by: disposeBag)
+        
+        reactor.state.map(\.categories)
+            .distinctUntilChanged()
+            .bind { [categoryFieldView] categories in
+                categoryFieldView.configure(categories: categories, initial: categoryFieldView.selectedCategory)
+            }
+            .disposed(by: disposeBag)
+        
+
+        Observable.merge(
+            rx.viewWillAppear.map{ _ in },
+            NotificationCenter.default.rx.notification(notification).map{ _ in }
+        )
+        .map { _ in .reloadCategories }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
+        
+        categoryFieldView.categoryMenuButton.newCategoryRelay
+            .map { .newCategory }
+            .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
     

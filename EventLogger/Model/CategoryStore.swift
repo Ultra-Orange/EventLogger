@@ -11,10 +11,10 @@ import UIKit
 // CategoryItem에 대응하는 SwiftData모델
 @Model
 final class CategoryStore {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    var position: Int
-    var colorId: Int
+    var id: UUID = UUID()
+    var name: String = ""
+    var position: Int = 0
+    var colorId: Int = 0
 
     init(id: UUID, name: String, position: Int, colorId: Int) {
         self.id = id

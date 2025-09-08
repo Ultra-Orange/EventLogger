@@ -7,20 +7,16 @@
 
 import Foundation
 import SwiftData
+import UIKit
 
 // 앱 최초실행시 카테고리 부여
 
 enum CategorySeeder {
+    
     static func runIfNeeded(modelContext: ModelContext) throws {
-//        let didSetup = UserDefaults.standard.bool(forKey: UDKey.didSetupDefaultCategories.rawValue)
-        @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
-        var didSetup: Bool
-
-        // UserDefaults에 실행기록이 없으면
-        guard !didSetup else { return }
-
+        
         let names = ["콘서트", "페스티벌", "연극", "뮤지컬", "팬미팅"]
-
+        
         for (index, name) in names.enumerated() {
             let store = CategoryStore(
                 id: UUID(),
@@ -39,10 +35,11 @@ enum CategorySeeder {
             )
             modelContext.insert(store)
         }
-
+        
         try modelContext.save()
-
-//        UserDefaults.standard.set(true, forKey: UDKey.didSetupDefaultCategories.rawValue)
-        didSetup = true
+        
+        @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
+        var didSetupDefaultCategories: Bool
+        didSetupDefaultCategories = true
     }
 }

@@ -12,6 +12,7 @@ import SnapKit
 import SwiftUI
 import Then
 import UIKit
+import CoreData
 
 final class EventListViewController: BaseViewController<EventListReactor> {
     private let backgroundGradientView = GradientBackgroundView()
@@ -82,6 +83,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.tintColor = .neutral50
     }
     
+    let notification = NSPersistentCloudKitContainer.eventChangedNotification
+    
     override func setupUI() {
         view.backgroundColor = .appBackground
         
@@ -114,23 +117,25 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
     
     override func bind(reactor: EventListReactor) {
-        let categories = reactor.currentState.categories
-        print(categories)
+        
         
         loadViewIfNeeded()
         
         // 액션
-        // 최초 로드
-        rx.viewWillAppear
-            .flatMap { _ in
-                Observable.from([
-                    EventListReactor.Action.reloadEventItems,
-                    EventListReactor.Action.reloadCategories
-                ])
-            }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-        
+        // 최초 로드, 동기화시 리로드
+        Observable.merge(
+            rx.viewWillAppear.map{ _ in },
+            NotificationCenter.default.rx.notification(notification).map{ _ in }
+        )
+        .flatMap { _ in
+            Observable.from([
+                EventListReactor.Action.reloadEventItems,
+                EventListReactor.Action.reloadCategories
+            ])
+        }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
+         
         segmentedControl.rx.selectedSegmentIndex
             .map { index -> EventListReactor.Action in
                 switch index {
@@ -205,6 +210,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
                 )
             })
             .disposed(by: disposeBag)
+        
     }
 }
 

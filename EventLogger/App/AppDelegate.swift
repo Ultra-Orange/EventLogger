@@ -5,12 +5,18 @@
 //  Created by 김우성 on 8/20/25.
 //
 
+import UserNotifications
 import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions : [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        Task {
+            _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            application.registerForRemoteNotifications()
+        }
+
         return true
     }
 

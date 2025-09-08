@@ -15,13 +15,16 @@ import RxSwift
 final class ScheduleReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
+        case reloadCategories
         case selectLocation(String)
         case sendEventPayload(EventPayload)
+        case newCategory
     }
     
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setLocation(String)
+        case setCategories([CategoryItem])
     }
     
     // View의 상태 정의 (현재 View의 상태값)
@@ -87,6 +90,9 @@ final class ScheduleReactor: BaseReactor {
     func mutate(action: Action) -> Observable<Mutation> {
         @Dependency(\.swiftDataManager) var swiftDataManager
         switch action {
+        case .reloadCategories:
+            let categories = swiftDataManager.fetchAllCategories()
+            return .just(.setCategories(categories))
         case let .selectLocation(location):
             return .just(.setLocation(location))
         case let .sendEventPayload(payload):
@@ -130,6 +136,10 @@ final class ScheduleReactor: BaseReactor {
                 steps.accept(AppStep.eventList)
                 return .empty()
             }
+
+        case .newCategory:
+            steps.accept(AppStep.createCategory)
+            return .empty()
         }
     }
     
@@ -140,6 +150,9 @@ final class ScheduleReactor: BaseReactor {
         switch mutation {
         case let .setLocation(location):
             newState.selectedLocation = location
+
+        case let .setCategories(categories):
+            newState.categories = categories
         }
         return newState
     }
