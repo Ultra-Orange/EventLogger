@@ -11,6 +11,7 @@ import RxCocoa
 import Then
 import SnapKit
 import Dependencies
+import CoreData
 
 // MARK: - StatsViewController
 
@@ -48,6 +49,8 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.showsVerticalScrollIndicator = true
         $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     }
+    
+    let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
     // MARK: Diffable
     enum StatsSection: Hashable {
@@ -130,11 +133,14 @@ final class StatsViewController: BaseViewController<StatsReactor> {
             .map { StatsReactor.Action.setScope($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-
-        Observable.just(())
-            .map { StatsReactor.Action.viewDidLoad }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
+        
+        Observable.merge(
+            rx.viewDidLoad.map{ _ in },
+            NotificationCenter.default.rx.notification(notification).map{ _ in }
+        )
+        .map { _ in .refresh }
+        .bind(to: reactor.action)
+        .disposed(by: disposeBag)
 
         // Output
         reactor.state
