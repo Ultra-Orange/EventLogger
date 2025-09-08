@@ -175,11 +175,15 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         let isTitleValid = inputTitleView.textField.rx.text
             .orEmpty
             .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .distinctUntilChanged()
-            .share(replay: 1)
         
-        // 버튼 활성 바인딩 (UIButton은 isEnabled=false면 탭 이벤트도 막힘)
-        isTitleValid
+        // 카테고리 존재 여부
+        let hasCategory = reactor.state
+            .map(\.categories)
+            .map { !$0.isEmpty }
+        
+        // 버튼 활성 바인딩 (제목 적었고, 카테고리 0개 아닐 때) (UIButton은 isEnabled=false면 탭 이벤트도 막힘)
+        Observable
+            .combineLatest(isTitleValid, hasCategory) { $0 && $1 }
             .bind(to: bottomButton.rx.isEnabled)
             .disposed(by: disposeBag)
         
