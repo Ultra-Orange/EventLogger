@@ -24,6 +24,7 @@ final class ArtistsFieldContainerView: UIView {
         $0.backgroundColor = .systemGray5
         $0.layer.cornerRadius = 10
         $0.clipsToBounds = true
+        $0.textField.returnKeyType = .done
 
         $0.placeholder = "출연자를 입력하세요"
         $0.placeholderFont = .font16Regular
