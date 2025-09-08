@@ -41,6 +41,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
     
+    private let addButton = UIButton.makeAddButton()
+    
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout()).then {
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = true
@@ -57,16 +59,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     ).then {
         $0.tintColor = .neutral50
         $0.isSpringLoaded = true
-    }
-    
-    private lazy var addButton = UIBarButtonItem(
-//        image: UIImage(systemName: "note.text.badge.plus"),
-        image: UIImage(systemName: "plus"),
-        style: .plain,
-        target: nil,
-        action: nil
-    ).then {
-        $0.tintColor = .neutral50
     }
     
     private lazy var statisticsButton = UIBarButtonItem(
@@ -102,9 +94,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.leading.trailing.bottom.equalToSuperview()
         }
         
+        view.addSubview(addButton)
+        addButton.snp.makeConstraints {
+            $0.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+            $0.size.equalTo(59)
+        }
+        
         navigationItem.backButtonDisplayMode = .minimal
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-        navigationItem.rightBarButtonItems = [menuButton, addButton, statisticsButton]
+        navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
     }
     
     override func bind(reactor: EventListReactor) {
