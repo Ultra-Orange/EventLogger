@@ -36,12 +36,7 @@ final class GradientBackgroundView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        // 만약 layerClass를 쓰면 gradient = self.layer as! CAGradientLayer 로 바로 접근 가능
-        if let g = layer as? CAGradientLayer {
-            gradient.colors = nil // dummy, 곧 updateGradient에서 세팅
-        } else {
-            layer.addSublayer(gradient)
-        }
+        gradient.colors = nil
         isUserInteractionEnabled = false // 배경이므로 이벤트 막지 않게
         updateGradient()
     }

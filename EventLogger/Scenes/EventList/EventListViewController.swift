@@ -329,13 +329,12 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         }
 
         // DataSource
-        let ds = DS(collectionView: collectionView) { [weak self] cv, indexPath, item in
-            guard let self else { return UICollectionViewCell() }
+        let ds = DS(collectionView: collectionView) { cv, indexPath, item in
             return cv.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
 
-        ds.supplementaryViewProvider = { [weak self] cv, kind, indexPath in
-            guard let self, kind == UICollectionView.elementKindSectionHeader else { return nil }
+        ds.supplementaryViewProvider = { cv, kind, indexPath in
+            guard kind == UICollectionView.elementKindSectionHeader else { return nil }
             return cv.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
 
