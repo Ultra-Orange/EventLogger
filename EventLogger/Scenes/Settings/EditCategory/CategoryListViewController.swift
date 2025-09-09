@@ -100,7 +100,7 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
         deleteCategoryRelay
             .withUnretained(self)
             .flatMap { `self`, item in
-                UIAlertController.rx.alert(on: self, title: "카테고리 삭제", message: "정말로 이 카테고리 삭제하시겠습니까?", actions: [
+                UIAlertController.rx.alert(on: self, title: "카테고리 삭제", message: "정말로 이 카테고리 삭제할까요?", actions: [
                     .cancel("취소"),
                     .destructive("삭제", payload: item),
                 ])
