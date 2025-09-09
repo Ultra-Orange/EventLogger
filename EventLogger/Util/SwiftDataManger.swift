@@ -107,7 +107,6 @@ struct SwiftDataManager {
 
     // Delete
     func deleteCategory(id: UUID) throws {
-        let allCategories = fetchAllCategories()
 
         // 조건1 등록된 이벤트가 존재하는 카테고리는 삭제 불가
         let stats = fetchCategoryStatistics()
