@@ -33,10 +33,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         $0.backgroundColor = .clear
         $0.contentMode = .scaleAspectFit
     }
-    
-    private let deleteLabel = UILabel().then {
-        $0.text = "이미지 삭제"
-        $0.font = .font12Regular
+        
+    private let removeImageButton = UIButton(configuration: .removeImgButton).then {
+        $0.configuration?.title = "이미지 삭제"
     }
     
     private let inputTitleView = TitleFieldContainerView()
@@ -87,7 +86,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
         
-        contentView.addSubview(deleteLabel)
+        contentView.addSubview(removeImageButton)
         contentView.addSubview(addImageView)
         contentView.addSubview(imageView)
         contentView.addSubview(inputTitleView)
@@ -100,17 +99,16 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(bottomButton)
         
         // 삭제 라벨 히든/사용불가 처리
-        deleteLabel.isHidden = true
-        deleteLabel.isUserInteractionEnabled = true
+        removeImageButton.isHidden = true
         
         // 오토 레이아웃
-        deleteLabel.snp.makeConstraints {
+        removeImageButton.snp.makeConstraints {
             $0.top.equalToSuperview().offset(10)
             $0.trailing.equalToSuperview()
         }
         
         addImageView.snp.makeConstraints {
-            $0.top.equalTo(deleteLabel.snp.bottom).offset(8)
+            $0.top.equalTo(removeImageButton.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
         }
         
@@ -210,11 +208,10 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
         
         // 이미지 삭제 라벨
-        deleteLabel.rx.tapGesture()
-            .when(.recognized)
+        removeImageButton.rx.tap
             .bind { [weak self] _ in
                 self?.imageView.image = nil
-                self?.deleteLabel.isHidden = true
+                self?.removeImageButton.isHidden = true
             }
             .disposed(by: disposeBag)
         
@@ -391,7 +388,7 @@ extension ScheduleViewController: PHPickerViewControllerDelegate {
                 guard let self, let uiImage = image as? UIImage else { return }
                 DispatchQueue.main.async {
                     self.imageView.image = uiImage
-                    self.deleteLabel.isHidden = false
+                    self.removeImageButton.isHidden = false
                 }
             }
         }

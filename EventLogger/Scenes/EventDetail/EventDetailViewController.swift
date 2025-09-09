@@ -150,7 +150,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         deleteActionRelay
             .withUnretained(self)
             .flatMap { `self`, _ in
-                UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제하시겠습니까?", actions: [
+                UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제할까요?", actions: [
                     .cancel("취소"),
                     .destructive("삭제", payload: .deleteEvent(eventItem)),
                 ])
@@ -182,7 +182,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                 case .success:
                     alert = UIAlertController(
                         title: "캘린더 저장 완료",
-                        message: "이 이벤트가 캘린더에 저장되었습니다.",
+                        message: "이 이벤트를 캘린더에 저장했어요.",
                         preferredStyle: .alert
                     )
                 case .denied:

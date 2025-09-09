@@ -109,18 +109,13 @@ struct SwiftDataManager {
     func deleteCategory(id: UUID) throws {
         let allCategories = fetchAllCategories()
 
-        // 조건 1) 카테고리가 하나만 남아있으면 삭제 불가
-        guard allCategories.count > 1 else {
-            throw SwiftDataMangerError.cannotDeleteLastCategory
-        }
-
-        // 조건 2) 등록된 이벤트가 존재하는 카테고리는 삭제 불가
+        // 조건1 등록된 이벤트가 존재하는 카테고리는 삭제 불가
         let stats = fetchCategoryStatistics()
         if stats.contains(where: { $0.category.id == id && $0.count > 0 }) {
             throw SwiftDataMangerError.cannotDeleteUsedCategory
         }
 
-        // 위 두 조건을 모두 통과해야 삭제진행
+        // 위 조건을 모두 통과해야 삭제진행
         if let target = fetchOneCategoryStore(id: id) {
             modelContext.delete(target)
             saveContext()
@@ -280,5 +275,4 @@ extension SwiftDataManager {
 
 enum SwiftDataMangerError: Error {
     case cannotDeleteUsedCategory
-    case cannotDeleteLastCategory
 }

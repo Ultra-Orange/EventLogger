@@ -72,6 +72,17 @@ extension UIButton.Configuration {
         return config
     }
     
+    static var removeImgButton: UIButton.Configuration {
+        var config = plain()
+        config.titleTextAttributesTransformer = .init { attr in
+            var newAttr = attr
+            newAttr.font = UIFont.font15Regular
+            newAttr.foregroundColor = .neutral50
+            return newAttr
+        }
+        return config
+    }
+    
     static var addButton: UIButton.Configuration {
         var config = filled()
         config.cornerStyle = .capsule

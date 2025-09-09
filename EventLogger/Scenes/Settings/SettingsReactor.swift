@@ -79,7 +79,7 @@ final class SettingsReactor: BaseReactor {
                         } else {
                             self.settingsService.pushNotificationEnabled = false
                             observer.onNext(.setPushEnabled(false))
-                            observer.onNext(.showDeniedAlert("알림 권한이 꺼져 있습니다.\n설정 > 알림에서 허용해주세요."))
+                            observer.onNext(.showDeniedAlert("알림 권한이 없어요.\n설정 > 알림에서 허용해주세요."))
                         }
                         observer.onCompleted()
                     }
@@ -116,7 +116,7 @@ final class SettingsReactor: BaseReactor {
                             return .setCalendarEnabled(true)
                         } else {
                             self.settingsService.autoSaveToCalendar = false
-                            return .showDeniedAlert("캘린더 접근 권한이 꺼져 있습니다.\n설정 > 캘린더에서 허용해주세요.")
+                            return .showDeniedAlert("캘린더 접근 권한이 없어요.\n설정 > 캘린더에서 허용해주세요.")
                         }
                     }
             } else {
