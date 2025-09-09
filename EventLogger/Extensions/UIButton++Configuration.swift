@@ -24,6 +24,18 @@ extension UIButton {
         }
         return button
     }
+    
+    // EventList용 우하단 추가 버튼 메이커
+    static func makeAddButton() -> UIButton {
+        let button = UIButton(configuration: .addButton)
+        button.layer.shadowColor = UIColor.primary500.cgColor
+        button.layer.shadowOpacity = 1
+        button.layer.shadowRadius = 10
+        button.layer.shadowOffset = .zero
+        button.layer.masksToBounds = false
+        button.clipsToBounds = false
+        return button
+    }
 }
 
 extension UIButton.Configuration {
@@ -57,6 +69,17 @@ extension UIButton.Configuration {
             
             return newAttr
         }
+        return config
+    }
+    
+    static var addButton: UIButton.Configuration {
+        var config = filled()
+        config.cornerStyle = .capsule
+        config.baseBackgroundColor = .primary500
+        config.baseForegroundColor = .neutral50
+        config.image = UIImage(systemName: "plus")?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 24, weight: .bold))
+        
         return config
     }
     

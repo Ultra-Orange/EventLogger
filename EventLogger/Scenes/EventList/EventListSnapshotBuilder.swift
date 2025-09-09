@@ -27,7 +27,7 @@ enum EventListSnapshotBuilder {
     
     static func build(input: Input) -> Output {
         let calendar = input.calendar
-        let today = calendar.startOfDay(for: input.today)
+        let now = input.today
         
         // 1) 상태 필터 (전체 / 참여예정 / 참여완료)
         let stateFiltered: [EventItem] = {
@@ -35,9 +35,9 @@ enum EventListSnapshotBuilder {
             case .all:
                 input.allItems
             case .upcoming:
-                input.allItems.filter { $0.startTime >= today }
+                input.allItems.filter { $0.startTime >= now }
             case .completed:
-                input.allItems.filter { $0.startTime < today }
+                input.allItems.filter { $0.startTime < now }
             }
         }()
         
@@ -51,7 +51,7 @@ enum EventListSnapshotBuilder {
         
         // 3) 다음 일정: 현재 필터링 결과에서 "가장 가까운 미래 1개" (일반 전체 그룹과 중복 허용)
         let nextUp: EventItem? = filtered
-            .filter { $0.startTime >= today }
+            .filter { $0.startTime >= now }
             .min(by: { $0.startTime < $1.startTime })
         
         // 4) 월 그룹
