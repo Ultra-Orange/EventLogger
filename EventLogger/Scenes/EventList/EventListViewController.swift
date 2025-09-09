@@ -71,10 +71,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     // MARK: UI
     private let backgroundGradientView = GradientBackgroundView()
 
-    private let titleLabel = UILabel().then {
-        $0.text = "Event Logger"
-        $0.textColor = .primary500
-        $0.font = .font17Semibold
+    private let titleView = UIImageView().then {
+        $0.image = UIImage(named: "MainLogo")
     }
 
     private lazy var menuButton = UIBarButtonItem(
@@ -142,7 +140,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     // MARK: Lifecycle
     override func setupUI() {
         navigationItem.backButtonDisplayMode = .minimal
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
         navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
 
         view.backgroundColor = .appBackground
