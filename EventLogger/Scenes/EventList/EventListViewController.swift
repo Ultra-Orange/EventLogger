@@ -120,9 +120,9 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     }
 
     private let emptyValueLabel = UILabel().then {
-        $0.text = "일정을 등록하고 한눈에 관리해 보세요"
+        $0.text = "일정을 등록하면 전체 일정을 한눈에 확인할 수 있어요\n참여 하루 전, 놓치지 않도록 알림도 챙겨드려요"
         $0.textColor = .neutral50
-        $0.font = .font17Regular
+        $0.font = .font14Regular
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
