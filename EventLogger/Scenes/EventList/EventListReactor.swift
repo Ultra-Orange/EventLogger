@@ -44,7 +44,6 @@ final class EventListReactor: BaseReactor {
 
     // 생성자에서 초기 상태 설정
     let initialState: State
-    @Dependency(\.modelContext) var modelContext
     @Dependency(\.swiftDataManager) var swiftDataManager
 
     init() {

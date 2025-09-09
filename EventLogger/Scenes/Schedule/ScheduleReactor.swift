@@ -136,7 +136,12 @@ final class ScheduleReactor: BaseReactor {
                 
                 if settingsService.autoSaveToCalendar {
                     calendarService.update(eventItem: updated)
-                        .subscribe()
+                        .subscribe(onSuccess: { tag in   // update 결과 태그 반환 받음
+                            @Dependency(\.swiftDataManager) var swiftDataManager
+                            var refreshed = updated
+                            refreshed.calendarEventId = tag   // 태그 갱신
+                            swiftDataManager.updateEvent(id: refreshed.id, event: refreshed)
+                        })
                         .disposed(by: disposeBag)
                 }
                 
@@ -144,7 +149,7 @@ final class ScheduleReactor: BaseReactor {
                 steps.accept(AppStep.eventList)
                 return .empty()
             }
-
+            
         case .newCategory:
             steps.accept(AppStep.createCategory)
             return .empty()
@@ -158,7 +163,7 @@ final class ScheduleReactor: BaseReactor {
         switch mutation {
         case let .setLocation(location):
             newState.selectedLocation = location
-
+            
         case let .setCategories(categories):
             newState.categories = categories
         }
@@ -177,10 +182,10 @@ private extension ScheduleReactor {
             .flatMap { [calendarService] granted -> Single<String> in
                 granted ? calendarService.save(eventItem: item) : .never()
             }
-            .subscribe(onSuccess: { identifier in
+            .subscribe(onSuccess: { tag in
                 @Dependency(\.swiftDataManager) var swiftDataManager
                 var updated = item
-                updated.calendarEventId = identifier
+                updated.calendarEventId = tag
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
             })
             .disposed(by: disposeBag)

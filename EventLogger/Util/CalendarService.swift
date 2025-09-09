@@ -16,14 +16,19 @@ protocol CalendarServicing {
     func requestAccess() -> Single<Bool>
     /// EventItem을 기본 캘린더에 저장
     func save(eventItem: EventItem) -> Single<String>
-    func update(eventItem: EventItem) -> Single<Void>
-    func delete(eventId: String) -> Single<Void>
+    func update(eventItem: EventItem) -> Single<String>
+    func delete(eventItem: EventItem) -> Single<Void>
 }
 
 // MARK: 구현
 
 final class CalendarService: CalendarServicing {
     private let store = EKEventStore()
+    
+    @UserSetting(key: UDKey.appCalendarName, defaultValue: "이벤트 로거")
+    var appCalendarName: String
+    @UserSetting(key: UDKey.appCalendarIdKey, defaultValue: "")
+    var appCalendarId: String
     
     // 권한 요청
     func requestAccess() -> Single<Bool> {
@@ -35,9 +40,7 @@ final class CalendarService: CalendarServicing {
                 single(.success(true))
                 
             case .writeOnly:
-                // "쓰기 전용" 권한. 이벤트 저장에는 충분하지만
-                // 읽기가 필요한 기능이 있다면 false를 반환하도록 정책 변경 필요
-                single(.success(true))
+                single(.success(false))
                 
             case .denied, .restricted:
                 single(.success(false))
@@ -45,8 +48,8 @@ final class CalendarService: CalendarServicing {
             case .notDetermined:
                 Task {
                     do {
-                        // 최소권한: 쓰기 권한만 요청
-                        let granted = try await self.store.requestWriteOnlyAccessToEvents()
+                        // 모든권한 요처
+                        let granted = try await self.store.requestFullAccessToEvents()
                         single(.success(granted))
                     } catch {
                         single(.failure(error))
@@ -60,33 +63,72 @@ final class CalendarService: CalendarServicing {
         }
     }
     
+    // iCloud 소스 찾기
+    private func findICloudSource() -> EKSource? {
+        return store.sources.first {
+            $0.sourceType == .calDAV && $0.title.localizedCaseInsensitiveContains("iCloud")
+        }
+    }
+    
+    // 이벤트로거 캘린더 보장
+    private func ensureAppCalendar() throws -> EKCalendar {
+        // 1) 저장된 identifier가 있으면 우선 시도
+        if !appCalendarId.isEmpty,
+           let cal = store.calendar(withIdentifier: appCalendarId) {
+            return cal
+        }
+        
+        // 2) iCloud 소스 필수
+        guard let icloud = findICloudSource() else {
+            throw NSError(
+                domain: "CalendarService",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "iCloud 캘린더 소스를 찾을 수 없습니다. iOS 설정에서 iCloud 캘린더를 활성화해 주세요."]
+            )
+        }
+        
+        // 3) 동일 이름의 기존 캘린더가 있으면 사용
+        if let existing = store.calendars(for: .event)
+            .first(where: { $0.source == icloud && $0.title == appCalendarName }) {
+            appCalendarId = existing.calendarIdentifier // UserDefaults에 보관
+            return existing
+        }
+        
+        // 4) 새 캘린더 생성
+        let newCal = EKCalendar(for: .event, eventStore: store)
+        newCal.title = appCalendarName
+        newCal.source = icloud
+        // newCal.cgColor = UIColor.systemBlue.cgColor // 원하면 색상 지정 가능
+        
+        try store.saveCalendar(newCal, commit: true)
+        appCalendarId = newCal.calendarIdentifier // UserDefaults에 보관
+        return newCal
+    }
+    
     func save(eventItem: EventItem) -> Single<String> {
         return Single.create { [store] single in
             // 캘린더(기본 캘린더)에 이벤트 생성
             let event = EKEvent(eventStore: store)
-            // TODO: identifer 활용한 리팩토링
-            //            print(event.eventIdentifier)
-            event.calendar = store.defaultCalendarForNewEvents
+            
+            do {
+                let calendar = try self.ensureAppCalendar()
+                event.calendar = calendar
+            } catch {
+                single(.failure(error))
+                return Disposables.create()
+            }
             
             event.title = eventItem.title
             event.startDate = eventItem.startTime
             event.endDate = eventItem.endTime
             event.location = eventItem.location
-            event.notes = eventItem.memo
             
-            // 이미지/아티스트/통화 등은 EventKit에 직접 매핑할 필드가 없으므로 메모에 보조정보를 남기는 식으로
-            if !eventItem.artists.isEmpty {
-                let artistsLine = "\n\n[출연자] " + eventItem.artists.joined(separator: ", ")
-                event.notes = (event.notes ?? "") + artistsLine
-            }
-            if eventItem.expense > 0 {
-                let expenseLine = "\n[비용] \(eventItem.currency.rawValue) \(eventItem.expense)"
-                event.notes = (event.notes ?? "") + expenseLine
-            }
+            let tag = self.makeIdentifierTag(for: eventItem)
+            event.notes = self.buildNotes(for: eventItem, with: tag)
             
             do {
                 try store.save(event, span: .thisEvent, commit: true)
-                single(.success(event.eventIdentifier))
+                single(.success(tag))
             } catch {
                 single(.failure(error))
             }
@@ -94,57 +136,116 @@ final class CalendarService: CalendarServicing {
         }
     }
     
-    func update(eventItem: EventItem) -> Single<Void> {
-        // 1) identifier가 없으면 아직 달력에 없다고 판단하고 “넘김”
-        guard let id = eventItem.calendarEventId else { return .just(()) }
+    func update(eventItem: EventItem) -> Single<String> {
+        return Single.create { single in
+            let key = eventItem.calendarEventId ?? ""
+            guard let event = self.findEvent(byTag: key,
+                                             near: eventItem.startTime,
+                                             endDate: eventItem.endTime) else {
+                single(.success(key))
+                return Disposables.create()
+            }
+            
+            event.title = eventItem.title
+            event.startDate = eventItem.startTime
+            event.endDate = eventItem.endTime
+            event.location = eventItem.location
+            
+            let tag = self.makeIdentifierTag(for: eventItem)
+                        event.notes = self.buildNotes(for: eventItem, with: tag)
+            
+            do {
+                try self.store.save(event, span: .thisEvent, commit: true)
+                single(.success((tag)))
+            } catch {
+                single(.failure(error))
+            }
+            return Disposables.create()
+        }
+    }
+    
+    // MARK: Delete
+    func delete(eventItem: EventItem) -> Single<Void> {
+        return Single.create { single in
+            guard let tag = eventItem.calendarEventId,
+                  let event = self.findEvent(byTag: tag,
+                                             near: eventItem.startTime,
+                                             endDate: eventItem.endTime) else {
+                single(.success(()))
+                return Disposables.create()
+            }
+            do {
+                try self.store.remove(event, span: .thisEvent, commit: true)
+                single(.success(()))
+            } catch {
+                single(.failure(error))
+            }
+            return Disposables.create()
+        }
+    }
+    
+    // 캘린더에서 이벤트 고유식별 태그 생성
+    private func makeIdentifierTag(for item: EventItem) -> String {
+        // UUID 앞 8자리
+        let shortUUID = item.id.uuidString.replacingOccurrences(of: "-", with: "").prefix(8)
         
-        return Single.create { [store] single in
-            // 2) 기존 이벤트 찾아서 필드만 갱신
-            guard let event = store.event(withIdentifier: id) else {
-                // 다음 단계에서: 못 찾는 경우 새로 만들고 id 갱신 처리 예정
-                single(.success(()))
-                return Disposables.create()
-            }
-            
-            event.title = eventItem.title
-            event.startDate = eventItem.startTime
-            event.endDate = eventItem.endTime
-            event.location = eventItem.location
-            event.notes = eventItem.memo
-            
-            if !eventItem.artists.isEmpty {
-                let artistsLine = "\n\n[출연자] " + eventItem.artists.joined(separator: ", ")
-                event.notes = (event.notes ?? "") + artistsLine
-            }
-            if eventItem.expense > 0 {
-                let expenseLine = "\n[비용] \(eventItem.currency.rawValue) \(eventItem.expense)"
-                event.notes = (event.notes ?? "") + expenseLine
-            }
-            
-            do {
-                try store.save(event, span: .thisEvent, commit: true)
-                single(.success(()))
-            } catch {
-                single(.failure(error))
-            }
-            return Disposables.create()
-        }
+        // 날짜 (전화번호처럼 안 보이도록 구분자 유지)
+        let df = DateFormatter()
+        df.dateFormat = "yyMMdd_HHmm"
+        let ts = df.string(from: item.startTime)
+        
+        // 제목 앞 10자 (개행/공백 제거)
+        let title10 = item.title
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\r", with: " ")
+            .trimmingCharacters(in: .whitespaces)
+            .prefix(10)
+        
+        // 두 줄 구성
+        return "EL:\(shortUUID)_\(ts)\n\(title10)"
     }
     
-    func delete(eventId: String) -> Single<Void> {
-        return Single.create { [store] single in
-            guard let event = store.event(withIdentifier: eventId) else {
-                // 이미 사라진 경우로 간주 (성공 처리)
-                single(.success(()))
-                return Disposables.create()
-            }
-            do {
-                try store.remove(event, span: .thisEvent, commit: true)
-                single(.success(()))
-            } catch {
-                single(.failure(error))
-            }
-            return Disposables.create()
+    // 노트 조립 태그
+    private func buildNotes(for item: EventItem, with tag: String) -> String {
+        var notes = tag
+        let memo = (item.memo).trimmingCharacters(in: .whitespacesAndNewlines)
+        if !memo.isEmpty { notes += "\n\n" + memo }
+        if !item.artists.isEmpty {
+            notes += "\n\n[출연자] " + item.artists.joined(separator: ", ")
         }
+        if item.expense > 0 {
+            notes += "\n[비용] \(item.currency.rawValue) \(item.expense)"
+        }
+        return notes
+    }
+    
+    private func findEvent(byTag tag: String, near start: Date, endDate: Date) -> EKEvent? {
+        guard let calendar = try? ensureAppCalendar() else { return nil }
+        let cal = Calendar.current
+
+        // 1) 1차: 새 입력값 근처 (start -1일 ~ start +1일)
+        let start1 = cal.date(byAdding: .day, value: -1, to: start) ?? start
+        let end1   = cal.date(byAdding: .day, value:  1, to: start) ?? start
+        if let hit = findEvent(byTag: tag, in: start1...end1, calendar: calendar) {
+            return hit
+        }
+
+        // 2) 2차: 넓은 fallback (start -180일 ~ start +180일)  // 대범위 보정
+        let start2 = cal.date(byAdding: .day, value: -180, to: start) ?? start
+        let end2   = cal.date(byAdding: .day, value:  180, to: start) ?? start
+        return findEvent(byTag: tag, in: start2...end2, calendar: calendar)
+    }
+
+    private func findEvent(byTag tag: String, in range: ClosedRange<Date>, calendar: EKCalendar) -> EKEvent? {
+        let predicate = store.predicateForEvents(withStart: range.lowerBound, end: range.upperBound, calendars: [calendar])
+        let events = store.events(matching: predicate)
+
+        // start 동일 우선 → 태그 포함 순으로 매칭
+        if let exact = events.first(where: {
+            $0.notes?.contains(tag) == true && Calendar.current.isDate($0.startDate, inSameDayAs: range.lowerBound)
+        }) {
+            return exact
+        }
+        return events.first(where: { $0.notes?.contains(tag) == true })
     }
 }

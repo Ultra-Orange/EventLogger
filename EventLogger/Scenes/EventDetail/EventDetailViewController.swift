@@ -152,7 +152,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .flatMap { `self`, _ in
                 UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제하시겠습니까?", actions: [
                     .cancel("취소"),
-                    .destructive("삭제", payload: .deleteEvent(eventItem.id, eventItem.calendarEventId)),
+                    .destructive("삭제", payload: .deleteEvent(eventItem)),
                 ])
             }
             .bind(to: reactor.action)

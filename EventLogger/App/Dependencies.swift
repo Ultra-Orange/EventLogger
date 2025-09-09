@@ -11,11 +11,6 @@ import SwiftData
 
 // 실제 사용할 의존성 주입된 변수
 extension DependencyValues {
-    var modelContext: ModelContext {
-        get { self[ModelContextKey.self] }
-        set { self[ModelContextKey.self] = newValue }
-    }
-
     var swiftDataManager: SwiftDataManager {
         get { self[SwiftDataManagerKey.self] }
         set { self[SwiftDataManagerKey.self] = newValue }
@@ -37,20 +32,6 @@ extension DependencyValues {
     }
 }
 
-// MARK: ModelContext
-
-private enum ModelContextKey: DependencyKey {
-    static var liveValue: ModelContext {
-        ModelContext(Persistence.container)
-    }
-
-    static var testValue: ModelContext {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let schema = Schema([CategoryStore.self, EventStore.self])
-        let container = try! ModelContainer(for: schema, configurations: config)
-        return ModelContext(container)
-    }
-}
 
 // MARK: SwiftData Manager
 
@@ -78,8 +59,6 @@ private enum NotificationServiceKey: DependencyKey {
     static var liveValue: NotificationServicing = NotificationService()
     static var testValue: NotificationServicing = NotificationService() // 테스트용
 }
-
-extension ModelContext: @unchecked @retroactive Sendable {}
 
 
 

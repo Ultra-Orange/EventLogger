@@ -26,7 +26,7 @@ final class EventDetailReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
     enum Action {
         case moveToEdit(EventItem)
-        case deleteEvent(UUID, String?)
+        case deleteEvent(EventItem)
         case addToCalendarTapped
     }
     
@@ -60,20 +60,18 @@ final class EventDetailReactor: BaseReactor {
         case let .moveToEdit(item):
             steps.accept(AppStep.updateSchedule(item))
             return .empty()
-        case let .deleteEvent(eventId, calendarId):
+        case let .deleteEvent(eventItem):
             @Dependency(\.swiftDataManager) var swiftDataManager
-            swiftDataManager.deleteEvent(id: eventId)
+            swiftDataManager.deleteEvent(id: eventItem.id)
             
             // 캘린더에도 삭제 반영
-            if let calendarId {
-                calendarService.delete(eventId: calendarId)
-                    .subscribe()
-                    .disposed(by: disposeBag)
-            }
+            calendarService.delete(eventItem: eventItem)
+                 .subscribe()
+                 .disposed(by: disposeBag)
             
             // 알림도 취소
             @Dependency(\.notificationService) var notificationService
-            notificationService.cancelNotification(id: eventId.uuidString)
+            notificationService.cancelNotification(id: eventItem.id.uuidString)
             
             steps.accept(AppStep.eventList)
             return .empty()
