@@ -48,6 +48,34 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.showsVerticalScrollIndicator = true
     }
     
+    private let emptyView = UIView().then {
+        $0.backgroundColor = .clear
+    }
+
+    private let emptyStackView = UIStackView().then {
+        $0.axis = .vertical
+        $0.alignment = .center
+        $0.distribution = .fill
+        $0.spacing = 10
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    private let emptyTitleLabel = UILabel().then {
+        $0.text = "보여드릴 이벤트가 없어요"
+        $0.textColor = .neutral50
+        $0.font = .font20Bold
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+
+    private let emptyValueLabel = UILabel().then {
+        $0.text = "일정을 등록하고 한눈에 관리해 보세요"
+        $0.textColor = .neutral50
+        $0.font = .font17Regular
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+    }
+    
     private lazy var dataSource = EventListDataSource(collectionView: collectionView)
     private var currentItemsByID: [UUID: EventItem] = [:]
     
@@ -93,6 +121,14 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+        collectionView.backgroundView = emptyView
+        emptyView.addSubview(emptyStackView)
+        emptyStackView.addArrangedSubview(emptyTitleLabel)
+        emptyStackView.addArrangedSubview(emptyValueLabel)
+        emptyStackView.snp.makeConstraints {
+            $0.center.equalTo(view.safeAreaLayoutGuide)
+        }
+        emptyView.isHidden = true
         
         view.addSubview(addButton)
         addButton.snp.makeConstraints {
