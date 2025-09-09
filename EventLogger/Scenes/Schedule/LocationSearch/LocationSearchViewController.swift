@@ -18,7 +18,9 @@ class LocationSearchViewController: UIViewController {
     lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: makeLayout()
-    )
+    ).then {
+        $0.keyboardDismissMode = .onDrag
+    }
 
     lazy var dataSource = makeDataSource(collectionView)
 
@@ -85,7 +87,8 @@ class LocationSearchViewController: UIViewController {
 
         collectionView.snp.makeConstraints {
             $0.top.equalTo(searchBar.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
         }
     }
 
