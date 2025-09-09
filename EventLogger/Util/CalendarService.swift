@@ -225,7 +225,15 @@ final class CalendarService: CalendarServicing {
             notes += "\n\n[출연자] " + item.artists.joined(separator: ", ")
         }
         if item.expense > 0 {
-            notes += "\n[비용] \(item.currency.rawValue) \(item.expense)"
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.locale = Locale(identifier: "ko_KR")
+            formatter.maximumFractionDigits = 0  //  소수점 제거
+            
+            let expenseText = formatter.string(from: NSNumber(value: item.expense))
+                ?? "\(item.expense)"  // 포맷 실패 시 fallback
+            
+            notes += "\n[비용] \(item.currency.rawValue) \(expenseText)"
         }
         return notes
     }
