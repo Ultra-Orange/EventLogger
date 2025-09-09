@@ -22,27 +22,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 
     private let backgroundGradientView = GradientBackgroundView()
 
-    private let segmentedControl = PillSegmentedControl(items: ["연도별", "월별", "전체"]).then {
-        $0.capsuleBackgroundColor = .appBackground
-        $0.capsuleBorderColor = .primary500
-        $0.capsuleShadowColor = .primary500
-        $0.capsuleBorderWidth = 1
-        $0.borderColor = .clear
-
-        $0.normalTextColor = .neutral50
-        $0.normalFont = .font17Regular
-
-        $0.selectedTextColor = .primary200
-        $0.selectedFont = .font17Semibold
-
-        $0.selectedTextShadowColor = UIColor.primary500
-        $0.textShadowOpacity = 1
-        $0.textShadowRadius = 7
-        $0.textShadowOffset = CGSize(width: 0, height: 0)
-
-        $0.segmentSpacing = 6
-        $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
-    }
+    private let segmentedControl = PillSegmentedControl(items: ["연도별", "월별", "전체"])
 
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: makeLayout()).then {
         $0.backgroundColor = .clear
@@ -170,9 +150,9 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 
     override func bind(reactor: StatsReactor) {
         // Input
-        segmentedControl.rx.controlEvent(.valueChanged)
-            .compactMap { [weak self] in Scope(rawValue: self?.segmentedControl.selectedIndex ?? 0) }
-            .map { StatsReactor.Action.setScope($0) }
+        segmentedControl.rx.selectedSegmentIndex
+            .compactMap { Scope(rawValue: $0) }
+            .map { .setScope($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
