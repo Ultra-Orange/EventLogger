@@ -152,18 +152,19 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .flatMap { `self`, _ in
                 UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제하시겠습니까?", actions: [
                     .cancel("취소"),
-                    .destructive("삭제", payload: .deleteEvent(eventItem.id)),
+                    .destructive("삭제", payload: .deleteEvent(eventItem)),
                 ])
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         infoItemView.addCalendarButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { EventDetailReactor.Action.addToCalendarTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        // TODO: 버튼액션
+        
         infoItemView.findDirectionsButton.rx.tap
             .withUnretained(self)
             .bind { `self`, _ in

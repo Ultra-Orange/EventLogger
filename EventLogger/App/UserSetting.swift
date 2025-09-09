@@ -36,11 +36,13 @@ enum UDKey {
     static let didSetupDefaultCategories = "didSetupDefaultCategories" // 최초 실행 체크
     static let pushNotificationEnabled = "pushNotificationEnabled" // 푸쉬알림 허용 체크
     static let autoSaveToCalendar = "settings.autoSaveToCalendar" // 캘린더 오토세이브
+    static let appCalendarName = "appCalendarName"
+    static let appCalendarIdKey = "ELCalendarIdentifier"
 }
 
 /*
  didSetupDefaultCategories를 쓴다면
- @UserSEtting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
+ @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
 var didSetupDefaultCategories: Type
  위처럼 변수 선언하고 변수 쓰듯이 쓰면 됨 유저디폴트 값이 없으면 defaultValue로 선언한게 들어감
  */

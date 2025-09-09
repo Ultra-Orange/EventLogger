@@ -10,8 +10,10 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+
 struct SwiftDataManager {
-    @Dependency(\.modelContext) var modelContext
+    
+    let modelContext = ModelContext(Persistence.container)
 
     // MARK: SaveContext
 
