@@ -83,7 +83,7 @@ final class CalendarService: CalendarServicing {
             throw NSError(
                 domain: "CalendarService",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "iCloud 캘린더 소스를 찾을 수 없습니다. iOS 설정에서 iCloud 캘린더를 활성화해 주세요."]
+                userInfo: [NSLocalizedDescriptionKey: "iCloud 캘린더를 활성화한 사용자에게만 제공되는 기능이에요. iOS 설정에서 iCloud 캘린더를 활성화해 주세요."]
             )
         }
         
