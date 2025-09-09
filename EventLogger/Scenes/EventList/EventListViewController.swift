@@ -15,12 +15,35 @@ import UIKit
 import CoreData
 
 final class EventListViewController: BaseViewController<EventListReactor> {
+    private lazy var dataSource = EventListDataSource(collectionView: collectionView)
+    private var currentItemsByID: [UUID: EventItem] = [:]
+    let cloudKitChanged = NSPersistentCloudKitContainer.eventChangedNotification
+    
     private let backgroundGradientView = GradientBackgroundView()
     
     private let titleLabel = UILabel().then {
         $0.text = "Event Logger"
         $0.textColor = .primary500
         $0.font = .font17Semibold
+    }
+    
+    private lazy var menuButton = UIBarButtonItem(
+        image: UIImage(systemName: "ellipsis.circle"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .neutral50
+        $0.isSpringLoaded = true
+    }
+    
+    private lazy var statisticsButton = UIBarButtonItem(
+        image: UIImage(systemName: "chart.bar.xaxis"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .neutral50
     }
     
     private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
@@ -40,8 +63,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.segmentSpacing = 6
         $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
     }
-    
-    private let addButton = UIButton.makeAddButton()
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout()).then {
         $0.backgroundColor = .clear
@@ -76,31 +97,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.numberOfLines = 0
     }
     
-    private lazy var dataSource = EventListDataSource(collectionView: collectionView)
-    private var currentItemsByID: [UUID: EventItem] = [:]
+    private let addButton = UIButton.makeAddButton()
     
-    private lazy var menuButton = UIBarButtonItem(
-        image: UIImage(systemName: "ellipsis.circle"),
-        style: .plain,
-        target: nil,
-        action: nil
-    ).then {
-        $0.tintColor = .neutral50
-        $0.isSpringLoaded = true
-    }
-    
-    private lazy var statisticsButton = UIBarButtonItem(
-        image: UIImage(systemName: "chart.bar.xaxis"),
-        style: .plain,
-        target: nil,
-        action: nil
-    ).then {
-        $0.tintColor = .neutral50
-    }
-    
-    let cloudKitChanged = NSPersistentCloudKitContainer.eventChangedNotification
+
     
     override func setupUI() {
+        navigationItem.backButtonDisplayMode = .minimal
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
+        navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
+        
         view.backgroundColor = .appBackground
         
         view.addSubview(backgroundGradientView)
@@ -135,10 +140,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             $0.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.size.equalTo(59)
         }
-        
-        navigationItem.backButtonDisplayMode = .minimal
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-        navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
     }
     
     override func bind(reactor: EventListReactor) {
@@ -150,8 +151,8 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     private func bindActions(_ reactor: EventListReactor) {
         // 최초 로드, CloudKit 동기화 시 리로드
         let triggerReload = Observable.merge(
-            rx.viewWillAppear.map{ _ in },
-            NotificationCenter.default.rx.notification(cloudKitChanged).map{ _ in }
+            rx.viewWillAppear.map { _ in },
+            NotificationCenter.default.rx.notification(cloudKitChanged).map { _ in }
         )
         .flatMap { _ in
             Observable.from([
@@ -304,9 +305,9 @@ private extension EventListDSItem {
         }
     }
 }
-
-#Preview {
-    let vc = EventListViewController()
-    vc.reactor = EventListReactor()
-    return vc
-}
+//
+//#Preview {
+//    let vc = EventListViewController()
+//    vc.reactor = EventListReactor()
+//    return vc
+//}
