@@ -174,6 +174,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .disposed(by: disposeBag)
         
         // TODO: 한 스트림에서 switch로 알럿을 만들지 말고, saveOutcome을 케이스별로 분기된 스트림으로 나눠서, 각각 UIAlertController의 Rx 확장으로 처리하라
+        // TODO: 리팩토링 필수
         reactor.saveOutcome
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, outcome in
@@ -185,12 +186,14 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                         message: "이 이벤트를 캘린더에 저장했어요.",
                         preferredStyle: .alert
                     )
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
                 case .denied:
                     alert = UIAlertController(
                         title: "접근 권한 필요",
                         message: "설정 > 개인정보보호 > 캘린더에서 권한을 허용해주세요.",
                         preferredStyle: .alert
                     )
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
                     alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
                         if let url = URL(string: UIApplication.openSettingsURLString) {
                             UIApplication.shared.open(url)
@@ -202,8 +205,8 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                         message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
                         preferredStyle: .alert
                     )
+                    alert.addAction(UIAlertAction(title: "확인", style: .default))
                 }
-                alert.addAction(UIAlertAction(title: "확인", style: .default))
                 owner.present(alert, animated: true)
             }
             .disposed(by: disposeBag)

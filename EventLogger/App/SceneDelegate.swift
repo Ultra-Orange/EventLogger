@@ -13,83 +13,6 @@ import UIKit
 import CoreData
 import CloudKit
 
-class AppStepper: Stepper {
-    
-    let steps = PublishRelay<Step>()
-    let disposeBag = DisposeBag()
-    
-    func readyToEmitSteps() {
-        @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
-        var didSetupDefaultCategories: Bool
-//        if didSetupDefaultCategories { // 카테고리가 시딩이 되어있으면
-//            steps.accept(AppStep.eventList)
-//            return
-//        }
-        // 최초 실행시 카테고리 시딩
-        let notification = NSPersistentCloudKitContainer.eventChangedNotification
-        NotificationCenter.default.rx.notification(notification).take(1)
-            .debug()
-            .subscribe(onNext: { [steps] _ in
-//                @Dependency(\.swiftDataManager) var swiftDataManager
-//                let categories = swiftDataManager.fetchAllCategories()
-//                
-//                if categories.isEmpty {
-//                    //카테고리가 비어있으면 시딩함수 실행
-//                    @Dependency(\.modelContext) var modelContext
-//                    do {
-//                        try CategorySeeder.runIfNeeded(modelContext: modelContext)
-//                        print("✅ Seed checked")
-//                    } catch {
-//                        assertionFailure("기본 카테고리 시딩 실패: \(error.localizedDescription)")
-//                    }
-//                }
-                steps.accept(AppStep.eventList)
-            })
-            .disposed(by: disposeBag)
-        Task {
-            do {
-                try await probeCloudPresence(recordType: "")
-            } catch {
-                print(error)
-            }
-        }
-    }
-    
-    func probeCloudPresence(recordType: String) async throws -> Bool {
-      let container = CKContainer(identifier: "iCloud.UltraOrange.EventLogger")
-        let predicate = NSPredicate(value: true)
-            let query = CKQuery(recordType: "CD_CategoryStore", predicate: predicate)
-            do {
-                let items = (try await container.privateCloudDatabase.records(matching: query)).matchResults
-                return items.isEmpty
-            } catch {
-                print(error)
-                return false
-                // this is for the answer's simplicity,
-                // but obviously you should handle errors accordingly.
-            }
-      
-    }
-    
-    func checkIfDataExists(completion: @escaping (Bool) -> Void) {
-        let container = CKContainer.default()
-        let privateDB = container.privateCloudDatabase
-        let query = CKQuery(recordType: "EventStore", predicate: NSPredicate(value: true))
-        let queryOperation = CKQueryOperation(query: query)
-        var found = false
-
-        queryOperation.recordFetchedBlock = { record in
-            found = true
-        }
-
-        queryOperation.queryCompletionBlock = { _, _ in
-            completion(found)
-        }
-
-        privateDB.add(queryOperation)
-    }
-}
-
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let coordinator = FlowCoordinator()
@@ -98,17 +21,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                
         let appFlow = AppFlow(windowScene: windowScene)
         
-//        @Dependency(\.modelContext) var modelContext
-//        do {
-//            try CategorySeeder.runIfNeeded(modelContext: modelContext)
-//            print("✅ Seed checked")
-//        } catch {
-//            assertionFailure("기본 카테고리 시딩 실패: \(error.localizedDescription)")
-//        }
-        
         coordinator.coordinate(
             flow: appFlow,
-//            with: AppStepper()
             with: OneStepper(withSingleStep: AppStep.eventList)
         )
     }

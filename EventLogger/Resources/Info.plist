@@ -2,14 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>comgooglemaps</string>
 	</array>
-	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
-	<string>이벤트를 캘린더에 추가하기 위해 권한이 필요합니다.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>이벤트를 캘린더에 추가, 관리하기 위해 권한이 필요합니다.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>푸쉬알람을 보내기 위해 권한이 필요합니다.</string>
 	<key>UIApplicationSceneManifest</key>
