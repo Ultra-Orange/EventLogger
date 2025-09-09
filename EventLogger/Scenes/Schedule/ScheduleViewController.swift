@@ -253,7 +253,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         
         let expenseRelay = BehaviorRelay<Double>(value: 0)
         expenseFieldView.textField.rx.text.orEmpty
-            .map { String($0.prefix(10)) } // 최대 10자리까지 입력되도록 제한
+            .map { String($0.prefix(15)) } // 최대 15자리까지 입력되도록 제한
             .map { $0.components(separatedBy: characterSets.inverted).joined() }
             .map { Double($0) ?? 0 }
             .bind(to: expenseRelay)
