@@ -135,14 +135,27 @@ final class ScheduleReactor: BaseReactor {
                 swiftDataManager.updateEvent(id: updated.id, event: updated)
                 
                 if settingsService.autoSaveToCalendar {
-                    calendarService.update(eventItem: updated)
-                        .subscribe(onSuccess: { tag in   // update 결과 태그 반환 받음
-                            @Dependency(\.swiftDataManager) var swiftDataManager
-                            var refreshed = updated
-                            refreshed.calendarEventId = tag   // 태그 갱신
-                            swiftDataManager.updateEvent(id: refreshed.id, event: refreshed)
-                        })
-                        .disposed(by: disposeBag)
+                    if updated.calendarEventId == nil {
+                        // 🔧 변경: 캘린더 이벤트가 없으면 새로 추가
+                        calendarService.save(eventItem: updated)
+                            .subscribe(onSuccess: { tag in
+                                @Dependency(\.swiftDataManager) var swiftDataManager
+                                var refreshed = updated
+                                refreshed.calendarEventId = tag
+                                swiftDataManager.updateEvent(id: refreshed.id, event: refreshed)
+                            })
+                            .disposed(by: disposeBag)
+                    } else {
+                        // 기존 이벤트가 있으면 업데이트
+                        calendarService.update(eventItem: updated)
+                            .subscribe(onSuccess: { tag in
+                                @Dependency(\.swiftDataManager) var swiftDataManager
+                                var refreshed = updated
+                                refreshed.calendarEventId = tag
+                                swiftDataManager.updateEvent(id: refreshed.id, event: refreshed)
+                            })
+                            .disposed(by: disposeBag)
+                    }
                 }
                 
                 schedulePushNotificationIfNeeded(updated)
