@@ -96,23 +96,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.tintColor = .neutral50
     }
 
-    private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
-        $0.capsuleBackgroundColor = .appBackground
-        $0.capsuleBorderColor = .primary500
-        $0.capsuleShadowColor = .primary500
-        $0.capsuleBorderWidth = 1
-        $0.borderColor = .clear
-        $0.normalTextColor = .neutral50
-        $0.normalFont = .font17Regular
-        $0.selectedTextColor = .primary200
-        $0.selectedFont = .font17Semibold
-        $0.selectedTextShadowColor = UIColor.primary500
-        $0.textShadowOpacity = 1
-        $0.textShadowRadius = 7
-        $0.textShadowOffset = CGSize(width: 0, height: 0)
-        $0.segmentSpacing = 6
-        $0.contentInsets = .init(top: 3, leading: 3, bottom: 3, trailing: 3)
-    }
+    private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"])
 
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout()).then {
         $0.backgroundColor = .clear
