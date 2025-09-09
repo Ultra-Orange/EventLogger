@@ -70,12 +70,6 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
 
         // 초기값 세팅
         configureInitialState(reactor: reactor)
-
-        let isNameValid = textField.rx.text
-            .orEmpty
-            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .distinctUntilChanged()
-            .share(replay: 1)
         
         bottomButton.rx.tap
             .bind { [weak self] _ in

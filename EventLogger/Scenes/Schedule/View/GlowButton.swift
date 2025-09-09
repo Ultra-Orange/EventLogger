@@ -49,7 +49,7 @@ final class GlowButton: UIButton {
         contentEdgeInsets = UIEdgeInsets(top: 14, left: 16, bottom: 14, right: 16)
 
         // 타이틀 스타일 (SF Pro 세미볼드 17, 없으면 시스템 대체)
-        let font = UIFont(name: "SFPro-Semibold", size: 17) ?? .systemFont(ofSize: 17, weight: .semibold)
+        let font = UIFont.font17Semibold
         titleLabel?.font = font
         setTitleColor(Palette.title, for: .normal)
 
