@@ -107,7 +107,16 @@ final class CalendarService: CalendarServicing {
     
     func save(eventItem: EventItem) -> Single<String> {
         return Single.create { [store] single in
-            // 캘린더(기본 캘린더)에 이벤트 생성
+            // 1) calendarEventId가 이미 있으면 중복 저장 방지
+            if let existingTag = eventItem.calendarEventId,
+               let _ = self.findEvent(byTag: existingTag,
+                                      near: eventItem.startTime,
+                                      endDate: eventItem.endTime) {
+                single(.success(existingTag))
+                return Disposables.create()
+            }
+            
+            // 캘린더에 새 이벤트 생성
             let event = EKEvent(eventStore: store)
             
             do {
@@ -152,7 +161,7 @@ final class CalendarService: CalendarServicing {
             event.location = eventItem.location
             
             let tag = self.makeIdentifierTag(for: eventItem)
-                        event.notes = self.buildNotes(for: eventItem, with: tag)
+            event.notes = self.buildNotes(for: eventItem, with: tag)
             
             do {
                 try self.store.save(event, span: .thisEvent, commit: true)
@@ -185,6 +194,7 @@ final class CalendarService: CalendarServicing {
     }
     
     // 캘린더에서 이벤트 고유식별 태그 생성
+    // TODO: 사용자가 지우지 않게끔 유도
     private func makeIdentifierTag(for item: EventItem) -> String {
         // UUID 앞 8자리
         let shortUUID = item.id.uuidString.replacingOccurrences(of: "-", with: "").prefix(8)
@@ -195,14 +205,15 @@ final class CalendarService: CalendarServicing {
         let ts = df.string(from: item.startTime)
         
         // 제목 앞 10자 (개행/공백 제거)
-        let title10 = item.title
-            .replacingOccurrences(of: "\n", with: " ")
-            .replacingOccurrences(of: "\r", with: " ")
-            .trimmingCharacters(in: .whitespaces)
-            .prefix(10)
+//        let title10 = item.title
+//            .replacingOccurrences(of: "\n", with: " ")
+//            .replacingOccurrences(of: "\r", with: " ")
+//            .trimmingCharacters(in: .whitespaces)
+//            .prefix(10)
         
         // 두 줄 구성
-        return "EL:\(shortUUID)_\(ts)\n\(title10)"
+//        return "EL:\(shortUUID)_\(ts)\n\(title10)"
+        return "Event Id:\(shortUUID)_\(ts)"
     }
     
     // 노트 조립 태그
@@ -222,24 +233,24 @@ final class CalendarService: CalendarServicing {
     private func findEvent(byTag tag: String, near start: Date, endDate: Date) -> EKEvent? {
         guard let calendar = try? ensureAppCalendar() else { return nil }
         let cal = Calendar.current
-
+        
         // 1) 1차: 새 입력값 근처 (start -1일 ~ start +1일)
         let start1 = cal.date(byAdding: .day, value: -1, to: start) ?? start
         let end1   = cal.date(byAdding: .day, value:  1, to: start) ?? start
         if let hit = findEvent(byTag: tag, in: start1...end1, calendar: calendar) {
             return hit
         }
-
+        
         // 2) 2차: 넓은 fallback (start -180일 ~ start +180일)  // 대범위 보정
         let start2 = cal.date(byAdding: .day, value: -180, to: start) ?? start
         let end2   = cal.date(byAdding: .day, value:  180, to: start) ?? start
         return findEvent(byTag: tag, in: start2...end2, calendar: calendar)
     }
-
+    
     private func findEvent(byTag tag: String, in range: ClosedRange<Date>, calendar: EKCalendar) -> EKEvent? {
         let predicate = store.predicateForEvents(withStart: range.lowerBound, end: range.upperBound, calendars: [calendar])
         let events = store.events(matching: predicate)
-
+        
         // start 동일 우선 → 태그 포함 순으로 매칭
         if let exact = events.first(where: {
             $0.notes?.contains(tag) == true && Calendar.current.isDate($0.startDate, inSameDayAs: range.lowerBound)

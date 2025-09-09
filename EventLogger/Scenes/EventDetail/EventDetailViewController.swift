@@ -159,11 +159,12 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .disposed(by: disposeBag)
         
         infoItemView.addCalendarButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { EventDetailReactor.Action.addToCalendarTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        // TODO: 버튼액션
+        
         infoItemView.findDirectionsButton.rx.tap
             .withUnretained(self)
             .bind { `self`, _ in

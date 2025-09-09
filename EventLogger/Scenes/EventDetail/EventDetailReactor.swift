@@ -31,11 +31,13 @@ final class EventDetailReactor: BaseReactor {
     }
     
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
-    enum Mutation {}
+    enum Mutation {
+        case setEvent(EventItem)
+    }
     
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
-        let eventItem: EventItem
+        var eventItem: EventItem
     }
     
     // 생성자에서 초기 상태 설정
@@ -66,8 +68,8 @@ final class EventDetailReactor: BaseReactor {
             
             // 캘린더에도 삭제 반영
             calendarService.delete(eventItem: eventItem)
-                 .subscribe()
-                 .disposed(by: disposeBag)
+                .subscribe()
+                .disposed(by: disposeBag)
             
             // 알림도 취소
             @Dependency(\.notificationService) var notificationService
@@ -79,10 +81,9 @@ final class EventDetailReactor: BaseReactor {
             // 권한 요청 -> 저장 -> 결과 알림
             let item = currentState.eventItem
             calendarService.requestAccess()
-                .flatMap { [calendarService] granted -> Single<Void> in
+                .flatMap { [calendarService] granted -> Single<String> in
                     if granted {
                         return calendarService.save(eventItem: item)
-                            .map { _ in () } // TODO: 구조 리팩터링
                     } else {
                         // 접근 거부
                         self.saveOutcome.accept(.denied)
@@ -90,14 +91,20 @@ final class EventDetailReactor: BaseReactor {
                     }
                 }
                 .subscribe(
-                    onSuccess: { [weak self] in self?.saveOutcome.accept(.success) },
+                    onSuccess: { [weak self] tag in
+                        @Dependency(\.swiftDataManager) var swiftDataManager
+                        var updated = item
+                        updated.calendarEventId = tag
+                        swiftDataManager.updateEvent(id: updated.id, event: updated)
+                        self?.saveOutcome.accept(.success)
+                    },
                     onFailure: { [weak self] error in
                         self?.saveOutcome.accept(.failure(message: error.localizedDescription))
                     }
                 )
                 .disposed(by: disposeBag)
             
-            return .empty()
+            return .just(.setEvent(item))
         }
     }
     
@@ -105,7 +112,10 @@ final class EventDetailReactor: BaseReactor {
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
-        switch mutation {}
+        switch mutation {
+        case let .setEvent(item):
+            newState.eventItem = item
+        }
         return newState
     }
 }
