@@ -9,15 +9,15 @@ import Dependencies
 import HostingView
 import ReactorKit
 import RxCocoa
-import RxSwift
 import RxRelay
+import RxSwift
 import SnapKit
 import SwiftUI
 import Then
 
 class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: UI Component
-    
+
     private let moreButton = UIBarButtonItem(
         image: UIImage(systemName: "ellipsis"),
         style: .plain,
@@ -26,7 +26,16 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     ).then {
         $0.tintColor = .neutral50
     }
-    
+
+    private let shareButton = UIBarButtonItem(
+        image: UIImage(systemName: "square.and.arrow.up"),
+        style: .plain,
+        target: nil,
+        action: nil
+    ).then {
+        $0.tintColor = .neutral50
+    }
+
     private let scrollView = UIScrollView()
     private let contentView = UIView()
 
@@ -50,37 +59,38 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     }
 
     private let infoItemView = InfoItemView()
-    
+
     private let memoLabel = UILabel().then {
         $0.text = "메모"
         $0.font = .font13Regular
         $0.textColor = .label
     }
+
     private let memoView = MemoView()
 
     private let editActionRelay = PublishRelay<Void>()
     private let deleteActionRelay = PublishRelay<Void>()
-    
+
     // MARK: SetupUI
 
     override func setupUI() {
         view.backgroundColor = .systemBackground
         // 네비게이션 영역
         title = "이벤트 상세"
-        navigationItem.rightBarButtonItem = moreButton
-        
+        navigationItem.rightBarButtonItems = [moreButton, shareButton]
+
         // UIMenu & Action
         let editAction = UIAction(title: "수정하기", image: UIImage(systemName: "pencil")) { [editActionRelay] _ in
             editActionRelay.accept(())
         }
 
-        let deleteAction = UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) {  [deleteActionRelay] _ in
+        let deleteAction = UIAction(title: "삭제하기", image: UIImage(systemName: "trash"), attributes: .destructive) { [deleteActionRelay] _ in
             deleteActionRelay.accept(())
         }
-        
+
         moreButton.menu = UIMenu(title: "", children: [editAction, deleteAction])
-        moreButton.primaryAction = nil   // 탭 시 바로 메뉴 표시
-        
+        moreButton.primaryAction = nil // 탭 시 바로 메뉴 표시
+
         // 스크롤 뷰
         view.addSubview(scrollView)
 
@@ -119,7 +129,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             $0.top.equalTo(titleLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview()
         }
-        
+
         memoLabel.snp.makeConstraints {
             $0.top.equalTo(infoItemView.snp.bottom).offset(30)
             $0.leading.trailing.equalTo(memoView).inset(16)
@@ -135,18 +145,17 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
     // MARK: Binding
 
     override func bind(reactor: EventDetailReactor) {
-               
         // 1회성 데이터 바인딩
         let eventItem = reactor.currentState.eventItem
         titleLabel.text = eventItem.title
         imageView.image = eventItem.image
         infoItemView.configureView(eventItem: eventItem)
         memoView.configureView(eventItem.memo)
-        
+
         editActionRelay.map { .moveToEdit(eventItem) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         deleteActionRelay
             .withUnretained(self)
             .flatMap { `self`, _ in
@@ -157,14 +166,13 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         infoItemView.addCalendarButton.rx.tap
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .map { EventDetailReactor.Action.addToCalendarTapped }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
 
-        
         infoItemView.findDirectionsButton.rx.tap
             .withUnretained(self)
             .bind { `self`, _ in
@@ -172,7 +180,31 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                 self.openInGoogleMaps(keyword: keyword)
             }
             .disposed(by: disposeBag)
-        
+
+        shareButton.rx.tap
+            .withUnretained(self)
+            .bind { `self`, _ in
+                guard let eventItem = self.reactor?.currentState.eventItem else { return }
+
+                // TODO: 공유 기본 메시지 UX 정하기
+                let text = "[\(eventItem.title)] 참가예정!"
+
+                var activityItems: [Any] = [text]
+
+                // 이미지가 없으면 기본 썸네일로 대체
+                let imageToShare = eventItem.image ?? UIImage(named: "DefaultImage")
+
+                if let image = imageToShare,
+                   let imageURL = self.makeTempImageURL(image: image)
+                {
+                    activityItems.append(imageURL)
+                }
+
+                let activityVC = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+                self.present(activityVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+
         // TODO: 한 스트림에서 switch로 알럿을 만들지 말고, saveOutcome을 케이스별로 분기된 스트림으로 나눠서, 각각 UIAlertController의 Rx 확장으로 처리하라
         // TODO: 리팩토링 필수
         reactor.saveOutcome
@@ -199,7 +231,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                             UIApplication.shared.open(url)
                         }
                     })
-                case .failure(let message):
+                case let .failure(message):
                     alert = UIAlertController(
                         title: "저장 실패",
                         message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
@@ -211,22 +243,33 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .disposed(by: disposeBag)
     }
-    
+
     private func openInGoogleMaps(keyword: String) {
         // URL은 공백이나 한글 같은 특수문자를 직접 포함할 수 없기 때문에 addingPercentEncoding으로 변환
         let encoded = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? keyword
-        
+
         // 1) 구글맵 앱으로 열기
         if let appURL = URL(string: "comgooglemaps://?q=\(encoded)"),
-           UIApplication.shared.canOpenURL(appURL) {
+           UIApplication.shared.canOpenURL(appURL)
+        {
             UIApplication.shared.open(appURL, options: [:], completionHandler: nil)
             return
         }
-        
+
         // 2) 앱이 없으면 웹으로 열기
         if let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(encoded)") {
             UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
         }
     }
 
+    // 공유를 위해 UIImage → 임시 파일 URL 변환기
+    private func makeTempImageURL(image: UIImage) -> URL? {
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".jpg")
+        if let data = image.jpegData(compressionQuality: 0.8) {
+            try? data.write(to: fileURL)
+            return fileURL
+        }
+        return nil
+    }
 }
