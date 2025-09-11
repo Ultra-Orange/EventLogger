@@ -15,50 +15,20 @@ import UIKit
 import CoreData
 import Dependencies
 
-// MARK: - 공통 타입
-enum EventListSortOrder: Equatable {
-    case newestFirst
-    case oldestFirst
-
-    mutating func toggle() {
-        self = (self == .newestFirst) ? .oldestFirst : .newestFirst
-    }
+// MARK: - 공통 타입 (동일)
+enum EventListSortOrder: Equatable { case newestFirst, oldestFirst
+    mutating func toggle() { self = (self == .newestFirst) ? .oldestFirst : .newestFirst }
 }
-
-enum EventListFilter: Equatable {
-    case all        // 전체
-    case upcoming   // 참여예정
-    case completed  // 참여완료
-}
-
-// 섹션 정렬용 (yyyy, MM)
+enum EventListFilter: Equatable { case all, upcoming, completed }
 struct EventListYearMonth: Hashable, Comparable {
-    let year: Int
-    let month: Int
-
-    static func < (lhs: EventListYearMonth, rhs: EventListYearMonth) -> Bool {
-        if lhs.year != rhs.year { return lhs.year < rhs.year }
-        return lhs.month < rhs.month
-    }
+    let year: Int; let month: Int
+    static func < (l: Self, r: Self) -> Bool { l.year != r.year ? l.year < r.year : l.month < r.month }
 }
-
-enum EventListSection: Hashable {
-    case nextUp
-    case month(EventListYearMonth)
-}
-
-// 동일 이벤트를 섹션별로 중복 표현하기 위한 래퍼
+enum EventListSection: Hashable { case nextUp; case month(EventListYearMonth) }
 enum EventListDSItem: Hashable {
-    case nextUp(UUID)
-    case monthEvent(UUID)
-
-    var eventID: UUID {
-        switch self {
-        case .nextUp(let id), .monthEvent(let id): return id
-        }
-    }
+    case nextUp(UUID); case monthEvent(UUID)
+    var eventID: UUID { switch self { case .nextUp(let id), .monthEvent(let id): return id } }
 }
-
 extension Calendar {
     func yearMonth(for date: Date) -> EventListYearMonth {
         let c = dateComponents([.year, .month], from: date)
@@ -68,8 +38,18 @@ extension Calendar {
 
 // MARK: - ViewController
 final class EventListViewController: BaseViewController<EventListReactor> {
-    // MARK: UI
-    private let backgroundGradientView = GradientBackgroundView()
+
+    // 고정 필터로 동작하도록 생성자 제공
+    private let fixedFilter: EventListFilter
+
+    init(fixedFilter: EventListFilter) {
+        self.fixedFilter = fixedFilter
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+//
+//    // MARK: UI
+//    private let backgroundGradientView = GradientBackgroundView()
 
     private let titleView = UIImageView().then {
         $0.image = UIImage(named: "MainLogo")
@@ -94,23 +74,15 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.tintColor = .neutral50
     }
 
-    private let segmentedControl = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"])
-
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: Self.makeLayout()).then {
         $0.backgroundColor = .clear
         $0.showsVerticalScrollIndicator = true
     }
 
     private let emptyView = UIView().then { $0.backgroundColor = .clear }
-
     private let emptyStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.alignment = .center
-        $0.distribution = .fill
-        $0.spacing = 10
-        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.axis = .vertical; $0.alignment = .center; $0.distribution = .fill; $0.spacing = 10; $0.translatesAutoresizingMaskIntoConstraints = false
     }
-
     private let emptyTitleLabel = UILabel().then {
         $0.text = "보여드릴 이벤트가 없어요"
         $0.textColor = .neutral50
@@ -118,7 +90,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
-
     private let emptyValueLabel = UILabel().then {
         $0.text = "일정을 등록하면 전체 일정을 한눈에 확인할 수 있어요\n참여 하루 전, 놓치지 않도록 알림도 챙겨드려요"
         $0.textColor = .neutral50
@@ -127,7 +98,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         $0.numberOfLines = 0
     }
 
-    private let addButton = UIButton.makeAddButton()
 
     // MARK: Diffable
     private typealias DS = UICollectionViewDiffableDataSource<EventListSection, EventListDSItem>
@@ -143,24 +113,17 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
         navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
 
-        view.backgroundColor = .appBackground
+        view.backgroundColor = .clear
 
-        view.addSubview(backgroundGradientView)
-        backgroundGradientView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.5)
-        }
-
-        view.addSubview(segmentedControl)
-        segmentedControl.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(50)
-        }
+//        view.addSubview(backgroundGradientView)
+//        backgroundGradientView.snp.makeConstraints {
+//            $0.leading.trailing.bottom.equalToSuperview()
+//            $0.height.equalToSuperview().multipliedBy(0.5)
+//        }
 
         view.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(10)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
@@ -171,11 +134,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         emptyStackView.snp.makeConstraints { $0.center.equalTo(view.safeAreaLayoutGuide) }
         emptyView.isHidden = true
 
-        view.addSubview(addButton)
-        addButton.snp.makeConstraints {
-            $0.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
-            $0.size.equalTo(59)
-        }
+
     }
 
     override func bind(reactor: EventListReactor) {
@@ -194,32 +153,19 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         .flatMap { _ in
             Observable.from([
                 EventListReactor.Action.reloadEventItems,
-                EventListReactor.Action.reloadCategories
+                EventListReactor.Action.reloadCategories,
+                // 고정 필터를 초기 1회 반영 (혹시 state 초기값과 다를 수 있으니 안전하게)
+                EventListReactor.Action.applyFixedFilter
             ])
         }
 
-        // 세그먼트 변경 -> 필터 변경
-        let filterChange = segmentedControl.rx.selectedSegmentIndex
-            .map { index -> EventListReactor.Action in
-                switch index {
-                case 1: return .setFilter(.upcoming)
-                case 2: return .setFilter(.completed)
-                default: return .setFilter(.all)
-                }
-            }
-
-        Observable.merge(triggerReload, filterChange)
+        triggerReload
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
     }
 
     // MARK: Bind - Navigation
     private func bindNavigation(_ reactor: EventListReactor) {
-        addButton.rx.tap
-            .map { AppStep.createSchedule }
-            .bind(to: reactor.steps)
-            .disposed(by: disposeBag)
-
         statisticsButton.rx.tap
             .map { AppStep.statistics }
             .bind(to: reactor.steps)
@@ -235,7 +181,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             .disposed(by: disposeBag)
     }
 
-    // MARK: Bind - State → UI (스냅샷 빌드 & 적용 + 메뉴)
+    // MARK: Bind - State → UI
     private func bindStateToUI(_ reactor: EventListReactor) {
         Observable
             .combineLatest(
@@ -282,7 +228,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
 
     // MARK: - DataSource (Cell/Header 등록 포함)
     private func configureDataSource() -> DS {
-        // Cell: SwiftUI EventCell를 iOS 17 UIHostingConfiguration으로 올림
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, EventListDSItem> { [weak self] cell, _, item in
             @Dependency(\.swiftDataManager) var swiftDataManager
             guard let self else { return }
@@ -328,16 +273,13 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             }
         }
 
-        // DataSource
         let ds = DS(collectionView: collectionView) { cv, indexPath, item in
             return cv.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
-
         ds.supplementaryViewProvider = { cv, kind, indexPath in
             guard kind == UICollectionView.elementKindSectionHeader else { return nil }
             return cv.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
-
         return ds
     }
 
@@ -351,7 +293,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         today: Date
     ) -> (snapshot: NSDiffableDataSourceSnapshot<EventListSection, EventListDSItem>, itemsByID: [UUID: EventItem]) {
 
-        // 1) 상태 필터
+        // 1) 상태 필터 (고정 필터 사용)
         let stateFiltered: [EventItem] = {
             switch filter {
             case .all: allItems
@@ -368,7 +310,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
 
         let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0) })
 
-        // 3) 다음 일정 (가장 가까운 미래 1개)
+        // 3) 다음 일정
         let nextUp: EventItem? = filtered
             .filter { $0.startTime >= today }
             .min(by: { $0.startTime < $1.startTime })
@@ -396,7 +338,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             itemsForSection[section] = monthItems.map { .monthEvent($0.id) }
         }
 
-        // 6) 스냅샷
         var snapshot = NSDiffableDataSourceSnapshot<EventListSection, EventListDSItem>()
         snapshot.appendSections(sections)
         for s in sections {
@@ -415,7 +356,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     ) {
         currentItemsByID = itemsByID
         dataSource.apply(snapshot, animatingDifferences: animated)
-
         let isEmpty = snapshot.itemIdentifiers.isEmpty
         collectionView.backgroundView?.isHidden = !isEmpty
     }
@@ -426,19 +366,17 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         return currentItemsByID[idItem.eventID]
     }
 
-    // MARK: - 메뉴 생성
+    // MARK: - 메뉴 생성 (동일)
     static func makeMenu(
         items: [EventItem],
         currentSort: EventListSortOrder,
         currentYear: Int?,
         dispatcher: ActionSubject<EventListReactor.Action>
     ) -> UIMenu {
-        // 설정
         let goSettings = UIAction(title: "설정", image: UIImage(systemName: "gearshape.fill")) { _ in
             dispatcher.onNext(.goSettings)
         }
 
-        // 정렬
         let newest = UIAction(title: "최신 순", image: UIImage(systemName: "arrow.down.to.line")) { _ in
             dispatcher.onNext(.setSortOrder(.newestFirst))
         }.toggled(currentSort == .newestFirst)
@@ -449,9 +387,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
 
         let sortMenu = UIMenu(title: "", options: .displayInline, children: [newest, oldest])
 
-        // 연도
-        let years = Set(items.map { Calendar.current.component(.year, from: $0.startTime) })
-            .sorted(by: >)
+        let years = Set(items.map { Calendar.current.component(.year, from: $0.startTime) }).sorted(by: >)
 
         let allYears = UIAction(title: "모든 연도", image: UIImage(systemName: "tray.full")) { _ in
             dispatcher.onNext(.setYearFilter(nil))
@@ -467,7 +403,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         return UIMenu(title: "", children: [goSettings, sortMenu, yearMenu])
     }
 
-    // MARK: - 레이아웃
+    // MARK: - 레이아웃 (동일)
     static func makeLayout() -> UICollectionViewLayout {
         UICollectionViewCompositionalLayout { _, _ in
             let itemSize = NSCollectionLayoutSize(
@@ -508,10 +444,3 @@ private extension UIAction {
         return self
     }
 }
-
-//
-//#Preview {
-//    let vc = EventListViewController()
-//    vc.reactor = EventListReactor()
-//    return vc
-//}

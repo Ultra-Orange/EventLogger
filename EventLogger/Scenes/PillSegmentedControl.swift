@@ -11,7 +11,7 @@ import RxCocoa
 import SnapKit
 import Then
 
-/// 프로젝트 전용, 고정 디자인의 캡슐형 세그먼트 컨트롤 (간결 버전)
+// FIXME: 
 public final class PillSegmentedControl: UIControl {
 
     // MARK: Public API
