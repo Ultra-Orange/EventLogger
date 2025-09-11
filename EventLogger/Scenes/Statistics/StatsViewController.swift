@@ -104,7 +104,6 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         childrenCache.removeAll()
     }
 
-    
     // MARK: - Lifecycle
 
     override func setupUI() {
@@ -135,7 +134,6 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         setupEmptyView()
 
         configureDataSource()
-        collectionView.delegate = self // 셀 탭 감지를 위해 델리게이트 설정
     }
     
     private func setupEmptyView() {
@@ -164,6 +162,24 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
 
+        collectionView.rx.itemSelected // 셀이 선택되면 이벤트를 내보냄
+            .do(onNext: { [weak self] indexPath in
+                self?.collectionView.deselectItem(at: indexPath, animated: true) // 일단 deselect를 해서 UI 깔끔하게
+            })
+            .compactMap { [weak self] indexPath -> StatsItem? in // 데이터소스에서 StatsItem을 꺼냄. 못 찾으면 드랍
+                guard let self = self else { return nil }
+                return self.dataSource.itemIdentifier(for: indexPath)
+            }
+            .compactMap { item -> RollupParent? in // 아이템이 .rollupParent 인 경우만 꺼내서 통과
+                if case let .rollupParent(parent) = item { return parent }
+                return nil
+            }
+            .observe(on: MainScheduler.instance) // 다음이 메인 스레드에서 실행되도록 보장
+            .subscribe(onNext: { [weak self] parent in // 펼치기/접기 토글을 수행. 내부에서는 스냅샷에 자식을 삽입/삭제하고, dataSource.apply로 애니메이션 적용
+                self?.toggle(parent: parent)
+            })
+            .disposed(by: disposeBag) // 구독 해제하며 누수 방지
+
         // Output
         reactor.state
             .observe(on: MainScheduler.instance)
@@ -171,6 +187,49 @@ final class StatsViewController: BaseViewController<StatsReactor> {
                 self?.applySnapshot(animated: true)
             })
             .disposed(by: disposeBag)
+    }
+
+    private func toggle(parent: RollupParent) {
+        guard var snapshot = dataSource?.snapshot() else { return }
+        let pid = parent.id
+        let children = (childrenCache[pid] ?? [])
+        let childItems = children.map { StatsItem.rollupChild($0) }
+        let parentItem = StatsItem.rollupParent(parent)
+
+        if expandedParentIDs.contains(pid) {
+            // 접기: 자식 삭제
+            snapshot.deleteItems(childItems)
+            expandedParentIDs.remove(pid)
+        } else {
+            // 펼치기: 부모 바로 뒤에 자식 삽입
+            if snapshot.indexOfItem(parentItem) != nil {
+                snapshot.insertItems(childItems, afterItem: parentItem)
+                expandedParentIDs.insert(pid)
+            } else {
+                // 혹시 동일성 문제로 못 찾았을 때(매우 드묾): 섹션 끝에라도 추가
+                // (실무에서는 assert로 잡아도 됨)
+                snapshot.appendItems(childItems, toSection: sectionFor(parent: parent, in: snapshot))
+                expandedParentIDs.insert(pid)
+            }
+        }
+        snapshot.reconfigureItems([parentItem]) // chevron 갱신 (cellRegistration의 액세서리 재계산 유도)
+
+        dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+
+    /// 부모가 속한 섹션을 찾는 헬퍼 (fallback용)
+    private func sectionFor(parent: RollupParent,
+                            in snapshot: NSDiffableDataSourceSnapshot<StatsSection, StatsItem>) -> StatsSection {
+        // 타입 -> 섹션 매핑
+        let section: StatsSection
+        switch parent.type {
+        case .categoryCount: section = .categoryCount
+        case .categoryExpense: section = .categoryExpense
+        case .artistCount: section = .artistCount
+        case .artistExpense: section = .artistExpense
+        }
+        // 섹션이 실제 스냅샷에 존재하면 그 섹션 반환, 아니면 첫 섹션
+        return snapshot.sectionIdentifiers.contains(section) ? section : (snapshot.sectionIdentifiers.first ?? .categoryCount)
     }
 }
 
