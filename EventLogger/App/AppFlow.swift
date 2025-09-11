@@ -52,8 +52,8 @@ final class AppFlow: Flow {
     }
     
     func navigateToEventList() -> FlowContributors {
-        let vc = MainEventViewController()
-        let reactor = MainEventReactor()
+        let vc = EventListViewController()
+        let reactor = EventListReactor()
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: false)
         return .one(
