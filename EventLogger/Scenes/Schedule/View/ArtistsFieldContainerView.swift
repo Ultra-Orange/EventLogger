@@ -15,7 +15,7 @@ import WSTagsField
 
 final class ArtistsFieldContainerView: UIView {
     let label = UILabel().then {
-        $0.text = "출연자"
+        $0.text = "아티스트"
         $0.font = .font13Regular
     }
 
@@ -26,25 +26,25 @@ final class ArtistsFieldContainerView: UIView {
         $0.clipsToBounds = true
         $0.textField.returnKeyType = .done
 
-        $0.placeholder = "출연자를 입력하세요"
+        $0.placeholder = "아티스트를 입력하세요"
         $0.placeholderFont = .font16Regular
         $0.placeholderColor = .neutral50
-        $0.cornerRadius = 10
+        $0.cornerRadius = 8
 
         $0.tintColor = .primary500
         $0.textColor = .neutral50
         $0.selectedColor = UIColor(red: 145.0 / 255.0, green: 60.0 / 255.0, blue: 3.0 / 255.0, alpha: 1.0)
         $0.selectedTextColor = .neutral50
-        $0.font = .font16Regular
+        $0.font = .font15Regular
         $0.acceptTagOption = .return
 
         $0.spaceBetweenTags = 10
         $0.spaceBetweenLines = 10
 
         // 칩 내부 마진
-        $0.layoutMargins = UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12)
+        $0.layoutMargins = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         // 전체 패딩
-        $0.contentInset = UIEdgeInsets(top: 11, left: 16, bottom: 9, right: 16)
+        $0.contentInset = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
     }
 
     private let disposeBag = DisposeBag()
@@ -56,13 +56,14 @@ final class ArtistsFieldContainerView: UIView {
         addSubview(tagsField)
 
         label.snp.makeConstraints {
-            $0.top.leading.equalToSuperview()
+            $0.top.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         tagsField.snp.makeConstraints {
             $0.top.equalTo(label.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
-            $0.height.greaterThanOrEqualTo(47)
+            $0.height.greaterThanOrEqualTo(44)
         }
 
         // 편집하다가 텍스트 필드를 떠나면 빈문자열로 변경
