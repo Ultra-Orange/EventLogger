@@ -48,6 +48,9 @@ final class AppFlow: Flow {
             return backToCategoryList()
         case .statistics:
             return navigateToStatistics()
+        case let .queryToGoogleMap(keyword):
+            return openInGoogleMaps(keyword: keyword)
+
         }
     }
     
@@ -163,5 +166,24 @@ final class AppFlow: Flow {
                 withNextStepper: reactor
             )
         )
+    }
+
+    private func openInGoogleMaps(keyword: String) -> FlowContributors {
+        // URL은 공백이나 한글 같은 특수문자를 직접 포함할 수 없기 때문에 addingPercentEncoding으로 변환
+        let encoded = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? keyword
+
+        // 1) 구글맵 앱으로 열기
+        if let appURL = URL(string: "comgooglemaps://?q=\(encoded)"),
+           UIApplication.shared.canOpenURL(appURL)
+        {
+            UIApplication.shared.open(appURL, options: [:], completionHandler: nil)
+            return .none
+        }
+
+        // 2) 앱이 없으면 웹으로 열기
+        if let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(encoded)") {
+            UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
+        }
+        return .none
     }
 }

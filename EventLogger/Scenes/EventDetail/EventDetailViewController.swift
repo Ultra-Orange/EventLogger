@@ -177,7 +177,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .withUnretained(self)
             .bind { `self`, _ in
                 let keyword = self.reactor?.currentState.eventItem.location ?? ""
-                self.openInGoogleMaps(keyword: keyword)
+                reactor.action.onNext(.queryToGoogleMap(keyword))
             }
             .disposed(by: disposeBag)
 
@@ -242,24 +242,6 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                 owner.present(alert, animated: true)
             }
             .disposed(by: disposeBag)
-    }
-
-    private func openInGoogleMaps(keyword: String) {
-        // URL은 공백이나 한글 같은 특수문자를 직접 포함할 수 없기 때문에 addingPercentEncoding으로 변환
-        let encoded = keyword.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? keyword
-
-        // 1) 구글맵 앱으로 열기
-        if let appURL = URL(string: "comgooglemaps://?q=\(encoded)"),
-           UIApplication.shared.canOpenURL(appURL)
-        {
-            UIApplication.shared.open(appURL, options: [:], completionHandler: nil)
-            return
-        }
-
-        // 2) 앱이 없으면 웹으로 열기
-        if let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(encoded)") {
-            UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
-        }
     }
 
     // 공유를 위해 UIImage → 임시 파일 URL 변환기

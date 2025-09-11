@@ -28,6 +28,7 @@ final class EventDetailReactor: BaseReactor {
         case moveToEdit(EventItem)
         case deleteEvent(EventItem)
         case addToCalendarTapped
+        case queryToGoogleMap(String)
     }
     
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -105,6 +106,9 @@ final class EventDetailReactor: BaseReactor {
                 .disposed(by: disposeBag)
             
             return .just(.setEvent(item))
+        case let .queryToGoogleMap(keyword):
+            steps.accept(AppStep.queryToGoogleMap(keyword))
+            return .empty()
         }
     }
     
