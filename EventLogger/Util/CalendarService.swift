@@ -69,7 +69,12 @@ final class CalendarService: CalendarServicing {
             $0.sourceType == .calDAV && $0.title.localizedCaseInsensitiveContains("iCloud")
         }
     }
-    
+
+    // 로컬 소스 찾기
+    private func findLocalSource() -> EKSource? {
+        return store.sources.first { $0.sourceType == .local }
+    }
+
     // 이벤트로거 캘린더 보장
     private func ensureAppCalendar() throws -> EKCalendar {
         // 1) 저장된 identifier가 있으면 우선 시도
@@ -77,19 +82,22 @@ final class CalendarService: CalendarServicing {
            let cal = store.calendar(withIdentifier: appCalendarId) {
             return cal
         }
-        
+
+        // 2) 소스 선택: iCloud 우선, 없으면 Local
+       let source = findICloudSource() ?? findLocalSource()
+
         // 2) iCloud 소스 필수
-        guard let icloud = findICloudSource() else {
+        guard let validSource = source else {
             throw NSError(
                 domain: "CalendarService",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "iCloud 캘린더를 활성화한 사용자에게만 제공되는 기능이에요. iOS 설정에서 iCloud 캘린더를 활성화해 주세요."]
+                userInfo: [NSLocalizedDescriptionKey: "사용 가능한 캘린더 소스를 찾을 수 없어요."]
             )
         }
-        
+
         // 3) 동일 이름의 기존 캘린더가 있으면 사용
         if let existing = store.calendars(for: .event)
-            .first(where: { $0.source == icloud && $0.title == appCalendarName }) {
+            .first(where: { $0.source == validSource && $0.title == appCalendarName }) {
             appCalendarId = existing.calendarIdentifier // UserDefaults에 보관
             return existing
         }
@@ -97,7 +105,7 @@ final class CalendarService: CalendarServicing {
         // 4) 새 캘린더 생성
         let newCal = EKCalendar(for: .event, eventStore: store)
         newCal.title = appCalendarName
-        newCal.source = icloud
+        newCal.source = validSource
         // newCal.cgColor = UIColor.systemBlue.cgColor // 원하면 색상 지정 가능
         
         try store.saveCalendar(newCal, commit: true)
