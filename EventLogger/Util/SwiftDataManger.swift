@@ -253,7 +253,7 @@ extension SwiftDataManager {
     // 카테고리에 해당하는 컬러 리턴 (기존 유지)
     func colorForCategory(_ id: UUID) -> Color {
         guard let item = fetchOneCategory(id: id),
-              let color = CategoryColor(rawValue: item.colorId)
+              let color = CategoryItem.Color(rawValue: item.colorId)
         else {
             return .gray
         }
