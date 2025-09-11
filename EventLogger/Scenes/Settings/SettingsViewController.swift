@@ -75,7 +75,13 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     let calendarLinkSwitch = UISwitch().then {
         $0.onTintColor = .systemOrange
     }
-    
+
+    let calendarNoticeLabel = UILabel().then {
+        $0.text = "iCloud 동기화를 꺼 두시면 다른 기기와 동기화되지 않습니다."
+        $0.font = .font12Regular
+        $0.textColor = .label
+    }
+
     // MARK: SetupUI
     
     override func setupUI() {
@@ -100,7 +106,8 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
         view.addSubview(calaendarLinkBackground)
         calaendarLinkBackground.addSubview(calendarAutoLinkLabel)
         calaendarLinkBackground.addSubview(calendarLinkSwitch)
-        
+        view.addSubview(calendarNoticeLabel)
+
         // 오토 레이아웃
         categoryControlBackground.snp.makeConstraints {
             $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
@@ -160,6 +167,11 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
             $0.trailing.equalToSuperview().inset(16)
             $0.width.equalTo(51)
             $0.height.equalTo(31)
+        }
+
+        calendarNoticeLabel.snp.makeConstraints {
+            $0.top.equalTo(calaendarLinkBackground.snp.bottom).offset(8)
+            $0.leading.trailing.equalTo(calaendarLinkBackground).inset(16)
         }
     }
     
