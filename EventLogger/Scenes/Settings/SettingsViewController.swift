@@ -77,9 +77,10 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let calendarNoticeLabel = UILabel().then {
-        $0.text = "iCloud 동기화를 꺼 두시면 다른 기기와 동기화되지 않습니다."
+        $0.text = "동기화가 꺼져 있을 때 만든 일정은 iCloud를 다시 켜도 연결되지 않을 수 있습니다."
         $0.font = .font12Regular
         $0.textColor = .label
+        $0.numberOfLines = 0
     }
 
     // MARK: SetupUI
@@ -111,11 +112,11 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
         // 오토 레이아웃
         categoryControlBackground.snp.makeConstraints {
             $0.top.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
-            $0.height.greaterThanOrEqualTo(42)
+            $0.height.equalTo(44)
         }
         
         categoryControlLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
+            $0.top.bottom.equalToSuperview().inset(11)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
@@ -128,18 +129,17 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
         noticeBackground.snp.makeConstraints {
             $0.top.equalTo(noticeLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.height.equalTo(44)
         }
         
         pushNoticeLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
+            $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(16)
         }
         
         pushNoticeSwitch.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
             $0.trailing.equalToSuperview().inset(16)
-            $0.width.equalTo(51)
-            $0.height.equalTo(31)
+            $0.centerY.equalToSuperview()
         }
         
         pushNoticeDescription.snp.makeConstraints {
@@ -155,18 +155,17 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
         calaendarLinkBackground.snp.makeConstraints {
             $0.top.equalTo(calendarLinkLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
+            $0.height.equalTo(44)
         }
         
         calendarAutoLinkLabel.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
+            $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalToSuperview().inset(16)
         }
         
         calendarLinkSwitch.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(10)
             $0.trailing.equalToSuperview().inset(16)
-            $0.width.equalTo(51)
-            $0.height.equalTo(31)
+            $0.centerY.equalToSuperview()
         }
 
         calendarNoticeLabel.snp.makeConstraints {
