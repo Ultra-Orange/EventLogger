@@ -40,7 +40,6 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.alignment = .center
         $0.distribution = .fill
         $0.spacing = 10
-        $0.translatesAutoresizingMaskIntoConstraints = false
     }
 
     private let emptyTitleLabel = UILabel().then {
