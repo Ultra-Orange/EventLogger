@@ -29,7 +29,8 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.showsVerticalScrollIndicator = true
         $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     }
-    
+
+    // MARK: 컬렉션뷰 백그라운드용
     private let emptyView = UIView().then {
         $0.backgroundColor = .clear
     }
@@ -189,6 +190,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
             .disposed(by: disposeBag)
     }
 
+    /// 부모 받아서 펼쳐져 있으면 접고, 접혀 있으면 펼치는 함수
     private func toggle(parent: RollupParent) {
         guard var snapshot = dataSource?.snapshot() else { return }
         let pid = parent.id
@@ -261,8 +263,6 @@ extension StatsViewController {
         case artistExpense
     }
 }
-
-
 
 // MARK: - Utilities
 final class KRWFormatter {
