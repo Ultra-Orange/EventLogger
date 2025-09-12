@@ -5,12 +5,12 @@
 //  Created by Yoon on 8/20/25.
 //
 
-import SwiftData
 import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
 import RxSwift
+import SwiftData
 
 final class EventListReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -43,6 +43,7 @@ final class EventListReactor: BaseReactor {
 
     // 생성자에서 초기 상태 설정
     let initialState: State
+
     @Dependency(\.swiftDataManager) var swiftDataManager
 
     init() {
@@ -73,7 +74,7 @@ final class EventListReactor: BaseReactor {
 
         case let .setYearFilter(year):
             return .just(.setYearFilter(year))
-            
+
         case .goSettings:
             steps.accept(AppStep.settings)
             return .empty()

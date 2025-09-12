@@ -31,7 +31,7 @@ extension StatsViewController {
         let totalCountReg = UICollectionView.CellRegistration<StatsTotalCountCell, TotalModel> { cell, _, model in
             cell.configure(totalCount: model.totalCount)
         }
-        
+
         let totalExpenseReg = UICollectionView.CellRegistration<StatsTotalExpenseCell, TotalModel> { cell, _, model in
             cell.configure(totalExpense: model.totalExpense)
         }
@@ -41,12 +41,11 @@ extension StatsViewController {
             cell.configure(title: model.title,
                            valueText: model.valueText,
                            leftDotColor: model.leftDotColor)
-            
+
             // chevron (expanded 여부에 따라 up/down)
             let isExpanded = self.expandedParentIDs.contains(model.id)
             cell.setChevron(expanded: isExpanded, animated: false)
 
-            
             // 터치 중 하이라이트만 적용되고 선택 잔상은 남지 않도록
             cell.automaticallyUpdatesBackgroundConfiguration = false
             cell.configurationUpdateHandler = { cell, state in
@@ -62,7 +61,7 @@ extension StatsViewController {
 
         let childReg = UICollectionView.CellRegistration<StatsRollupChildCell, RollupChild> { cell, _, model in
             cell.configure(title: model.title, valueText: model.valueText, leftDotColor: model.leftDotColor)
-            
+
             cell.automaticallyUpdatesBackgroundConfiguration = false
             cell.configurationUpdateHandler = { cell, state in
                 var bg = UIBackgroundConfiguration.listGroupedCell()
@@ -78,15 +77,15 @@ extension StatsViewController {
         let titleReg = UICollectionView.CellRegistration<StatsTitleCell, String> { cell, _, title in
             cell.configure(title: title)
         }
-        
+
         let heatmapHeaderReg = UICollectionView.CellRegistration<HeatmapHeaderCell, String> { cell, _, title in
             cell.configure(title: title)
         }
-        
+
         let legendReg = UICollectionView.CellRegistration<HeatmapFooterCell, UUID> { cell, _, _ in
             cell.configure()
         }
-        
+
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
             case .title(let title):

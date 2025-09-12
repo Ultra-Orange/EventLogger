@@ -175,7 +175,7 @@ final class DateRangeFieldContainerView: UIView {
         
         // 상단 행 (시작 시간)
         container.addArrangedSubview(startRow)
-        startRow.snp.makeConstraints { $0.height.equalTo(26) }
+        startRow.snp.makeConstraints { $0.height.equalTo(25.5) }
         startRow.addArrangedSubview(startLabel)
         startRow.addArrangedSubview(startRowSpacer)
         startRow.addArrangedSubview(startDateButton)
@@ -190,7 +190,7 @@ final class DateRangeFieldContainerView: UIView {
         
         // 하단 행 (종료 시간)
         container.addArrangedSubview(endRow)
-        endRow.snp.makeConstraints { $0.height.equalTo(26) }
+        endRow.snp.makeConstraints { $0.height.equalTo(25.5) }
         endRow.addArrangedSubview(endLabel)
         endRow.addArrangedSubview(endRowSpacer)
         endRow.addArrangedSubview(endDateButton)

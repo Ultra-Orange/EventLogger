@@ -81,11 +81,11 @@ extension StatsViewController {
 
         // 5) 총합
         let (cnt, expense) = statisticsService.total(for: period)
-        
+
 //        if cnt == 0 {
 //            collectionView.backgroundView?.isHidden = false
 //            collectionView.showsVerticalScrollIndicator = false
-//            
+//
 //            // 비어있는 스냅샷 적용 (아이템/섹션 0개여야 backgroundView가 보입니다)
 //            let empty = NSDiffableDataSourceSnapshot<StatsSection, StatsItem>()
 //            dataSource.apply(empty, animatingDifferences: animated)
@@ -94,7 +94,7 @@ extension StatsViewController {
 //            collectionView.backgroundView?.isHidden = true
 //            collectionView.showsVerticalScrollIndicator = true
 //        }
-        
+
         snapshot.appendItems([.totalCount(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalCount)
         snapshot.appendItems([.totalExpense(.init(totalCount: cnt, totalExpense: expense))], toSection: .totalExpense)
 
