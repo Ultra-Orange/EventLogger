@@ -145,7 +145,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     // MARK: Lifecycle
 
     override func setupUI() {
-        navigationItem.backButtonDisplayMode = .minimal
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
         navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
 

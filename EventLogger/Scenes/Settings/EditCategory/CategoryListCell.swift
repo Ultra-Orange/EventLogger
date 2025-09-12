@@ -37,9 +37,9 @@ class CategoryListCell: UICollectionViewListCell {
         }
 
         // TODO: 눌렀을때 색
-        selectedBackgroundView = UIView().then {
-            $0.backgroundColor = .black.withAlphaComponent(0.5)
-        }
+//        selectedBackgroundView = UIView().then {
+//            $0.backgroundColor = .black.withAlphaComponent(0.5)
+//        }
 
         backgroundView = UIView().then {
             $0.backgroundColor = .neutral800

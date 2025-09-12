@@ -18,7 +18,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     // MARK: UI Component
 
     let categoryControlBackground = UIView().then {
-        $0.backgroundColor = .systemGray6
+        $0.backgroundColor = .neutral800
         $0.layer.cornerRadius = 12
     }
 
@@ -35,7 +35,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let noticeBackground = UIView().then {
-        $0.backgroundColor = .systemGray6
+        $0.backgroundColor = .neutral800
         $0.layer.cornerRadius = 12
     }
 
@@ -62,7 +62,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let calaendarLinkBackground = UIView().then {
-        $0.backgroundColor = .systemGray6
+        $0.backgroundColor = .neutral800
         $0.layer.cornerRadius = 12
     }
 
@@ -86,8 +86,6 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     // MARK: SetupUI
 
     override func setupUI() {
-        navigationItem.backButtonDisplayMode = .minimal
-
         view.backgroundColor = .systemBackground
         title = "설정"
 
