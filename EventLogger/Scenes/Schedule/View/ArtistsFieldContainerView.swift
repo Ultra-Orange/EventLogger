@@ -47,7 +47,7 @@ final class ArtistsFieldContainerView: UIView {
     }
 
     private let disposeBag = DisposeBag()
-    
+
     init() {
         super.init(frame: .zero)
 

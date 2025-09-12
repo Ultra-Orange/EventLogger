@@ -5,8 +5,8 @@
 //  Created by Yoon on 8/30/25.
 //
 
-import SwiftData
 import Foundation
+import SwiftData
 
 @Model
 final class ArtistStore {

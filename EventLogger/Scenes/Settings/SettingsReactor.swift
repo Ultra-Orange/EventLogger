@@ -8,6 +8,7 @@
 import SwiftData
 
 import Dependencies
+import EventKit
 import Foundation
 import ReactorKit
 import RxFlow
@@ -15,7 +16,6 @@ import RxRelay
 import RxSwift
 import UIKit
 import UserNotifications
-import EventKit
 
 final class SettingsReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -97,8 +97,8 @@ final class SettingsReactor: BaseReactor {
             return Observable.create { observer in
                 UNUserNotificationCenter.current().getNotificationSettings { settings in
                     let isGranted = (settings.authorizationStatus == .authorized
-                                     || settings.authorizationStatus == .provisional
-                                     || settings.authorizationStatus == .ephemeral)
+                        || settings.authorizationStatus == .provisional
+                        || settings.authorizationStatus == .ephemeral)
                     observer.onNext(.setPushEnabled(isGranted && self.settingsService.pushNotificationEnabled))
                     observer.onCompleted()
                 }
@@ -128,7 +128,7 @@ final class SettingsReactor: BaseReactor {
         case .refreshCalendarStatus:
             let status = EKEventStore.authorizationStatus(for: .event)
             let isGranted = (status == .fullAccess || status == .writeOnly)
-            return .just(.setCalendarEnabled(isGranted && self.settingsService.autoSaveToCalendar))
+            return .just(.setCalendarEnabled(isGranted && settingsService.autoSaveToCalendar))
         }
     }
 

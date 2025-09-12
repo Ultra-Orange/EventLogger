@@ -16,7 +16,7 @@ enum Persistence {
                 ArtistStore.self,
             ]
             let schema = Schema(models)
-            
+
             let config = ModelConfiguration(
                 "Default",
                 cloudKitDatabase: .automatic // CloudKit 자동 동기화
@@ -24,8 +24,8 @@ enum Persistence {
             return try ModelContainer(for: schema, configurations: config)
         } catch {
             let pretty = "\(error) | \(String(reflecting: error))"
-              assertionFailure("❌ ModelContainer init failed: \(pretty)")
-              fatalError(pretty) // 임시
+            assertionFailure("❌ ModelContainer init failed: \(pretty)")
+            fatalError(pretty) // 임시
 //            fatalError(error.localizedDescription)
         }
     }()

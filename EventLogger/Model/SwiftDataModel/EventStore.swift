@@ -10,7 +10,6 @@ import UIKit
 
 @Model
 final class EventStore {
-    
     var id: UUID = UUID()
     var title: String = ""
     var categoryId: UUID? = nil
@@ -18,10 +17,10 @@ final class EventStore {
     var startTime: Date = Date.now
     var endTime: Date = Date.now
     var location: String?
-    
+
     // DB에는 Data로 저장
     @Relationship var artists: [ArtistStore]? = []
-    
+
     // 순서 정보
     var artistsOrderData: Data?
 
@@ -34,12 +33,12 @@ final class EventStore {
             artistsOrderData = try? JSONEncoder().encode(newValue)
         }
     }
-    
+
     var expense: Double = 0.0
     var currency: String = "KRW"
     var memo: String = ""
     var calendarEventId: String?
-    
+
     init(
         id: UUID = UUID(),
         title: String,
@@ -48,7 +47,7 @@ final class EventStore {
         startTime: Date,
         endTime: Date,
         location: String? = nil,
-        artists: [String] = [],
+        artists _: [String] = [],
         expense: Double = 0,
         currency: String,
         memo: String,
@@ -66,28 +65,24 @@ final class EventStore {
         self.memo = memo
         self.calendarEventId = calendarEventId
     }
-    
-
 }
 
 extension EventStore {
-     
-    func toDomain() ->  EventItem {
+    func toDomain() -> EventItem {
         // 저장된 된 순서대로 반환
         // 1) 관계가 옵셔널이므로 안전하게 꺼냅니다.
         let storeArtists: [ArtistStore] = artists ?? []
         // 2) 관계에서 가져온 이름들
         let fetchedNames: [String] = storeArtists.map(\.name)
         // 3) 순서 보존: artistsOrder(예: [String])가 있으면 그 순서로 정리,
-               //  없으면 관계의 순서를 사용합니다.
-               let orderedNames: [String] = {
-                   let order = artistsOrder         
-                   guard !order.isEmpty else { return fetchedNames }
-                   let nameSet = Set(fetchedNames)         // 삭제/누락 대비 교집합만 유지
-                   return order.filter { nameSet.contains($0) }
-               }()
-        
-       
+        //  없으면 관계의 순서를 사용합니다.
+        let orderedNames: [String] = {
+            let order = artistsOrder
+            guard !order.isEmpty else { return fetchedNames }
+            let nameSet = Set(fetchedNames) // 삭제/누락 대비 교집합만 유지
+            return order.filter { nameSet.contains($0) }
+        }()
+
         return EventItem(
             id: id,
             title: title,
@@ -104,4 +99,3 @@ extension EventStore {
         )
     }
 }
-

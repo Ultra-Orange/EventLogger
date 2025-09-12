@@ -5,11 +5,11 @@
 //  Created by Yoon on 8/24/25.
 //
 
+import RxCocoa
+import RxSwift
 import SnapKit
 import Then
 import UIKit
-import RxSwift
-import RxCocoa
 
 final class ExpenseFieldContainerView: UIView {
     let label = UILabel().then {
@@ -21,9 +21,9 @@ final class ExpenseFieldContainerView: UIView {
         $0.placeholder = "비용을 입력하세요"
         $0.keyboardType = .decimalPad
     }
-    
+
     private let disposeBag = DisposeBag()
-    
+
     init() {
         super.init(frame: .zero)
 
@@ -40,7 +40,7 @@ final class ExpenseFieldContainerView: UIView {
             $0.leading.bottom.trailing.equalToSuperview()
             $0.height.equalTo(44)
         }
-        
+
         textField.rx.controlEvent(.editingDidEnd)
             .withLatestFrom(textField.rx.text.orEmpty)
             .compactMap { Double($0) }

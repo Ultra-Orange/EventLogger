@@ -5,13 +5,13 @@
 //  Created by Yoon on 8/31/25.
 //
 
+import CoreData
 import ReactorKit
 import RxCocoa
 import RxSwift
 import SnapKit
 import Then
 import UIKit
-import CoreData
 
 import Dependencies
 
@@ -38,7 +38,7 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
 
     let reorderCategoryRelay = PublishRelay<[CategoryItem]>()
     let deleteCategoryRelay = PublishRelay<CategoryItem>()
-    
+
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
     override func viewWillAppear(_ animated: Bool) {
@@ -94,8 +94,7 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
         reorderCategoryRelay.map { items in .reorderCategories(items) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
-            
+
         deleteCategoryRelay
             .withUnretained(self)
             .flatMap { `self`, item in
@@ -117,10 +116,10 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
             }
             .bind {}
             .disposed(by: disposeBag)
-        
+
         Observable.merge(
-            rx.viewWillAppear.map{ _ in },
-            NotificationCenter.default.rx.notification(notification).map{ _ in }
+            rx.viewWillAppear.map { _ in },
+            NotificationCenter.default.rx.notification(notification).map { _ in }
         )
         .map { _ in .reloadCategories }
         .bind(to: reactor.action)

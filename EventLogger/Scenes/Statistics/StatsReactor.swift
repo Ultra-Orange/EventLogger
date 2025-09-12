@@ -90,10 +90,10 @@ final class StatsReactor: BaseReactor {
                 .just(.setActiveYears(years)),
                 .just(.setSelectedYear(defaultYear)),
                 .just(.setSelectedMonth(defaultMonth)),
-                .just(.setHeatmap(heatmap))
+                .just(.setHeatmap(heatmap)),
             ])
 
-        case .setScope(let newScope):
+        case let .setScope(newScope):
             // 스코프 전환 시 기본 선택값 보정
             var selectedYear: Int?
             var selectedMonth: Int? = nil
@@ -110,13 +110,13 @@ final class StatsReactor: BaseReactor {
                 .just(.setScope(newScope)),
                 .just(.setSelectedYear(selectedYear)),
                 .just(.setSelectedMonth(selectedMonth)),
-                .just(.setActiveYears(years))
+                .just(.setActiveYears(years)),
             ])
 
-        case .pickYear(let year):
+        case let .pickYear(year):
             return .just(.setSelectedYear(year))
 
-        case .pickMonth(let month):
+        case let .pickMonth(month):
             return .just(.setSelectedMonth(month))
         }
     }
@@ -126,19 +126,19 @@ final class StatsReactor: BaseReactor {
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state
         switch mutation {
-        case .setActiveYears(let years):
+        case let .setActiveYears(years):
             newState.activeYears = years
 
-        case .setScope(let scope):
+        case let .setScope(scope):
             newState.scope = scope
 
-        case .setSelectedYear(let year):
+        case let .setSelectedYear(year):
             newState.selectedYear = year
 
-        case .setSelectedMonth(let month):
+        case let .setSelectedMonth(month):
             newState.selectedMonth = month
 
-        case .setHeatmap(let model):
+        case let .setHeatmap(model):
             newState.heatmap = model
         }
         return newState

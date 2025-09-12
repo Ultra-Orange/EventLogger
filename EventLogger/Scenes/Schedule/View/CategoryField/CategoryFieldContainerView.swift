@@ -1,5 +1,5 @@
 //
-//  CategoryContainerView.swift
+//  CategoryFieldContainerView.swift
 //  EventLogger
 //
 //  Created by 김우성 on 8/27/25.

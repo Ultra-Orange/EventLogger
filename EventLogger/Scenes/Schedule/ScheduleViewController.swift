@@ -5,6 +5,7 @@
 //  Created by Yoon on 8/22/25.
 //
 
+import CoreData
 import Dependencies
 import PhotosUI
 import ReactorKit
@@ -16,7 +17,6 @@ import SwiftData
 import SwiftUI
 import Then
 import UIKit
-import CoreData
 
 class ScheduleViewController: BaseViewController<ScheduleReactor> {
     // MARK: UI Components
@@ -65,8 +65,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func setupUI() {
-
-
         view.backgroundColor = .systemBackground
 
         // 스크롤 뷰
@@ -162,7 +160,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
 
     override func bind(reactor: ScheduleReactor) {
-
         // 초기값 세팅
         reactor.state
             .take(1)
@@ -174,7 +171,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.configureInitialState(state: state)
             }
             .disposed(by: disposeBag)
-
 
         // 제목 입력에 따라 버튼 활성/비활성
         let isTitleValid = inputTitleView.textField.rx.text
@@ -266,7 +262,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             })
             .disposed(by: disposeBag)
 
-
         var characterSets = CharacterSet.decimalDigits
         characterSets.insert(".")
 
@@ -280,7 +275,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         expenseRelay
             .map { $0 == .zero ? "" : $0.formatted(.number) }
-        //            .distinctUntilChanged() // distinctUntilChanged 켜놓으면 .도 입력 불가
+            //            .distinctUntilChanged() // distinctUntilChanged 켜놓으면 .도 입력 불가
             .bind(to: expenseFieldView.textField.rx.text)
             .disposed(by: disposeBag)
 
@@ -296,8 +291,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                     startTime: dateRangeFieldView.startDate,
                     endTime: dateRangeFieldView.endDate,
                     location: reactor.currentState.selectedLocation.isEmpty
-                    ? nil
-                    : reactor.currentState.selectedLocation,
+                        ? nil
+                        : reactor.currentState.selectedLocation,
                     artists: artistsFieldView.tagsField.tags.map(\.text),
                     expense: expense,
                     currency: .KRW, // MVP 기준 고정
@@ -315,10 +310,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-
         Observable.merge(
-            rx.viewWillAppear.map{ _ in },
-            NotificationCenter.default.rx.notification(notification).map{ _ in }
+            rx.viewWillAppear.map { _ in },
+            NotificationCenter.default.rx.notification(notification).map { _ in }
         )
         .map { _ in .reloadCategories }
         .bind(to: reactor.action)
@@ -362,7 +356,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
             // 메모
             memoFieldView.textView.text = item.memo
-
         }
     }
 }
@@ -384,7 +377,6 @@ extension ScheduleViewController {
     }
 }
 
-
 struct EventPayload {
     var title: String
     var categoryId: UUID
@@ -397,4 +389,3 @@ struct EventPayload {
     var currency: Currency
     var memo: String
 }
-

@@ -54,7 +54,6 @@ extension CategoryItem {
         case code10 = 10
         case code11 = 11
 
-
         var uiColor: UIColor {
             switch self {
             case .code0: return UIColor.category0
@@ -73,4 +72,3 @@ extension CategoryItem {
         }
     }
 }
-

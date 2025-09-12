@@ -232,7 +232,7 @@ extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
         completerResults.accept(completer.results)
     }
 
-    func completer(_: MKLocalSearchCompleter, didFailWithError error: Error) {
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         completerResults.accept([])
     }
 }

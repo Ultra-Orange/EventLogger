@@ -6,12 +6,11 @@
 //
 
 import SnapKit
-import UIKit
 import Then
+import UIKit
 
 // 섹션 헤더 뷰
 final class HeatmapHeaderCell: UICollectionViewCell {
-
     private let titleLabel = UILabel().then {
         $0.font = .font17Semibold
         $0.textColor = .neutral50

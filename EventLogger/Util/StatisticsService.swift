@@ -66,7 +66,7 @@ extension StatisticsService {
             var agg = bucket[categoryId] ?? CatAgg()
             agg.count += 1
             agg.totalExpense += event.expense
-            
+
             // 아티스트별: 비용은 "각 아티스트에 동일하게"
             // 그래서 아티스트 받아온 것들 다 합쳐서 총액을 쓸 수는 없음
             for name in event.artists {

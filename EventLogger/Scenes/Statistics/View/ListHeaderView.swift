@@ -6,8 +6,8 @@
 //
 
 import SnapKit
-import UIKit
 import Then
+import UIKit
 
 // 섹션 헤더 뷰
 final class ListHeaderView: UICollectionReusableView {

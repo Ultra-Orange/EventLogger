@@ -7,12 +7,12 @@
 
 import UIKit
 
-
 // SF Symbol Config용 폰트 사이즈
 extension UIImage.Configuration {
     static let font17Regular = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 17))
     static let font32Regular = UIImage.SymbolConfiguration(font: .systemFont(ofSize: 32))
 }
+
 /*
  사용 예제
  private let mapPinIcon = UIImageView(image: UIImage.SFSymbol(named: "mappin.and.ellipse", config: .font16Regular))
@@ -29,7 +29,7 @@ extension UIImage {
             .withConfiguration(config)
             .withTintColor(.neutral50, renderingMode: .alwaysOriginal)
     }
-    
+
     // 취소버튼 용 config
     static func symbolXCircleFill(
         config: UIImage.SymbolConfiguration,
@@ -39,7 +39,7 @@ extension UIImage {
             .withConfiguration(config)
             .withTintColor(color, renderingMode: .alwaysOriginal)
     }
-    
+
     // 카테고리 색 점 아이콘 생성 유틸
     static func circle(diameter: CGFloat, color: UIColor) -> UIImage {
         let format = UIGraphicsImageRendererFormat()

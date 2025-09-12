@@ -21,7 +21,7 @@ final class MemoFieldContainerView: UIView {
         $0.layer.cornerRadius = 10
         $0.textContainerInset = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
     }
-    
+
     private var textViewHeightConstraint: Constraint?
 
     init() {
