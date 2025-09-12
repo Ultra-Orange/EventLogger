@@ -205,42 +205,64 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .disposed(by: disposeBag)
 
-        // TODO: 한 스트림에서 switch로 알럿을 만들지 말고, saveOutcome을 케이스별로 분기된 스트림으로 나눠서, 각각 UIAlertController의 Rx 확장으로 처리하라
-        // TODO: 리팩토링 필수
-        reactor.saveOutcome
+
+        let saveResult = reactor.pulse(\.$saveResult)
+            .compactMap { $0 }
             .observe(on: MainScheduler.instance)
-            .bind(with: self) { owner, outcome in
-                let alert: UIAlertController
-                switch outcome {
-                case .success:
-                    alert = UIAlertController(
-                        title: "캘린더 저장 완료",
-                        message: "이 이벤트를 캘린더에 저장했어요.",
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                case .denied:
-                    alert = UIAlertController(
-                        title: "접근 권한 필요",
-                        message: "설정 > 개인정보보호 > 캘린더에서 권한을 허용해주세요.",
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                    alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
-                        if let url = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(url)
-                        }
-                    })
-                case let .failure(message):
-                    alert = UIAlertController(
-                        title: "저장 실패",
-                        message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
-                        preferredStyle: .alert
-                    )
-                    alert.addAction(UIAlertAction(title: "확인", style: .default))
-                }
-                owner.present(alert, animated: true)
+            .share()
+
+        // 권한 요청 성공
+        saveResult
+            .filter { $0 == .success }
+            .withUnretained(self)
+            .flatMap { `self`, _ in
+                UIAlertController.rx.alert(
+                    on: self,
+                    title: "캘린더 저장 완료",
+                    message: "이 이벤트를 캘린더에 저장했어요.",
+                    actions: [
+                        .action("확인", payload: ()),
+                    ])
             }
+            .subscribe()
+            .disposed(by: disposeBag)
+
+        // 권한 요청 거부
+        saveResult 
+            .filter { $0 == .denied }
+            .withUnretained(self)
+            .flatMap { `self`, _ in
+                UIAlertController.rx.alert(
+                    on: self,
+                    title: "접근 권한 필요",
+                    message: "설정 > 개인정보보호 > 캘린더에서 권한을 허용해주세요.",
+                    actions: [
+                        .cancel("확인"),
+                        .action("설정으로 이동", payload: .openSystemSettings),
+                    ])
+            }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // saveResult 획득 실패
+        saveResult
+            .compactMap {
+                if case let .failure(message) = $0 {
+                    return message
+                }
+                return nil
+            }
+            .withUnretained(self)
+            .flatMap { `self`, message in
+                UIAlertController.rx.alert(
+                    on: self,
+                    title: "저장 실패",
+                    message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
+                    actions: [
+                        .action("확인", payload: ()),
+                    ])
+            }
+            .subscribe()
             .disposed(by: disposeBag)
     }
 
