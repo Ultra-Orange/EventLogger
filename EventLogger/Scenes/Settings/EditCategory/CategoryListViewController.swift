@@ -41,7 +41,6 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
     
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
-    // TODO: 백 스와이프 해제애니메이션이 없이 바로 해제
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let selectedIndexPaths = collectionView.indexPathsForSelectedItems, let transitionCoordinator else {

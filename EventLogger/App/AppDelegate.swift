@@ -13,7 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions : [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         Task {
-
             let pushEnable = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
             application.registerForRemoteNotifications()
             

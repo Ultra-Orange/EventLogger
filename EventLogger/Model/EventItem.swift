@@ -17,8 +17,8 @@ struct EventItem: Hashable {
     var endTime: Date // 종연시간
     var location: String? // 장소
     var artists: [String] // 아티스트
-    var expense: Double // TODO: 토털은 원화변환
-    var currency: Currency // TODO: MVP까지는 KRW단일
+    var expense: Double // 비용
+    var currency: Currency // 확장 전까지는 KRW 고정
     var memo: String // 메모
     var calendarEventId: String? // 달력이벤트 idenfier
 

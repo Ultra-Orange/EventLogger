@@ -35,10 +35,18 @@ class CategoryListCell: UICollectionViewListCell {
             $0.trailing.equalToSuperview().inset(10)
             $0.top.bottom.equalToSuperview().inset(11)
         }
+
+        // TODO: 눌렀을때 색
+        selectedBackgroundView = UIView().then {
+            $0.backgroundColor = .black.withAlphaComponent(0.5)
+        }
+
+        backgroundView = UIView().then {
+            $0.backgroundColor = .neutral800
+        }
     }
 
     func configureCell(item: CategoryItem) {
-        backgroundColor = .neutral800
         colorMark.backgroundColor = item.color
         nameLabel.text = item.name
     }

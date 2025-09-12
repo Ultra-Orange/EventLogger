@@ -206,7 +206,7 @@ private extension ScheduleReactor {
     }
     
     func schedulePushNotificationIfNeeded(_ item: EventItem) {
-        // 스위치 off -> 알림 없음
+        // 스위치 off -> 알림 없음 
         guard settingsService.pushNotificationEnabled else { return }
         // 기존 예약 삭제
         notificationService.cancelNotification(id: item.id.uuidString)

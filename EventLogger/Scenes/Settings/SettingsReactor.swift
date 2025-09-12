@@ -42,8 +42,6 @@ final class SettingsReactor: BaseReactor {
         @Pulse var alertMessage: String?
     }
 
-    // TODO: 리팩토링 요소 있음, notificationService 관련
-    // TODO: 캘린더 권한 묻는 시점 리팩토링
     @Dependency(\.settingsService) var settingsService
     @Dependency(\.notificationService) var notificationService
     @Dependency(\.calendarService) var calendarService
