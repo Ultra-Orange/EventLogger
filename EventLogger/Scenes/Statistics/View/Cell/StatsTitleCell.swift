@@ -6,8 +6,8 @@
 //
 
 import SnapKit
-import UIKit
 import Then
+import UIKit
 
 // 섹션 헤더 뷰
 final class StatsTitleCell: UICollectionViewCell {
@@ -26,7 +26,7 @@ final class StatsTitleCell: UICollectionViewCell {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError() }
+    required init?(coder _: NSCoder) { fatalError() }
 
     func configure(title: String) {
         titleLabel.text = title

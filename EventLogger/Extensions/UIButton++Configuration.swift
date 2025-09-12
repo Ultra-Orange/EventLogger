@@ -24,7 +24,7 @@ extension UIButton {
         }
         return button
     }
-    
+
     // EventList용 우하단 추가 버튼 메이커
     static func makeAddButton() -> UIButton {
         let button = UIButton(configuration: .addButton)
@@ -39,10 +39,9 @@ extension UIButton {
 }
 
 extension UIButton.Configuration {
-   
     //     사용부
     //    private let button = UIButton(configuration: .closed)
-    
+
     // 기본 버튼
     static var defaultButton: UIButton.Configuration {
         var config = filled()
@@ -55,7 +54,7 @@ extension UIButton.Configuration {
         }
         return config
     }
-    
+
     static var defaultColorReversed: UIButton.Configuration {
         var config = filled()
         config.baseBackgroundColor = .systemGray5
@@ -66,12 +65,12 @@ extension UIButton.Configuration {
             var newAttr = attr
             newAttr.font = UIFont.font16Regular
             newAttr.foregroundColor = .accent
-            
+
             return newAttr
         }
         return config
     }
-    
+
     static var removeImgButton: UIButton.Configuration {
         var config = plain()
         config.titleTextAttributesTransformer = .init { attr in
@@ -82,7 +81,7 @@ extension UIButton.Configuration {
         }
         return config
     }
-    
+
     static var addButton: UIButton.Configuration {
         var config = filled()
         config.cornerStyle = .capsule
@@ -90,10 +89,10 @@ extension UIButton.Configuration {
         config.baseForegroundColor = .neutral50
         config.image = UIImage(systemName: "plus")?
             .withConfiguration(UIImage.SymbolConfiguration(pointSize: 24, weight: .bold))
-        
+
         return config
     }
-    
+
     // 하단 버튼
     static var bottomButton: UIButton.Configuration {
         var config = filled()
@@ -106,7 +105,7 @@ extension UIButton.Configuration {
         }
         return config
     }
-    
+
     // 네비게이션 닫기 버튼
     static var navCancel: UIButton.Configuration {
         var config = plain()
@@ -118,5 +117,4 @@ extension UIButton.Configuration {
         }
         return config
     }
-    
 }

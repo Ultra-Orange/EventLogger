@@ -11,8 +11,8 @@ import UIKit
 
 struct HeatmapModel: Hashable {
     struct Row: Hashable {
-        let yearLabel: String   // "`25" 또는 "2025" 등 넣기
-        let monthCounts: [Int]  // 12개짜리 Int 배열 넣기
+        let yearLabel: String // "`25" 또는 "2025" 등 넣기
+        let monthCounts: [Int] // 12개짜리 Int 배열 넣기
     }
 
     let rows: [Row]
@@ -22,15 +22,15 @@ struct HeatmapModel: Hashable {
 // + 최상단에 1~12 월 헤더 추가
 final class HeatmapView: UIView {
     // 레이아웃 상수 한 곳에서 관리
-    struct Metrics {
-        static let topPadding: CGFloat = 10                 // 최상단 여백 (헤더 위)
-        static let headerHeight: CGFloat = 16               // "1~12" 헤더 라벨 높이
-        static let headerBottomSpacing: CGFloat = 7         // 헤더와 첫 행 사이 간격
+    enum Metrics {
+        static let topPadding: CGFloat = 10 // 최상단 여백 (헤더 위)
+        static let headerHeight: CGFloat = 16 // "1~12" 헤더 라벨 높이
+        static let headerBottomSpacing: CGFloat = 7 // 헤더와 첫 행 사이 간격
         static let bottomPadding: CGFloat = 10
-        
+
         static let leftYearWidth: CGFloat = 25
-        static let hSpacing: CGFloat = 8.5    // 월 칸 사이 간격 (12개)
-        static let vSpacing: CGFloat = 8.5    // 행 간격
+        static let hSpacing: CGFloat = 8.5 // 월 칸 사이 간격 (12개)
+        static let vSpacing: CGFloat = 8.5 // 행 간격
         static let minCellHeight: CGFloat = 16
         static let horizontalContentInset: CGFloat = 20 // 좌우 총 여백(= 10 + 10)
         static let monthCount = 12
@@ -63,7 +63,7 @@ final class HeatmapView: UIView {
 
         // 최종 높이 = 상단 여백 + 헤더 높이 + 헤더-셀 간격 + 셀영역 + 행간격 + 하단여백
         return m.topPadding + m.headerHeight + m.headerBottomSpacing
-             + totalCellsHeight + totalVSpacing + m.bottomPadding
+            + totalCellsHeight + totalVSpacing + m.bottomPadding
     }
 
     private var yearLabels: [UILabel] = []
@@ -191,15 +191,16 @@ final class HeatmapView: UIView {
 
     private func colorForCount(_ count: Int) -> UIColor {
         switch count {
-        case 0:     return .neutral700
+        case 0: return .neutral700
         case 1...4: return .primary200
         case 5...8: return .primary300
-        default:    return .primary500
+        default: return .primary500
         }
     }
 }
 
 // MARK: - Safe index helper
+
 private extension Array {
     subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil

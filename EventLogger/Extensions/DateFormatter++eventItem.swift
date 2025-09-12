@@ -50,7 +50,7 @@ extension DateFormatter {
     }
 
     // MARK: - String → Date
-    
+
     // 전체 포맷("yyyy년 M월 d일 H:mm") 문자열만 파싱합니다.
     static func toDate(_ string: String) -> Date? {
         return eventItemFullFormatter.date(from: string)

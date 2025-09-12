@@ -10,6 +10,7 @@ class BaseViewController<R: Reactor>: UIViewController, View {
     var disposeBag = DisposeBag()
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.backButtonDisplayMode = .minimal
         setupUI()
     }
 

@@ -6,8 +6,8 @@
 //
 
 enum Currency: String {
+    // 향후 확장성을 위해 유지
     case KRW
-    // TODO: 나머지는 추후구현
 
     var description: String {
         return rawValue

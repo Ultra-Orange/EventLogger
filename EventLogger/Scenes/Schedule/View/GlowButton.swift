@@ -9,9 +9,9 @@ import UIKit
 
 /// Figma 스타일의 글로우 버튼 (cornerRadius 12, 다크배경, 오렌지 보더 + 글로우)
 final class GlowButton: UIButton {
-
     // MARK: - Color Palette (Figma 값 그대로)
-    private struct Palette {
+
+    private enum Palette {
         static let glow = UIColor(red: 0.961, green: 0.397, blue: 0.019, alpha: 1.0)
         static let border = UIColor(red: 0.988, green: 0.631, blue: 0.392, alpha: 1.0)
         static let background = UIColor(red: 0.084, green: 0.084, blue: 0.084, alpha: 1.0)
@@ -22,6 +22,7 @@ final class GlowButton: UIButton {
     }
 
     // MARK: - Init
+
     convenience init(title: String? = nil) {
         self.init(frame: .zero)
         setTitle(title, for: .normal)
@@ -40,38 +41,38 @@ final class GlowButton: UIButton {
     private func commonInit() {
         clipsToBounds = false
         layer.cornerRadius = 12
-        
+
         // UIButton.Configuration을 사용한 스타일 설정
         var config = UIButton.Configuration.filled()
         config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 16, bottom: 14, trailing: 16)
         config.background.cornerRadius = 12
-        
+
         // 타이틀 스타일
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
             outgoing.font = UIFont.font17Semibold // 기존 폰트 사용
             return outgoing
         }
-        
-        self.configuration = config
-        
+
+        configuration = config
+
         // 상태 변화에 따라 스타일을 업데이트하는 핸들러
-        self.configurationUpdateHandler = { [weak self] button in
+        configurationUpdateHandler = { [weak self] button in
             guard let self = self else { return }
             var updatedConfig = button.configuration
-            
+
             let isEnabled = button.state.contains(.disabled) == false
-            
+
             // 배경색, 보더
             updatedConfig?.baseBackgroundColor = isEnabled ? Palette.background : Palette.disabledBg
             updatedConfig?.background.strokeColor = isEnabled ? Palette.border : Palette.disabledBorder
             updatedConfig?.background.strokeWidth = 1.0
-            
+
             // 타이틀 색상
             updatedConfig?.baseForegroundColor = isEnabled ? Palette.title : Palette.disabledTitle
-            
+
             button.configuration = updatedConfig
-            
+
             // 그림자(글로우) 로직
             self.updateGlow(isEnabled: isEnabled, isHighlighted: button.isHighlighted)
         }

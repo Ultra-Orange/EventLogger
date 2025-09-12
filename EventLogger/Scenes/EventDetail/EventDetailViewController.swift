@@ -205,7 +205,6 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             }
             .disposed(by: disposeBag)
 
-
         let saveResult = reactor.pulse(\.$saveResult)
             .compactMap { $0 }
             .observe(on: MainScheduler.instance)
@@ -222,13 +221,14 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                     message: "이 이벤트를 캘린더에 저장했어요.",
                     actions: [
                         .action("확인", payload: ()),
-                    ])
+                    ]
+                )
             }
             .subscribe()
             .disposed(by: disposeBag)
 
         // 권한 요청 거부
-        saveResult 
+        saveResult
             .filter { $0 == .denied }
             .withUnretained(self)
             .flatMap { `self`, _ in
@@ -239,7 +239,8 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                     actions: [
                         .cancel("확인"),
                         .action("설정으로 이동", payload: .openSystemSettings),
-                    ])
+                    ]
+                )
             }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
@@ -260,7 +261,8 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
                     message: "캘린더 저장 중 오류가 발생했습니다.\n\(message)",
                     actions: [
                         .action("확인", payload: ()),
-                    ])
+                    ]
+                )
             }
             .subscribe()
             .disposed(by: disposeBag)

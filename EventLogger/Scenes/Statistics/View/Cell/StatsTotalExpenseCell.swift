@@ -14,25 +14,25 @@ final class StatsTotalExpenseCell: UICollectionViewCell {
     private let expenseBox = StatBoxView(title: "총액").then {
         $0.layer.cornerRadius = 10
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         setupUI()
     }
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
-    
+
     private func setupUI() {
         contentView.addSubview(expenseBox)
-        
+
         expenseBox.snp.makeConstraints {
             $0.edges.equalToSuperview()
             $0.height.greaterThanOrEqualTo(50)
         }
     }
-    
+
     func configure(totalExpense: Double) {
         expenseBox.setValue(KRWFormatter.shared.string(totalExpense))
     }

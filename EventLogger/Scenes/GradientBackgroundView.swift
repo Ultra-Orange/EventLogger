@@ -9,19 +9,19 @@ import UIKit
 
 final class GradientBackgroundView: UIView {
     private let gradient = CAGradientLayer()
-    
+
     var colors: [UIColor] = [
         UIColor(white: 0.084, alpha: 0.0),
-        UIColor(red: 0.569, green: 0.235, blue: 0.011, alpha: 1.0)
+        UIColor(red: 0.569, green: 0.235, blue: 0.011, alpha: 1.0),
     ] {
         didSet { updateGradient() }
     }
-    
+
     /// 0.0~1.0
     var locations: [NSNumber] = [0, 1] {
         didSet { gradient.locations = locations }
     }
-    
+
     /// 그라데이션 방향 (기본: 위→아래)
     var direction: (start: CGPoint, end: CGPoint) = (CGPoint(x: 0.5, y: 0.0),
                                                      CGPoint(x: 0.5, y: 1.0))
@@ -31,19 +31,19 @@ final class GradientBackgroundView: UIView {
             gradient.endPoint = direction.end
         }
     }
-    
+
     override class var layerClass: AnyClass { CAGradientLayer.self }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         gradient.colors = nil
         isUserInteractionEnabled = false // 배경이므로 이벤트 막지 않게
         updateGradient()
     }
-    
+
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
+    required init?(coder _: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         // layerClass를 썼으면 frame 세팅 불필요. 하위 레이어일 경우에만 필요.
@@ -51,7 +51,7 @@ final class GradientBackgroundView: UIView {
         gradient.frame = bounds.insetBy(dx: -bounds.width * 0.5, dy: -bounds.height * 0.5) // 피그마식 확장 필요 시
         gradient.position = CGPoint(x: bounds.midX, y: bounds.midY)
     }
-    
+
     private func updateGradient() {
         let cgColors = colors.map { $0.cgColor }
         if let gradientLayer = layer as? CAGradientLayer {

@@ -23,8 +23,8 @@ struct CategoryStats: Hashable {
     let category: CategoryItem
 
     // 상위(총합) — 기존 코드 호환용
-    let count: Int                // 카테고리 내 이벤트 수
-    let totalExpense: Double      // 총 비용
+    let count: Int // 카테고리 내 이벤트 수
+    let totalExpense: Double // 총 비용
 
     // 하위(정렬된 목록)
     /// 아티스트별 참여 횟수(내림차순)

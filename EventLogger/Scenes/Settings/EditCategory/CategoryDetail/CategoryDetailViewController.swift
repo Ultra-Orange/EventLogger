@@ -70,7 +70,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
 
         // 초기값 세팅
         configureInitialState(reactor: reactor)
-        
+
         bottomButton.rx.tap
             .bind { [weak self] _ in
                 guard let self, let reactor = self.reactor else { return }

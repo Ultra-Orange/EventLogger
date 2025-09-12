@@ -88,23 +88,23 @@ extension StatsViewController {
 
         dataSource = UICollectionViewDiffableDataSource<StatsSection, StatsItem>(collectionView: collectionView) { collectionView, indexPath, item in
             switch item {
-            case .title(let title):
+            case let .title(title):
                 return collectionView.dequeueConfiguredReusableCell(using: titleReg, for: indexPath, item: title)
-            case .menu(let id):
+            case let .menu(id):
                 return collectionView.dequeueConfiguredReusableCell(using: menuReg, for: indexPath, item: id)
-            case .heatmapHeaderTitle(let title):
+            case let .heatmapHeaderTitle(title):
                 return collectionView.dequeueConfiguredReusableCell(using: heatmapHeaderReg, for: indexPath, item: title)
-            case .heatmap(let model):
+            case let .heatmap(model):
                 return collectionView.dequeueConfiguredReusableCell(using: heatmapReg, for: indexPath, item: model)
-            case .heatmapLegend(let id):
+            case let .heatmapLegend(id):
                 return collectionView.dequeueConfiguredReusableCell(using: legendReg, for: indexPath, item: id)
-            case .totalCount(let model):
+            case let .totalCount(model):
                 return collectionView.dequeueConfiguredReusableCell(using: totalCountReg, for: indexPath, item: model)
-            case .totalExpense(let model):
+            case let .totalExpense(model):
                 return collectionView.dequeueConfiguredReusableCell(using: totalExpenseReg, for: indexPath, item: model)
-            case .rollupParent(let model):
+            case let .rollupParent(model):
                 return collectionView.dequeueConfiguredReusableCell(using: parentReg, for: indexPath, item: model)
-            case .rollupChild(let model):
+            case let .rollupChild(model):
                 return collectionView.dequeueConfiguredReusableCell(using: childReg, for: indexPath, item: model)
             }
         }

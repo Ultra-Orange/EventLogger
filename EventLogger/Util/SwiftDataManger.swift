@@ -10,9 +10,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-
 struct SwiftDataManager {
-    
     let modelContext = ModelContext(Persistence.container)
 
     // MARK: SaveContext
@@ -107,7 +105,6 @@ struct SwiftDataManager {
 
     // Delete
     func deleteCategory(id: UUID) throws {
-
         // 조건1 등록된 이벤트가 존재하는 카테고리는 삭제 불가
         let stats = fetchCategoryStatistics()
         if stats.contains(where: { $0.category.id == id && $0.count > 0 }) {
@@ -265,7 +262,7 @@ extension SwiftDataManager {
         let service = StatisticsService(manager: self)
         return service.artistStats(for: .all)
     }
-    
+
     func fetchCategoryStatistics() -> [CategoryStats] {
         let service = StatisticsService(manager: self)
         return service.categoryStats(for: .all)
