@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import UserNotifications
 import RxSwift
+import UserNotifications
 
 protocol NotificationServicing {
     func requestAuthorization() -> Observable<Bool>

@@ -15,23 +15,22 @@ extension DependencyValues {
         get { self[SwiftDataManagerKey.self] }
         set { self[SwiftDataManagerKey.self] = newValue }
     }
-    
+
     var calendarService: CalendarServicing {
         get { self[CalendarServiceKey.self] }
         set { self[CalendarServiceKey.self] = newValue }
     }
-    
+
     var settingsService: SettingsServicing {
         get { self[SettingsServiceKey.self] }
         set { self[SettingsServiceKey.self] = newValue }
     }
-    
+
     var notificationService: NotificationServicing {
         get { self[NotificationServiceKey.self] }
         set { self[NotificationServiceKey.self] = newValue }
     }
 }
-
 
 // MARK: SwiftData Manager
 
@@ -43,50 +42,23 @@ private enum SwiftDataManagerKey: DependencyKey {
 }
 
 // MARK: Calendar Service
+
 private enum CalendarServiceKey: DependencyKey {
     static var liveValue: CalendarServicing = CalendarService()
     static var testValue: CalendarServicing = CalendarService() // 테스트용 만들 필요
 }
 
 // MARK: Settings Service
+
 private enum SettingsServiceKey: DependencyKey {
     static var liveValue: SettingsServicing = SettingsService()
     static var testValue: SettingsServicing = SettingsService() // 테스트용 만들 필요
 }
 
 // MARK: Notification Service
+
 private enum NotificationServiceKey: DependencyKey {
     static var liveValue: NotificationServicing = NotificationService()
     static var testValue: NotificationServicing = NotificationService() // 테스트용
 }
 
-
-
-// 사용법
-// struct MyCounter {
-//    var getValue: () -> Int
-// }
-//
-// private enum CounterKey: DependencyKey {
-//    // 실제 서비스 (SwiftData에서 가져오기)
-//    static let liveValue: MyCounter = .init {
-//        let context = ModelContext(Persistence.container)
-//        let items = try! context.fetch(FetchDescriptor<Counter>())
-//        return items.first?.value ?? 0
-//    }
-//    // 테스트 / 디버그 환경에서만 사용할 값
-//    static let testValue: MyCounter = .init {
-//        return 100
-//    }
-//    // 프리뷰에서 보여줄 값
-//    static let previewValue: MyCounter = .init {
-//        return 42
-//    }
-// }
-//
-// extension DependencyValues {
-//    var myCounter: MyCounter {
-//        get { self[CounterKey.self] }
-//        set { self[CounterKey.self] = newValue }
-//    }
-// }

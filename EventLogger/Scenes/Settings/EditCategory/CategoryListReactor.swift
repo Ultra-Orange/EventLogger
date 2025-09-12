@@ -57,7 +57,7 @@ final class CategoryListReactor: BaseReactor {
                 try swiftDataManager.deleteCategory(id: item.id)
                 return .just(.setCategories(categories))
             } catch SwiftDataMangerError.cannotDeleteUsedCategory {
-                return .just(.setAlertMessage("사용 중인 카테고리는 삭제할 수 없어요.")) 
+                return .just(.setAlertMessage("사용 중인 카테고리는 삭제할 수 없어요."))
             } catch {
                 return .just(.setAlertMessage("알 수 없는 오류가 발생했습니다."))
             }

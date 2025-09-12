@@ -14,15 +14,15 @@ final class AppFlow: Flow {
     private let window: UIWindow
     private let rootNav = UINavigationController()
     private let selectedLocationRelay = PublishRelay<String>()
-    
+
     var root: Presentable { rootNav }
-    
+
     init(windowScene: UIWindowScene) {
         window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootNav
         window.makeKeyAndVisible()
     }
-    
+
     func navigate(to step: any Step) -> FlowContributors {
         guard let step = step as? AppStep else { return .none }
         switch step {
@@ -50,10 +50,9 @@ final class AppFlow: Flow {
             return navigateToStatistics()
         case let .queryToGoogleMap(keyword):
             return openInGoogleMaps(keyword: keyword)
-
         }
     }
-    
+
     func navigateToEventList() -> FlowContributors {
         let vc = EventListViewController()
         let reactor = EventListReactor()
@@ -66,7 +65,7 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor(eventItem: eventItem)
@@ -79,7 +78,7 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     func navigateToSchedule(mode: ScheduleReactor.Mode) -> FlowContributors {
         let reactor = ScheduleReactor(mode: mode)
         let vc = ScheduleViewController(selectedLocationRelay: selectedLocationRelay)
@@ -92,16 +91,16 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     private func navigateToLocationSearch(query: String) -> FlowContributors {
         let vc = LocationSearchViewController(
             selectedLocationRelay: selectedLocationRelay,
             initialQuery: query
         )
-        
+
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .pageSheet
-        
+
         if let sheet = nav.sheetPresentationController {
             sheet.detents = [.large()]
             sheet.prefersGrabberVisible = false
@@ -109,7 +108,7 @@ final class AppFlow: Flow {
         rootNav.present(nav, animated: true)
         return .none
     }
-    
+
     private func navigateToSettings() -> FlowContributors {
         let vc = SettingsViewController()
         let reactor = SettingsReactor()
@@ -122,7 +121,7 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     private func navigateToCategoryList() -> FlowContributors {
         let vc = CategoryListViewController()
         let reactor = CategoryListReactor()
@@ -135,7 +134,7 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     private func navigateToCategoryDetail(mode: CategoryDetailReactor.Mode) -> FlowContributors {
         let reactor = CategoryDetailReactor(mode: mode)
         let vc = CategoryDetailViewController()
@@ -148,13 +147,12 @@ final class AppFlow: Flow {
             )
         )
     }
-    
+
     private func backToCategoryList() -> FlowContributors {
-        
         rootNav.popViewController(animated: true)
         return .none
     }
-    
+
     private func navigateToStatistics() -> FlowContributors {
         let vc = StatsViewController()
         let reactor = StatsReactor()

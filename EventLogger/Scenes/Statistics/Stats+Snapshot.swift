@@ -27,7 +27,7 @@ extension StatsViewController {
                     .categoryCountHeader, .categoryCount,
                     .categoryExpenseHeader, .categoryExpense,
                     .artistCountHeader, .artistCount,
-                    .artistExpenseHeader, .artistExpense
+                    .artistExpenseHeader, .artistExpense,
                 ]
             )
         } else { // .all
@@ -38,7 +38,7 @@ extension StatsViewController {
                     .categoryCountHeader, .categoryCount,
                     .categoryExpenseHeader, .categoryExpense,
                     .artistCountHeader, .artistCount,
-                    .artistExpenseHeader, .artistExpense
+                    .artistExpenseHeader, .artistExpense,
                 ]
             )
         }

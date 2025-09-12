@@ -227,13 +227,12 @@ class LocationSearchViewController: UIViewController {
 
 // MARK: MKLocalSearchCompleterDelegate
 
-// TODO: DelegateProxy로 변경
 extension LocationSearchViewController: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         completerResults.accept(completer.results)
     }
 
-    func completer(_: MKLocalSearchCompleter, didFailWithError error: Error) {
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         completerResults.accept([])
     }
 }

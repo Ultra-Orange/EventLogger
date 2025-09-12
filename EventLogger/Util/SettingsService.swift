@@ -13,13 +13,12 @@ protocol SettingsServicing: AnyObject {
 }
 
 final class SettingsService: SettingsServicing {
-    
     @UserSetting(key: UDKey.autoSaveToCalendar, defaultValue: false)
     private var autoSaveToCalendaKey: Bool
 
     var autoSaveToCalendar: Bool {
         get { autoSaveToCalendaKey }
-        set { autoSaveToCalendaKey   = newValue }
+        set { autoSaveToCalendaKey = newValue }
     }
 
     @UserSetting(key: UDKey.pushNotificationEnabled, defaultValue: false)
@@ -30,4 +29,3 @@ final class SettingsService: SettingsServicing {
         set { pushNotificationKey = newValue }
     }
 }
-

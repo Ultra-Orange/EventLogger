@@ -14,16 +14,16 @@ final class StatsTotalCountCell: UICollectionViewCell {
     private let countBox = StatBoxView(title: "총 참여 횟수").then {
         $0.layer.cornerRadius = 10
     }
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         setupUI()
     }
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
-    
+
     private func setupUI() {
         contentView.addSubview(countBox)
         countBox.snp.makeConstraints {
@@ -31,7 +31,7 @@ final class StatsTotalCountCell: UICollectionViewCell {
             $0.height.greaterThanOrEqualTo(50)
         }
     }
-    
+
     func configure(totalCount: Int) {
         countBox.setValue("\(totalCount)")
     }

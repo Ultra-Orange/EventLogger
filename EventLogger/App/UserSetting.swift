@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 // UserDefault의 다른 값을 하나로 관리하기 위해 @propertyWrapper 사용
 @propertyWrapper
 struct UserSetting<T> { // Wrapper로 쌀 내용
@@ -41,8 +40,8 @@ enum UDKey {
 }
 
 /*
- didSetupDefaultCategories를 쓴다면
- @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
-var didSetupDefaultCategories: Type
- 위처럼 변수 선언하고 변수 쓰듯이 쓰면 됨 유저디폴트 값이 없으면 defaultValue로 선언한게 들어감
- */
+  didSetupDefaultCategories를 쓴다면
+  @UserSetting(key: UDKey.didSetupDefaultCategories, defaultValue: false)
+ var didSetupDefaultCategories: Type
+  위처럼 변수 선언하고 변수 쓰듯이 쓰면 됨 유저디폴트 값이 없으면 defaultValue로 선언한게 들어감
+  */

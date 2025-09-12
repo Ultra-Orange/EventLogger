@@ -55,7 +55,7 @@ enum EventListDSItem: Hashable {
 
     var eventID: UUID {
         switch self {
-        case .nextUp(let id), .monthEvent(let id): return id
+        case let .nextUp(id), let .monthEvent(id): return id
         }
     }
 }
@@ -145,7 +145,6 @@ final class EventListViewController: BaseViewController<EventListReactor> {
     // MARK: Lifecycle
 
     override func setupUI() {
-        navigationItem.backButtonDisplayMode = .minimal
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleView)
         navigationItem.rightBarButtonItems = [menuButton, statisticsButton]
 
@@ -201,7 +200,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         .flatMap { _ in
             Observable.from([
                 EventListReactor.Action.reloadEventItems,
-                EventListReactor.Action.reloadCategories
+                EventListReactor.Action.reloadCategories,
 
             ])
         }
@@ -335,7 +334,7 @@ final class EventListViewController: BaseViewController<EventListReactor> {
             let section = snapshot.sectionIdentifiers[indexPath.section]
             switch section {
             case .nextUp: label.text = "다음 일정"
-            case .month(let ym): label.text = "\(ym.year)년 \(ym.month)월"
+            case let .month(ym): label.text = "\(ym.year)년 \(ym.month)월"
             }
         }
 
