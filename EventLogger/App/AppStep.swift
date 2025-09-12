@@ -19,4 +19,5 @@ enum AppStep: Step {
     case updateCategory(CategoryItem)
     case backToCategoryList
     case statistics
+    case queryToGoogleMap(String)
 }

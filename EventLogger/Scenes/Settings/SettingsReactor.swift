@@ -27,30 +27,30 @@ final class SettingsReactor: BaseReactor {
         case toggleCalendarAutoSave(Bool)
         case refreshCalendarStatus
     }
-    
+
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
     enum Mutation {
         case setPushEnabled(Bool)
         case showDeniedAlert(String)
         case setCalendarEnabled(Bool)
     }
-    
+
     // View의 상태 정의 (현재 View의 상태값)
     struct State {
         var pushEnabled: Bool
         var calendarEnabled: Bool
         @Pulse var alertMessage: String?
     }
-    
+
     // TODO: 리팩토링 요소 있음, notificationService 관련
     // TODO: 캘린더 권한 묻는 시점 리팩토링
     @Dependency(\.settingsService) var settingsService
     @Dependency(\.notificationService) var notificationService
     @Dependency(\.calendarService) var calendarService
-    
+
     // 생성자에서 초기 상태 설정
     let initialState: State
-    
+
     init() {
         @Dependency(\.settingsService) var settingsService
         initialState = State(
@@ -58,7 +58,7 @@ final class SettingsReactor: BaseReactor {
             calendarEnabled: settingsService.autoSaveToCalendar
         )
     }
-    
+
     // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
     // 사용자 입력 → 상태 변화 신호로 변환
     func mutate(action: Action) -> Observable<Mutation> {
@@ -69,22 +69,26 @@ final class SettingsReactor: BaseReactor {
         case let .togglePushNotification(isOn):
             if isOn {
                 // 스위치 ON
-                return Observable.create { [weak self] observer in
-                    guard let self else { return Disposables.create() }
-                    self.notificationService.requestAuthorization { granted in
+                return notificationService.requestAuthorization()
+                    .do(onNext: { [weak self] granted in // 사이드이펙트는 map, flatMap이 아니라 do 안에서 처리
                         if granted {
-                            self.settingsService.pushNotificationEnabled = true
-                            observer.onNext(.setPushEnabled(true))
-                            self.setNotificationAll()
+                            self?.settingsService.pushNotificationEnabled = true
+                            self?.setNotificationAll()
                         } else {
-                            self.settingsService.pushNotificationEnabled = false
-                            observer.onNext(.setPushEnabled(false))
-                            observer.onNext(.showDeniedAlert("알림 권한이 없어요.\n설정 > 알림에서 허용해주세요."))
+                            self?.settingsService.pushNotificationEnabled = false
                         }
-                        observer.onCompleted()
+                    })
+                    .flatMap { granted in
+                        if granted {
+                            return Observable.just(Mutation.setPushEnabled(true))
+                        } else {
+                            return .of(
+                                .setPushEnabled(false),
+                                .showDeniedAlert("알림 권한이 없어요.\n설정 > 알림에서 허용해주세요.")
+                            )
+                        }
                     }
-                    return Disposables.create()
-                }
+
             } else {
                 // 스위치 OFF
                 settingsService.pushNotificationEnabled = false
@@ -129,7 +133,7 @@ final class SettingsReactor: BaseReactor {
             return .just(.setCalendarEnabled(isGranted && self.settingsService.autoSaveToCalendar))
         }
     }
-    
+
     // Mutation이 발생했을 때 상태(State)를 실제로 바꿈
     // 상태 변화 신호 → 실제 상태 반영
     func reduce(state: State, mutation: Mutation) -> State {

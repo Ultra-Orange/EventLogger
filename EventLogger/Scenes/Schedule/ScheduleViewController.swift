@@ -162,13 +162,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     }
     
     override func bind(reactor: ScheduleReactor) {
-        // 상단 타이틀 & 하단 버튼
-        title = reactor.currentState.navTitle
-        bottomButton.setTitle(reactor.currentState.buttonTitle, for: .normal)
-        
+
         // 초기값 세팅
-        configureInitialState(reactor: reactor)
-        
+        reactor.state
+            .take(1)
+            .bind { [weak self] state in
+                // 상단 타이틀 & 하단 버튼
+                self?.title = state.navTitle
+                self?.bottomButton.setTitle(state.buttonTitle, for: .normal)
+                // 초기값 바인딩
+                self?.configureInitialState(state: state)
+            }
+            .disposed(by: disposeBag)
+
+
         // 제목 입력에 따라 버튼 활성/비활성
         let isTitleValid = inputTitleView.textField.rx.text
             .orEmpty
@@ -311,11 +318,11 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
     }
     
-    private func configureInitialState(reactor: ScheduleReactor) {
+    private func configureInitialState(state: ScheduleReactor.State) {
         // 공통 카테고리 & 아이템
-        let categories = reactor.currentState.categories
-        
-        switch reactor.mode {
+        let categories = state.categories
+
+        switch state.mode {
         case .create:
             // 신규등록은 카테고리 목록만 세팅
             categoryFieldView.configure(categories: categories)
@@ -332,12 +339,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             // 날짜 및 시간
             dateRangeFieldView.startDate = item.startTime
             dateRangeFieldView.endDate = item.endTime
-            
-            // 장소
-            if let location = item.location {
-                reactor.action.onNext(.selectLocation(location))
-            }
-            
+
+            // 장소 (리액터에서 바인딩)
+
             // 아티스트
             item.artists.forEach { artistsFieldView.tagsField.addTag($0) }
             

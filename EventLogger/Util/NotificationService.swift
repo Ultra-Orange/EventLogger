@@ -7,26 +7,31 @@
 
 import Foundation
 import UserNotifications
+import RxSwift
 
 protocol NotificationServicing {
-    func requestAuthorization(completion: @escaping (Bool) -> Void)
+    func requestAuthorization() -> Observable<Bool>
     func cancelAll()
     func cancelNotification(id: String)
     func scheduleNotification(id: String, title: String, body: String, date: Date)
 }
 
-// TODO: 앱 실행 최초로 와야한다 -> 동기화가 그래야 됨
 final class NotificationService: NotificationServicing {
-    func requestAuthorization(completion: @escaping (Bool) -> Void) {
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: [.alert, .sound, .badge]
-        ) { granted, error in
-            if let error = error {
-                print("알림 권한 요청 실패:", error.localizedDescription)
-                completion(false)
-                return
+    func requestAuthorization() -> Observable<Bool> {
+        return Observable.create { observer in
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: [.alert, .sound, .badge]
+            ) { granted, error in
+                if let error = error {
+                    print("알림 권한 요청 실패:", error.localizedDescription)
+                    observer.onNext(false)
+                    observer.onCompleted()
+                    return
+                }
+                observer.onNext(granted)
+                observer.onCompleted()
             }
-            completion(granted)
+            return Disposables.create()
         }
     }
 

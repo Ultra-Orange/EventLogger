@@ -32,8 +32,9 @@ final class ScheduleReactor: BaseReactor {
         let eventItem: EventItem?
         let navTitle: String
         let buttonTitle: String
-        var selectedLocation: String = ""
+        var selectedLocation: String
         var categories: [CategoryItem]
+        let mode: Mode
     }
     
     // TODO: 리팩토링 고려요소 원칙적으로 리액터는 뷰를 몰라야되니까 여기에 버튼타이틀은 어색하다!
@@ -64,7 +65,6 @@ final class ScheduleReactor: BaseReactor {
     }
     
     let initialState: State
-    let mode: Mode
     
     @Dependency(\.settingsService) private var settingsService
     @Dependency(\.calendarService) private var calendarService
@@ -76,12 +76,13 @@ final class ScheduleReactor: BaseReactor {
         @Dependency(\.swiftDataManager) var swiftDataManager
         let categories = swiftDataManager.fetchAllCategories()
         
-        self.mode = mode
         initialState = State(
             eventItem: mode.eventItem,
             navTitle: mode.navTitle,
             buttonTitle: mode.buttonTitle,
-            categories: categories
+            selectedLocation: mode.eventItem?.location ?? "",
+            categories: categories,
+            mode: mode
         )
     }
     
@@ -96,7 +97,7 @@ final class ScheduleReactor: BaseReactor {
         case let .selectLocation(location):
             return .just(.setLocation(location))
         case let .sendEventPayload(payload):
-            switch mode {
+            switch currentState.mode {
             case .create:
                 let item = EventItem(
                     id: UUID(), //  새 id 생성

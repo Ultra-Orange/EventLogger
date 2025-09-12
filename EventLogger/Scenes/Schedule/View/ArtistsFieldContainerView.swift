@@ -19,7 +19,6 @@ final class ArtistsFieldContainerView: UIView {
         $0.font = .font13Regular
     }
 
-    // TODO: 디자인 완성후 컬러 맞추기
     let tagsField = WSTagsField().then {
         $0.backgroundColor = .systemGray5
         $0.layer.cornerRadius = 10
