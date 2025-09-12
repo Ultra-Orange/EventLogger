@@ -5,16 +5,16 @@
 //  Created by 김우성 on 8/22/25.
 //
 
-import UIKit
-import RxSwift
 import RxCocoa
+import RxSwift
 import SnapKit
 import Then
+import UIKit
 
-// FIXME: 
+// FIXME:
 public final class PillSegmentedControl: UIControl {
-
     // MARK: Public API
+
     public var items: [String] {
         didSet { rebuildButtons() }
     }
@@ -25,6 +25,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: 내부 테마 (앱 토큰 고정)
+
     private enum Theme {
         static var capsuleBackground: UIColor { .appBackground }
         static var capsuleBorder: UIColor { .primary500 }
@@ -49,6 +50,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Subviews
+
     private let stackView = UIStackView().then {
         $0.axis = .horizontal
         $0.alignment = .fill
@@ -71,14 +73,16 @@ public final class PillSegmentedControl: UIControl {
     private var buttons: [UIButton] = []
 
     // MARK: - State
+
     private var _selectedIndex: Int = 0
     private var isSettingUp = false
     private var needsInitialAttach = false
 
     // MARK: - Init
+
     public init(items: [String], selectedIndex: Int = 0) {
         self.items = items
-        self._selectedIndex = max(0, min(selectedIndex, max(0, items.count - 1)))
+        _selectedIndex = max(0, min(selectedIndex, max(0, items.count - 1)))
         super.init(frame: .zero)
         isSettingUp = true
         configure()
@@ -87,7 +91,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     public required init?(coder: NSCoder) {
-        self.items = []
+        items = []
         super.init(coder: coder)
         isSettingUp = true
         configure()
@@ -96,6 +100,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Setup (SnapKit)
+
     private func configure() {
         backgroundColor = .clear
         layer.masksToBounds = false
@@ -114,11 +119,12 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Build
+
     private func rebuildButtons() {
         buttons.forEach { $0.removeFromSuperview() }
         buttons.removeAll()
 
-        items.enumerated().forEach { index, title in
+        for (index, title) in items.enumerated() {
             let button = UIButton(type: .system).then { btn in
                 var cfg = UIButton.Configuration.plain()
                 cfg.contentInsets = Theme.buttonContentInsets
@@ -159,6 +165,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Interaction
+
     private func tap(_ button: UIButton) {
         guard let index = buttons.firstIndex(of: button), index != _selectedIndex else { return }
         setSelectedIndex(index, animated: true)
@@ -183,6 +190,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Selection visuals (SnapKit로 캡슐 이동)
+
     private func updateSelection(animated: Bool) {
         buttons.forEach { $0.setNeedsUpdateConfiguration() }
         guard buttons.indices.contains(_selectedIndex) else {
@@ -213,7 +221,8 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Layout
-    public override func layoutSubviews() {
+
+    override public func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = Theme.controlCorner
         selectionCapsuleView.layer.cornerRadius = Theme.controlCorner
@@ -229,7 +238,7 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    public override var intrinsicContentSize: CGSize {
+    override public var intrinsicContentSize: CGSize {
         let buttonHeights = buttons.map { $0.intrinsicContentSize.height }
         let height = max(Theme.minHeight, (buttonHeights.max() ?? 28) + Theme.contentInsets.top + Theme.contentInsets.bottom)
         let totalButtonsWidth = buttons.reduce(0) { $0 + $1.intrinsicContentSize.width }
@@ -240,6 +249,7 @@ public final class PillSegmentedControl: UIControl {
     }
 
     // MARK: - Helpers
+
     private func attributed(title: String, selected: Bool) -> AttributedString {
         let font = selected ? Theme.fontSelected : Theme.fontNormal
         let ns = NSMutableAttributedString(string: title, attributes: [.font: font])
@@ -258,6 +268,7 @@ public final class PillSegmentedControl: UIControl {
 }
 
 // MARK: - Rx
+
 public extension Reactive where Base: PillSegmentedControl {
     var selectedSegmentIndex: ControlProperty<Int> {
         let control = base

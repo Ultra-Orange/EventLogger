@@ -5,12 +5,12 @@
 //  Created by Yoon on 8/20/25.
 //
 
-import SwiftData
 import Dependencies
 import ReactorKit
 import RxFlow
 import RxRelay
 import RxSwift
+import SwiftData
 
 final class EventListReactor: BaseReactor {
     // 사용자 액션 정의 (사용자의 의도)
@@ -21,7 +21,6 @@ final class EventListReactor: BaseReactor {
         case setSortOrder(EventListSortOrder)
         case setYearFilter(Int?)
         case goSettings
-
     }
 
     // 상태변경 이벤트 정의 (상태를 어떻게 바꿀 것인가)
@@ -31,7 +30,6 @@ final class EventListReactor: BaseReactor {
         case setSortOrder(EventListSortOrder)
         case setCategories([CategoryItem])
         case setYearFilter(Int?)
-
     }
 
     // View의 상태 정의 (현재 View의 상태값)
@@ -50,7 +48,6 @@ final class EventListReactor: BaseReactor {
 
     init() {
         initialState = State(
-
             eventItems: [],
             filter: .all,
             sortOrder: .newestFirst
@@ -77,13 +74,10 @@ final class EventListReactor: BaseReactor {
 
         case let .setYearFilter(year):
             return .just(.setYearFilter(year))
-            
+
         case .goSettings:
             steps.accept(AppStep.settings)
             return .empty()
-
-
-
         }
     }
 
@@ -107,9 +101,6 @@ final class EventListReactor: BaseReactor {
         case let .setYearFilter(year):
             newState.yearFilter = year
         }
-
-
-
 
         return newState
     }

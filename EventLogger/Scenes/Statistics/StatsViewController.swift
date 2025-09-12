@@ -5,18 +5,17 @@
 //  Created by 김우성 on 9/2/25.
 //
 
-import UIKit
-import RxSwift
-import RxCocoa
-import Then
-import SnapKit
-import Dependencies
 import CoreData
+import Dependencies
+import RxCocoa
+import RxSwift
+import SnapKit
+import Then
+import UIKit
 
 // MARK: - StatsViewController
 
 final class StatsViewController: BaseViewController<StatsReactor> {
-
     @Dependency(\.swiftDataManager) var swiftDataManager
     lazy var statisticsService = StatisticsService(manager: swiftDataManager)
 
@@ -31,6 +30,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     }
 
     // MARK: 컬렉션뷰 백그라운드용
+
     private let emptyView = UIView().then {
         $0.backgroundColor = .clear
     }
@@ -58,10 +58,11 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.textAlignment = .center
         $0.numberOfLines = 0
     }
-    
+
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
     // MARK: Diffable
+
     enum StatsSection: Hashable {
         case menuBar
         case heatmapHeader
@@ -95,10 +96,10 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 
     // 어떤 부모가 펼쳐져 있는지 추적
     var expandedParentIDs = Set<UUID>()
-    
+
     // parentId -> 자식들 캐시 (스냅샷 생성 시 계산 / 토글 시 삽입·삭제에 재사용)
     var childrenCache: [UUID: [RollupChild]] = [:]
-    
+
     // 스냅샷 재구성 시 캐시 초기화
     func resetRollupCaches() {
         expandedParentIDs.removeAll()
@@ -131,17 +132,17 @@ final class StatsViewController: BaseViewController<StatsReactor> {
             $0.top.equalTo(segmentedControl.snp.bottom).offset(12)
             $0.leading.trailing.bottom.equalToSuperview()
         }
-        
+
         setupEmptyView()
 
         configureDataSource()
     }
-    
+
     private func setupEmptyView() {
         emptyView.addSubview(emptyStackView)
         emptyStackView.addArrangedSubview(emptyTitleLabel)
         emptyStackView.addArrangedSubview(emptyValueLabel)
-        
+
         emptyStackView.snp.makeConstraints {
             $0.center.equalTo(view.safeAreaLayoutGuide)
         }
@@ -154,10 +155,10 @@ final class StatsViewController: BaseViewController<StatsReactor> {
             .map { .setScope($0) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
-        
+
         Observable.merge(
-            rx.viewDidLoad.map{ _ in },
-            NotificationCenter.default.rx.notification(notification).map{ _ in }
+            rx.viewDidLoad.map { _ in },
+            NotificationCenter.default.rx.notification(notification).map { _ in }
         )
         .map { _ in .refresh }
         .bind(to: reactor.action)
@@ -221,7 +222,8 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 
     /// 부모가 속한 섹션을 찾는 헬퍼 (fallback용)
     private func sectionFor(parent: RollupParent,
-                            in snapshot: NSDiffableDataSourceSnapshot<StatsSection, StatsItem>) -> StatsSection {
+                            in snapshot: NSDiffableDataSourceSnapshot<StatsSection, StatsItem>) -> StatsSection
+    {
         // 타입 -> 섹션 매핑
         let section: StatsSection
         switch parent.type {
@@ -236,6 +238,7 @@ final class StatsViewController: BaseViewController<StatsReactor> {
 }
 
 // MARK: - Models (UI 전용 뷰모델)
+
 extension StatsViewController {
     struct TotalModel: Hashable {
         let totalCount: Int
@@ -249,6 +252,7 @@ extension StatsViewController {
         let valueText: String
         let type: RollupType
     }
+
     struct RollupChild: Hashable {
         let id: UUID
         let parentId: UUID
@@ -256,6 +260,7 @@ extension StatsViewController {
         let title: String
         let valueText: String
     }
+
     enum RollupType: Hashable {
         case categoryCount
         case categoryExpense
@@ -265,6 +270,7 @@ extension StatsViewController {
 }
 
 // MARK: - Utilities
+
 final class KRWFormatter {
     static let shared = KRWFormatter()
     private let nf: NumberFormatter
@@ -274,14 +280,15 @@ final class KRWFormatter {
         nf.groupingSeparator = ","
         nf.maximumFractionDigits = 0
     }
+
     func string(_ value: Double) -> String {
-        let v = Int((value).rounded())
+        let v = Int(value.rounded())
         return (nf.string(from: NSNumber(value: v)) ?? "\(v)") + " 원"
     }
 }
 
 private extension Array {
-    subscript (safe index: Index) -> Element? {
+    subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil
     }
 }
@@ -293,12 +300,12 @@ extension StatsViewController {
         case .menuBar: return nil
         case .heatmapHeader: return "참여 캘린더"
         case .heatmap: return nil
-        case .totalCount:   return nil
-        case .totalExpense:   return nil
-        case .categoryCount:   return "카테고리별 참여 횟수"
+        case .totalCount: return nil
+        case .totalExpense: return nil
+        case .categoryCount: return "카테고리별 참여 횟수"
         case .categoryExpense: return "카테고리별 지출"
-        case .artistCount:     return "아티스트별 참여 횟수"
-        case .artistExpense:   return "아티스트별 지출"
+        case .artistCount: return "아티스트별 참여 횟수"
+        case .artistExpense: return "아티스트별 지출"
         default: return nil
         }
     }
