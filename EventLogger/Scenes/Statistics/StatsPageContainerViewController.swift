@@ -69,14 +69,6 @@ final class StatsPageContainerViewController: UIViewController {
     }
 
     private func bind() {
-        // 간단한 상태 스냅샷 출력
-        func log(_ event: String, idx: Int) {
-            let seg = segmented.selectedIndex
-            let relay = selectedIndexRelay.value
-            let page = pageVC.viewControllers?.first.flatMap { pages.firstIndex(of: $0) } ?? -1
-            print("🔎[\(event)] idx=\(idx) seg=\(seg) relay=\(relay) page=\(page)")
-        }
-
         // 1) 입력: 세그 탭
         let segmentTap = segmented.rx.indexChangedByUser
             .do(onNext: { [weak self] i in self?.log("segmentTap", idx: i) })
