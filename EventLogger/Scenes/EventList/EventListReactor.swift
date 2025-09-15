@@ -41,21 +41,33 @@ final class EventListReactor: BaseReactor {
         var yearFilter: Int? = nil // nil = 모든 연도
     }
 
-    // 생성자에서 초기 상태 설정
-    let initialState: State
-
+    // MARK: Dependencies
     @Dependency(\.swiftDataManager) var swiftDataManager
 
+    // MARK: Fixed Filter (옵션)
+    /// nil = 가변, 값 존재 = 해당 필터로 고정
+    private let fixedFilter: EventListFilter?
+
+    // 초기 상태
+    let initialState: State
+
+    // 기본(가변) 생성자
     init() {
-        initialState = State(
-            eventItems: [],
-            filter: .all,
-            sortOrder: .newestFirst
-        )
+        self.fixedFilter = nil
+        self.initialState = State(eventItems: [], filter: .all, sortOrder: .newestFirst)
     }
 
-    // Action이 들어왔을 때 어떤 Mutation으로 바뀔지 정의
-    // 사용자 입력 → 상태 변화 신호로 변환
+    // 고정 필터 생성자 (탭별 컨텐츠 VC에 사용)
+    convenience init(fixedFilter: EventListFilter) {
+        self.init(fixed: fixedFilter)
+    }
+
+    private init(fixed: EventListFilter?) {
+        self.fixedFilter = fixed
+        self.initialState = State(eventItems: [], filter: fixed ?? .all, sortOrder: .newestFirst)
+    }
+
+    // MARK: mutate
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .reloadEventItems:
@@ -63,6 +75,8 @@ final class EventListReactor: BaseReactor {
             return .just(.setEventItems(fetchItems))
 
         case let .setFilter(filter):
+            // 고정 모드면 무시
+            if let fixedFilter, fixedFilter != filter { return .empty() }
             return .just(.setFilter(filter))
 
         case let .setSortOrder(order):
