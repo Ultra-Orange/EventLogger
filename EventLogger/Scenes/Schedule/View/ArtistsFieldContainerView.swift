@@ -70,6 +70,12 @@ final class ArtistsFieldContainerView: UIView {
             .map { "" }
             .bind(to: tagsField.textField.rx.text)
             .disposed(by: disposeBag)
+
+        tagsField.textField.inputAccessoryView = makeDoneToolbar(target: self, action: #selector(dismissKeyboard))
+    }
+    
+    @objc private func dismissKeyboard() {
+        tagsField.endEditing(true)
     }
 
     @available(*, unavailable)
