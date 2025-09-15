@@ -22,6 +22,12 @@ final class ExpenseFieldContainerView: UIView {
         $0.keyboardType = .decimalPad
     }
 
+    let alertlabel = UILabel().then {
+        $0.text = "* 비용은 최대 15자리까지만 입력할 수 있어요"
+        $0.textColor = .appRed
+        $0.font = .font12Regular
+    }
+
     private let disposeBag = DisposeBag()
 
     init() {
@@ -29,6 +35,7 @@ final class ExpenseFieldContainerView: UIView {
 
         addSubview(label)
         addSubview(textField)
+        addSubview(alertlabel)
 
         label.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -39,6 +46,11 @@ final class ExpenseFieldContainerView: UIView {
             $0.top.equalTo(label.snp.bottom).offset(8)
             $0.leading.bottom.trailing.equalToSuperview()
             $0.height.equalTo(44)
+        }
+
+        alertlabel.snp.makeConstraints {
+            $0.top.equalTo(textField.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         textField.rx.controlEvent(.editingDidEnd)

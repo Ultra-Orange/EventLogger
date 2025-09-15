@@ -67,15 +67,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // 스크롤 뷰
+        // 뷰 주입
         view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        view.addSubview(bottomButton)
 
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
         }
 
-        scrollView.addSubview(contentView)
+        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
+
 
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
@@ -94,9 +96,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expenseFieldView)
         contentView.addSubview(memoFieldView)
-        contentView.addSubview(bottomButton)
+//        contentView.addSubview(bottomButton)
 
-        // 삭제 라벨 히든/사용불가 처리
 
 
         // 오토 레이아웃
@@ -148,14 +149,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
+            // TODO: 여백이 필요하면 offset (스크롤 시)
+            $0.top.equalTo(scrollView.snp.bottom)
+            $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
-            $0.bottom.equalToSuperview().inset(10)
+//            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-10)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
+
         }
     }
 
@@ -266,11 +270,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         characterSets.insert(".")
 
         let expenseRelay = BehaviorRelay<Double>(value: 0)
-        expenseFieldView.textField.rx.text.orEmpty
+        let expensText = expenseFieldView.textField.rx.text.orEmpty
             .map { $0.components(separatedBy: characterSets.inverted).joined() }
+            .share()
+
+        expensText
             .map { String($0.prefix(15)) } // 최대 15자리까지 입력되도록 제한
             .map { Double($0) ?? 0 }
             .bind(to: expenseRelay)
+            .disposed(by: disposeBag)
+
+        expensText
+            .map { $0.count <= 15 } // 15자 이하이면 경고라벨 히든
+            .startWith(true)
+            .bind(to: expenseFieldView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
 
         expenseRelay

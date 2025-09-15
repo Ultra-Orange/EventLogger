@@ -157,7 +157,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         memoLabel.isHidden = isMemoEmpty
         memoView.isHidden = isMemoEmpty
 
-
+        // 바인딩
         editActionRelay.map { .moveToEdit(eventItem) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

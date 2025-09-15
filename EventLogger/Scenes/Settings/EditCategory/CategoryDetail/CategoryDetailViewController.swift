@@ -65,7 +65,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
 
         bottomButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
             $0.height.equalTo(54)
         }
     }
