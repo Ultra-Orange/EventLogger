@@ -54,8 +54,8 @@ final class AppFlow: Flow {
     }
 
     func navigateToEventList() -> FlowContributors {
-        let vc = EventListViewController()
-        let reactor = EventListReactor()
+        let vc = EventListPageContainerViewController()
+        let reactor = EventListPageReactor()
         vc.reactor = reactor
         rootNav.pushViewController(vc, animated: false)
         return .one(
@@ -154,9 +154,9 @@ final class AppFlow: Flow {
     }
 
     private func navigateToStatistics() -> FlowContributors {
-        let vc = StatsViewController()
+        let vc = StatsPageContainerViewController()
         let reactor = StatsReactor()
-        vc.reactor = reactor
+//        vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
             flowContributor: .contribute(
