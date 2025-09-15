@@ -15,7 +15,9 @@ import Then
 class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
     // MARK: UI Components
 
-    private let textField = AppTextField()
+    private let textField = AppTextField().then {
+        $0.placeholder = "카테고리 이름을 입력해주세요"
+    }
 
     private let bottomButton = GlowButton(title: "")
 
@@ -36,6 +38,11 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
     }
 
     lazy var dataSource = makeDataSource(collectionView)
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        textField.becomeFirstResponder()
+    }
 
     override func setupUI() {
         view.backgroundColor = .appBackground
