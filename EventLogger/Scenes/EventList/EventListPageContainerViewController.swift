@@ -70,16 +70,7 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
             $0.height.equalToSuperview().multipliedBy(0.5)
         }
 
-        view.addSubview(segmented)
         view.addSubview(containerView)
-        view.addSubview(addButton)
-
-        segmented.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(50)
-        }
-
         containerView.snp.makeConstraints {
 //            $0.top.equalTo(segmented.snp.bottom).offset(12)
 //            $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -87,15 +78,27 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
-        addChild(pageVC)
-        containerView.addSubview(pageVC.view)
-        pageVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
-        pageVC.didMove(toParent: self)
+        view.addSubview(segmented)
+        segmented.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(50)
+        }
 
+        view.addSubview(addButton)
         addButton.snp.makeConstraints {
             $0.trailing.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.size.equalTo(59)
         }
+
+        addChild(pageVC)
+        containerView.addSubview(pageVC.view)
+        pageVC.view.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        pageVC.didMove(toParent: self)
+
+
     }
 
     override func viewDidLoad() {
