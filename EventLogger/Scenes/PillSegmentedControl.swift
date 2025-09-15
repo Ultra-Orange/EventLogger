@@ -11,31 +11,24 @@ import SnapKit
 import Then
 import UIKit
 
-// FIXME:
 public final class PillSegmentedControl: UIControl {
     // MARK: Public API
-
-    public var items: [String] {
-        didSet { rebuildButtons() }
-    }
+    public var items: [String] { didSet { rebuildButtons() } }
 
     public var selectedIndex: Int {
         get { _selectedIndex }
         set { setSelectedIndex(newValue, animated: false) }
     }
 
-    // MARK: 내부 테마 (앱 토큰 고정)
-
+    // MARK: Theme/Subviews/State (동일)
     private enum Theme {
         static var capsuleBackground: UIColor { .appBackground }
         static var capsuleBorder: UIColor { .primary500 }
         static var textNormal: UIColor { .neutral50 }
         static var textSelected: UIColor { .primary200 }
         static var shadowColor: UIColor { .primary500 }
-
         static var fontNormal: UIFont { .font17Regular }
         static var fontSelected: UIFont { .font17Semibold }
-
         static let controlCorner: CGFloat = 16
         static let capsuleBorderWidth: CGFloat = 1
         static let contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
@@ -43,13 +36,10 @@ public final class PillSegmentedControl: UIControl {
         static let buttonContentInsets = NSDirectionalEdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12)
         static let minHeight: CGFloat = 50
         static let attachInset: CGFloat = 2
-
         static let textShadowOpacity: Float = 1
         static let textShadowRadius: CGFloat = 7
         static let textShadowOffset: CGSize = .zero
     }
-
-    // MARK: - Subviews
 
     private let stackView = UIStackView().then {
         $0.axis = .horizontal
@@ -71,15 +61,11 @@ public final class PillSegmentedControl: UIControl {
     }
 
     private var buttons: [UIButton] = []
-
-    // MARK: - State
-
     private var _selectedIndex: Int = 0
     private var isSettingUp = false
     private var needsInitialAttach = false
 
-    // MARK: - Init
-
+    // MARK: Init/Setup (동일)
     public init(items: [String], selectedIndex: Int = 0) {
         self.items = items
         _selectedIndex = max(0, min(selectedIndex, max(0, items.count - 1)))
@@ -99,26 +85,14 @@ public final class PillSegmentedControl: UIControl {
         isSettingUp = false
     }
 
-    // MARK: - Setup (SnapKit)
-
     private func configure() {
         backgroundColor = .clear
         layer.masksToBounds = false
-
         addSubview(selectionCapsuleView)
         addSubview(stackView)
-
-        // stackView inset
-        stackView.snp.makeConstraints {
-            $0.edges.equalTo(Theme.contentInsets)
-        }
-        // 최소 높이
-        snp.makeConstraints {
-            $0.height.greaterThanOrEqualTo(Theme.minHeight)
-        }
+        stackView.snp.makeConstraints { $0.edges.equalTo(Theme.contentInsets) }
+        snp.makeConstraints { $0.height.greaterThanOrEqualTo(Theme.minHeight) }
     }
-
-    // MARK: - Build
 
     private func rebuildButtons() {
         buttons.forEach { $0.removeFromSuperview() }
@@ -135,26 +109,24 @@ public final class PillSegmentedControl: UIControl {
                 btn.configuration = cfg
 
                 btn.configurationUpdateHandler = { [weak self] b in
-                    guard
-                        let self = self,
-                        let idx = self.buttons.firstIndex(of: b)
-                    else { return }
+                    guard let self = self, let idx = self.buttons.firstIndex(of: b) else { return }
                     let selected = (idx == self._selectedIndex)
                     var updated = b.configuration ?? .plain()
                     updated.attributedTitle = self.attributed(title: self.items[idx], selected: selected)
                     updated.baseForegroundColor = selected ? Theme.textSelected : Theme.textNormal
                     updated.background.backgroundColor = .clear
                     b.configuration = updated
-                    if let label = b.titleLabel {
-                        self.applyTextShadow(to: label, selected: selected)
-                    }
+                    if let label = b.titleLabel { self.applyTextShadow(to: label, selected: selected) }
                 }
 
                 btn.addAction(UIAction { [weak self] _ in
-                    self?.tap(btn)
+                    guard let self = self else { return }
+                    if let idx = self.buttons.firstIndex(of: btn), idx != self._selectedIndex {
+                        self.setSelectedIndex(idx, animated: true)
+                        self.sendActions(for: .valueChanged)
+                    }
                 }, for: .touchUpInside)
             }
-
             buttons.append(button)
             stackView.addArrangedSubview(button)
         }
@@ -162,14 +134,6 @@ public final class PillSegmentedControl: UIControl {
         needsInitialAttach = true
         setNeedsLayout()
         invalidateIntrinsicContentSize()
-    }
-
-    // MARK: - Interaction
-
-    private func tap(_ button: UIButton) {
-        guard let index = buttons.firstIndex(of: button), index != _selectedIndex else { return }
-        setSelectedIndex(index, animated: true)
-        sendActions(for: .valueChanged)
     }
 
     public func setSelectedIndex(_ index: Int, animated: Bool) {
@@ -189,8 +153,6 @@ public final class PillSegmentedControl: UIControl {
         invalidateIntrinsicContentSize()
     }
 
-    // MARK: - Selection visuals (SnapKit로 캡슐 이동)
-
     private func updateSelection(animated: Bool) {
         buttons.forEach { $0.setNeedsUpdateConfiguration() }
         guard buttons.indices.contains(_selectedIndex) else {
@@ -207,26 +169,15 @@ public final class PillSegmentedControl: UIControl {
     }
 
     private func attachCapsule(to target: UIView, animated: Bool) {
-        // target(Button)에 맞춰 캡슐 constraints 재설정
-        selectionCapsuleView.snp.remakeConstraints {
-            $0.edges.equalTo(target).inset(Theme.attachInset)
-        }
-
+        selectionCapsuleView.snp.remakeConstraints { $0.edges.equalTo(target).inset(Theme.attachInset) }
         let animations = { self.layoutIfNeeded() }
-        if animated {
-            UIView.animate(withDuration: 0.22, delay: 0, options: [.curveEaseInOut, .allowUserInteraction], animations: animations)
-        } else {
-            animations()
-        }
+        animated ? UIView.animate(withDuration: 0.22, delay: 0, options: [.curveEaseInOut, .allowUserInteraction], animations: animations) : animations()
     }
-
-    // MARK: - Layout
 
     override public func layoutSubviews() {
         super.layoutSubviews()
         layer.cornerRadius = Theme.controlCorner
         selectionCapsuleView.layer.cornerRadius = Theme.controlCorner
-
         selectionCapsuleView.layer.shadowPath = UIBezierPath(
             roundedRect: selectionCapsuleView.bounds,
             cornerRadius: Theme.controlCorner
@@ -238,18 +189,7 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    override public var intrinsicContentSize: CGSize {
-        let buttonHeights = buttons.map { $0.intrinsicContentSize.height }
-        let height = max(Theme.minHeight, (buttonHeights.max() ?? 28) + Theme.contentInsets.top + Theme.contentInsets.bottom)
-        let totalButtonsWidth = buttons.reduce(0) { $0 + $1.intrinsicContentSize.width }
-        let width = totalButtonsWidth
-            + CGFloat(max(0, buttons.count - 1)) * Theme.segmentSpacing
-            + Theme.contentInsets.leading + Theme.contentInsets.trailing
-        return CGSize(width: max(120, width), height: height)
-    }
-
-    // MARK: - Helpers
-
+    // Helpers
     private func attributed(title: String, selected: Bool) -> AttributedString {
         let font = selected ? Theme.fontSelected : Theme.fontNormal
         let ns = NSMutableAttributedString(string: title, attributes: [.font: font])
@@ -268,20 +208,16 @@ public final class PillSegmentedControl: UIControl {
 }
 
 // MARK: - Rx
-
 public extension Reactive where Base: PillSegmentedControl {
+    /// 유저 상호작용(.valueChanged)만 방출
+    var indexChangedByUser: ControlEvent<Int> {
+        ControlEvent(events: controlEvent(.valueChanged).map { base.selectedIndex })
+    }
+
+    /// 양방향 바인딩용 (values는 valueChanged만, sink는 programmatic set)
     var selectedSegmentIndex: ControlProperty<Int> {
-        let control = base
-
-        let values = control.rx.controlEvent(.valueChanged)
-            .map { _ in control.selectedIndex }
-            .startWith(control.selectedIndex)
-            .distinctUntilChanged()
-
-        let sink = Binder(control) { ctrl, newIndex in
-            ctrl.selectedIndex = newIndex
-        }.asObserver()
-
+        let values = controlEvent(.valueChanged).map { base.selectedIndex }
+        let sink = Binder(base) { ctrl, newIndex in ctrl.selectedIndex = newIndex }.asObserver()
         return ControlProperty(values: values, valueSink: sink)
     }
 }

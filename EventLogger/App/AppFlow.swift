@@ -154,9 +154,9 @@ final class AppFlow: Flow {
     }
 
     private func navigateToStatistics() -> FlowContributors {
-        let vc = StatsViewController()
+        let vc = StatsPageContainerViewController()
         let reactor = StatsReactor()
-        vc.reactor = reactor
+//        vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
             flowContributor: .contribute(

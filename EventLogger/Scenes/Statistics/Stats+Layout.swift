@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension StatsViewController {
+extension StatsContentViewController {
     func makeLayout() -> UICollectionViewLayout {
         let configuration = UICollectionViewCompositionalLayoutConfiguration().then {
             $0.contentInsetsReference = .layoutMargins

@@ -173,7 +173,9 @@ final class EventListViewController: BaseViewController<EventListReactor> {
         emptyView.addSubview(emptyStackView)
         emptyStackView.addArrangedSubview(emptyTitleLabel)
         emptyStackView.addArrangedSubview(emptyValueLabel)
-        emptyStackView.snp.makeConstraints { $0.center.equalTo(view.safeAreaLayoutGuide) }
+        emptyStackView.snp.makeConstraints {
+            $0.center.equalTo(view.safeAreaLayoutGuide)
+        }
         emptyView.isHidden = true
 
         view.addSubview(addButton)
