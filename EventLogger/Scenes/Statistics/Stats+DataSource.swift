@@ -19,8 +19,16 @@ extension StatsContentViewController {
                 yearProvider: { reactor.currentState.activeYears },
                 selectedYear: state.selectedYear,
                 selectedMonth: state.selectedMonth,
+                isMonthEnabled: { month in
+                    let months = reactor.currentState.activeMonths
+                    return months.contains(month)
+                },
                 onYearPicked: { [weak reactor] y in reactor?.action.onNext(.pickYear(y)) },
-                onMonthPicked: { [weak reactor] m in reactor?.action.onNext(.pickMonth(m)) }
+                onMonthPicked: { [weak reactor] m in
+                    guard let r = reactor else { return }
+                    let enabled = r.currentState.activeMonths.contains(m)
+                    if enabled { r.action.onNext(.pickMonth(m)) }
+                }
             )
         }
 

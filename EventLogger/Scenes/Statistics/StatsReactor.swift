@@ -29,6 +29,7 @@ final class StatsReactor: BaseReactor {
 
     enum Mutation {
         case setActiveYears([String])
+        case setActiveMonths([Int])
         case setScope(Scope)
         case setSelectedYear(Int?)
         case setSelectedMonth(Int?)
@@ -42,6 +43,7 @@ final class StatsReactor: BaseReactor {
         var selectedYear: Int?
         var selectedMonth: Int?
         var activeYears: [String] = [] // 메뉴에 그릴 연도 목록
+        var activeMonths: [Int] = []   // 선택된 연도의 활성화될 월
         var heatmap: HeatmapModel = .init(rows: [])
     }
 
@@ -92,41 +94,65 @@ final class StatsReactor: BaseReactor {
                 }
             }()
 
-            let defaultMonth: Int? = (currentState.scope == .month) ? 1 : nil
+            let months = (defaultYear != nil) ? statisticsService.activeMonths(in: defaultYear!) : []
+
+            let defaultMonth: Int? = {
+                guard currentState.scope == .month else { return nil }
+                return months.first
+            }()
 
             let heatmap = statisticsService.buildHeatmapAll()
 
             return .concat([
                 .just(.setActiveYears(years)),
                 .just(.setSelectedYear(defaultYear)),
+                .just(.setActiveMonths(months)),
                 .just(.setSelectedMonth(defaultMonth)),
                 .just(.setHeatmap(heatmap)),
             ])
 
         case let .setScope(newScope):
-            // 스코프 전환 시 기본 선택값 보정
+            // 스코프 전환 시 연/월 재설정
             var selectedYear: Int?
-            var selectedMonth: Int? = nil
             if newScope == .year || newScope == .month {
                 if let firstYear = statisticsService.activeYears().first, let year = Int(firstYear) {
                     selectedYear = year
                 } else {
                     selectedYear = Calendar.current.component(.year, from: Date())
                 }
-                if newScope == .month { selectedMonth = 1 }
             }
+
             let years = statisticsService.activeYears()
+            // 선택 연도 기준 활성 월 계산
+            let months = (selectedYear != nil) ? statisticsService.activeMonths(in: selectedYear!) : []
+            // .month면 첫 활성 월, 아니면 nil
+            let selectedMonth: Int? = (newScope == .month) ? months.first : nil
+
             return .concat([
                 .just(.setScope(newScope)),
                 .just(.setSelectedYear(selectedYear)),
-                .just(.setSelectedMonth(selectedMonth)),
                 .just(.setActiveYears(years)),
+                .just(.setActiveMonths(months)),
+                .just(.setSelectedMonth(selectedMonth)),
             ])
 
         case let .pickYear(year):
-            return .just(.setSelectedYear(year))
+            // 연도 바뀌면 활성 월도 갱신, 선택 월은 유지 가능하면 유지, 아니면 첫 활성 월/ nil
+            let months = statisticsService.activeMonths(in: year)
+            let currentSelectedMonth = currentState.selectedMonth
+            let nextSelectedMonth = months.contains(currentSelectedMonth ?? -1) ? currentSelectedMonth : months.first
+            return .concat([
+                .just(.setSelectedYear(year)),
+                .just(.setActiveMonths(months)),
+                .just(.setSelectedMonth(nextSelectedMonth)),
+            ])
 
         case let .pickMonth(month):
+            // 비활성 월 선택 방지: 액션 레벨에서도 한 번 더 가드
+            if let y = currentState.selectedYear {
+                let months = statisticsService.activeMonths(in: y)
+                guard months.contains(month) else { return .empty() }
+            }
             return .just(.setSelectedMonth(month))
         }
     }
@@ -138,6 +164,9 @@ final class StatsReactor: BaseReactor {
         switch mutation {
         case let .setActiveYears(years):
             newState.activeYears = years
+
+        case let .setActiveMonths(month):
+            newState.activeMonths = month
 
         case let .setScope(scope):
             newState.scope = scope
