@@ -15,6 +15,7 @@ struct CategoryBadgeView: View {
         Text(name)
             .font(Font(UIFont.font12Medium))
             .foregroundStyle(Color(UIColor.neutral50))
+            .lineLimit(1)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(color)
