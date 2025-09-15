@@ -152,6 +152,12 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         infoItemView.configureView(eventItem: eventItem)
         memoView.configureView(eventItem.memo)
 
+        // 메모가 없으면 숨김 처리
+        let isMemoEmpty = eventItem.memo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        memoLabel.isHidden = isMemoEmpty
+        memoView.isHidden = isMemoEmpty
+
+
         editActionRelay.map { .moveToEdit(eventItem) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
