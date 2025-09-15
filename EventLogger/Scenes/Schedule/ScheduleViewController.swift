@@ -97,7 +97,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(bottomButton)
 
         // 삭제 라벨 히든/사용불가 처리
-        removeImageButton.isHidden = true
+
 
         // 오토 레이아웃
         removeImageButton.snp.makeConstraints {
@@ -222,7 +222,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-        // 이미지 삭제 라벨
+        // 이미지 삭제 버튼
         removeImageButton.rx.tap
             .bind { [weak self] _ in
                 self?.imageView.image = nil
@@ -332,9 +332,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         case .create:
             // 신규등록은 카테고리 목록만 세팅
             categoryFieldView.configure(categories: categories)
+            removeImageButton.isHidden = true
         case let .update(item):
             // 이미지
             imageView.image = item.image
+            removeImageButton.isHidden = (item.image == nil)
+
             // 제목
             inputTitleView.textField.text = item.title
 
