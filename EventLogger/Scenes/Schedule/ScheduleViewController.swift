@@ -153,11 +153,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         }
 
         bottomButton.snp.makeConstraints {
-            // TODO: 여백이 필요하면 offset (스크롤 시)
             $0.top.equalTo(scrollView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
-//            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-10)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
 
         }

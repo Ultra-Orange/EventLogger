@@ -60,6 +60,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
         collectionView.snp.makeConstraints {
             $0.top.equalTo(textField.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(20)
+            $0.centerX.equalToSuperview()
             $0.bottom.equalTo(bottomButton.snp.top)
         }
 
@@ -136,22 +137,27 @@ extension CategoryDetailViewController {
     }
 
     private func makeLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { _, _ in
+        let layout = UICollectionViewCompositionalLayout { _, enviroment in
             let layoutItem = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .absolute(36),
-                    heightDimension: .absolute(36)
+                    widthDimension: .absolute(44),
+                    heightDimension: .absolute(44)
                 )
             )
+
+            // 좌우인셋 -20, 마지막 아이템 간격 +16
+            let width = (enviroment.container.effectiveContentSize.width - 40) + 16
+            let itemCount = Int(width / 60)
+
             let layoutGroup = NSCollectionLayoutGroup.horizontal(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .absolute(36)
+                    heightDimension: .absolute(44)
                 ),
                 repeatingSubitem: layoutItem,
-                count: 6
+                count: itemCount
             )
-            layoutGroup.interItemSpacing = .flexible(5)
+            layoutGroup.interItemSpacing = .flexible(16)
 
             let sectionBackground = NSCollectionLayoutDecorationItem.background(elementKind: ColorChipBacgroundView.identifier)
             return NSCollectionLayoutSection(group: layoutGroup).then {
