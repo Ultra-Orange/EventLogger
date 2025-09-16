@@ -155,7 +155,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
-
         }
     }
 
@@ -200,7 +199,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .withLatestFrom(reactor.state.map(\.mode))
             .filter { $0 == .create }
             .take(1)
-            .bind{ [inputTitleView] _ in
+            .bind { [inputTitleView] _ in
                 inputTitleView.textField.becomeFirstResponder()
             }
             .disposed(by: disposeBag)
@@ -215,9 +214,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         let isTitleValid = Observable.merge(
             inputTitleView.textField.rx.text.orEmpty.asObservable(),
             editingDidEnd
-            )
-            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-            .share(replay: 1)
+        )
+        .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        .share(replay: 1)
 
         // 카테고리 존재 여부
         let hasCategory = reactor.state
