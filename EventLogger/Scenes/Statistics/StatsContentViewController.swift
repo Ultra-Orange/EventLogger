@@ -1,8 +1,8 @@
 //
-//  StatsViewController.swift
+//  StatsContentViewController.swift
 //  EventLogger
 //
-//  Created by 김우성 on 9/2/25.
+//  Created by 김우성 on 9/12/25.
 //
 
 import CoreData
@@ -13,15 +13,9 @@ import SnapKit
 import Then
 import UIKit
 
-// MARK: - StatsViewController
-
-final class StatsViewController: BaseViewController<StatsReactor> {
+final class StatsContentViewController: BaseViewController<StatsReactor> {
     @Dependency(\.swiftDataManager) var swiftDataManager
     lazy var statisticsService = StatisticsService(manager: swiftDataManager)
-
-    private let backgroundGradientView = GradientBackgroundView()
-
-    private let segmentedControl = PillSegmentedControl(items: ["연도별", "월별", "전체"])
 
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: makeLayout()).then {
         $0.backgroundColor = .clear
@@ -29,40 +23,22 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
     }
 
-    // MARK: 컬렉션뷰 백그라운드용
-
-    private let emptyView = UIView().then {
-        $0.backgroundColor = .clear
-    }
-
+    private let emptyView = UIView().then { $0.backgroundColor = .clear }
     private let emptyStackView = UIStackView().then {
-        $0.axis = .vertical
-        $0.alignment = .center
-        $0.distribution = .fill
-        $0.spacing = 10
-        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.axis = .vertical; $0.alignment = .center; $0.distribution = .fill; $0.spacing = 10
     }
-
     private let emptyTitleLabel = UILabel().then {
-        $0.text = "보여드릴 통계가 없어요"
-        $0.textColor = .neutral50
-        $0.font = .font20Bold
-        $0.textAlignment = .center
-        $0.numberOfLines = 0
+        $0.text = "보여드릴 통계가 없어요"; $0.textColor = .neutral50; $0.font = .font20Bold
+        $0.textAlignment = .center; $0.numberOfLines = 0
     }
-
     private let emptyValueLabel = UILabel().then {
-        $0.text = "일정을 등록하면 통계를 보여드릴 수 있어요"
-        $0.textColor = .neutral50
-        $0.font = .font17Regular
-        $0.textAlignment = .center
-        $0.numberOfLines = 0
+        $0.text = "일정을 등록하면 통계를 보여드릴 수 있어요"; $0.textColor = .neutral50; $0.font = .font17Regular
+        $0.textAlignment = .center; $0.numberOfLines = 0
     }
 
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
-    // MARK: Diffable
-
+    // MARK: Diffable (원본 그대로)
     enum StatsSection: Hashable {
         case menuBar
         case heatmapHeader
@@ -93,48 +69,27 @@ final class StatsViewController: BaseViewController<StatsReactor> {
     }
 
     var dataSource: UICollectionViewDiffableDataSource<StatsSection, StatsItem>!
-
-    // 어떤 부모가 펼쳐져 있는지 추적
     var expandedParentIDs = Set<UUID>()
-
-    // parentId -> 자식들 캐시 (스냅샷 생성 시 계산 / 토글 시 삽입·삭제에 재사용)
     var childrenCache: [UUID: [RollupChild]] = [:]
 
-    // 스냅샷 재구성 시 캐시 초기화
-    func resetRollupCaches() {
-        expandedParentIDs.removeAll()
-        childrenCache.removeAll()
+    // MARK: - Init (고정 스코프 Reactor 주입용)
+    convenience init(reactor: StatsReactor) {
+        self.init()
+        self.reactor = reactor
     }
 
-    // MARK: - Lifecycle
-
     override func setupUI() {
-        view.backgroundColor = .appBackground
-        title = "통계"
-
-        view.addSubview(backgroundGradientView)
-        backgroundGradientView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalToSuperview().multipliedBy(0.5)
-        }
-
-        view.addSubview(segmentedControl)
-        segmentedControl.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(10)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(50)
-        }
+        view.backgroundColor = .clear
 
         view.addSubview(collectionView)
         collectionView.backgroundView = emptyView
         emptyView.isHidden = true
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(12)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(0)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
         setupEmptyView()
-
         configureDataSource()
     }
 
@@ -142,20 +97,11 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         emptyView.addSubview(emptyStackView)
         emptyStackView.addArrangedSubview(emptyTitleLabel)
         emptyStackView.addArrangedSubview(emptyValueLabel)
-
-        emptyStackView.snp.makeConstraints {
-            $0.center.equalTo(view.safeAreaLayoutGuide)
-        }
+        emptyStackView.snp.makeConstraints { $0.center.equalTo(view.safeAreaLayoutGuide) }
     }
 
     override func bind(reactor: StatsReactor) {
-        // Input
-        segmentedControl.rx.selectedSegmentIndex
-            .compactMap { Scope(rawValue: $0) }
-            .map { .setScope($0) }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
-
+        // 최초 로드 + 외부 변경시 새로고침
         Observable.merge(
             rx.viewDidLoad.map { _ in },
             NotificationCenter.default.rx.notification(notification).map { _ in }
@@ -164,25 +110,25 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
 
-        collectionView.rx.itemSelected // 셀이 선택되면 이벤트를 내보냄
+        // 접기/펼치기
+        collectionView.rx.itemSelected
             .do(onNext: { [weak self] indexPath in
-                self?.collectionView.deselectItem(at: indexPath, animated: true) // 일단 deselect를 해서 UI 깔끔하게
+                self?.collectionView.deselectItem(at: indexPath, animated: true)
             })
-            .compactMap { [weak self] indexPath -> StatsItem? in // 데이터소스에서 StatsItem을 꺼냄. 못 찾으면 드랍
-                guard let self = self else { return nil }
+            .compactMap { [weak self] indexPath -> StatsItem? in
+                guard let self else { return nil }
                 return self.dataSource.itemIdentifier(for: indexPath)
             }
-            .compactMap { item -> RollupParent? in // 아이템이 .rollupParent 인 경우만 꺼내서 통과
+            .compactMap { item -> RollupParent? in
                 if case let .rollupParent(parent) = item { return parent }
                 return nil
             }
-            .observe(on: MainScheduler.instance) // 다음이 메인 스레드에서 실행되도록 보장
-            .subscribe(onNext: { [weak self] parent in // 펼치기/접기 토글을 수행. 내부에서는 스냅샷에 자식을 삽입/삭제하고, dataSource.apply로 애니메이션 적용
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] parent in
                 self?.toggle(parent: parent)
             })
-            .disposed(by: disposeBag) // 구독 해제하며 누수 방지
+            .disposed(by: disposeBag)
 
-        // Output
         reactor.state
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] _ in
@@ -235,11 +181,13 @@ final class StatsViewController: BaseViewController<StatsReactor> {
         // 섹션이 실제 스냅샷에 존재하면 그 섹션 반환, 아니면 첫 섹션
         return snapshot.sectionIdentifiers.contains(section) ? section : (snapshot.sectionIdentifiers.first ?? .categoryCount)
     }
-}
 
-// MARK: - Models (UI 전용 뷰모델)
+    func resetRollupCaches() {
+        expandedParentIDs.removeAll()
+        childrenCache.removeAll()
+    }
 
-extension StatsViewController {
+    // MARK: - Models (원본 그대로)
     struct TotalModel: Hashable {
         let totalCount: Int
         let totalExpense: Double
@@ -248,7 +196,7 @@ extension StatsViewController {
     struct RollupParent: Hashable {
         let id: UUID
         let title: String
-        let leftDotColor: UIColor? // 카테고리면 색 점, 아티스트면 nil
+        let leftDotColor: UIColor?
         let valueText: String
         let type: RollupType
     }
@@ -256,7 +204,7 @@ extension StatsViewController {
     struct RollupChild: Hashable {
         let id: UUID
         let parentId: UUID
-        let leftDotColor: UIColor? // 카테고리면 색 점
+        let leftDotColor: UIColor?
         let title: String
         let valueText: String
     }
@@ -271,42 +219,8 @@ extension StatsViewController {
 
 // MARK: - Utilities
 
-final class KRWFormatter {
-    static let shared = KRWFormatter()
-    private let nf: NumberFormatter
-    private init() {
-        nf = NumberFormatter()
-        nf.numberStyle = .decimal
-        nf.groupingSeparator = ","
-        nf.maximumFractionDigits = 0
-    }
-
-    func string(_ value: Double) -> String {
-        let v = Int(value.rounded())
-        return (nf.string(from: NSNumber(value: v)) ?? "\(v)") + " 원"
-    }
-}
-
 private extension Array {
     subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil
-    }
-}
-
-// 헤더 타이틀 매핑
-extension StatsViewController {
-    func headerTitle(for section: StatsSection) -> String? {
-        switch section {
-        case .menuBar: return nil
-        case .heatmapHeader: return "참여 캘린더"
-        case .heatmap: return nil
-        case .totalCount: return nil
-        case .totalExpense: return nil
-        case .categoryCount: return "카테고리별 참여 횟수"
-        case .categoryExpense: return "카테고리별 지출"
-        case .artistCount: return "아티스트별 참여 횟수"
-        case .artistExpense: return "아티스트별 지출"
-        default: return nil
-        }
     }
 }

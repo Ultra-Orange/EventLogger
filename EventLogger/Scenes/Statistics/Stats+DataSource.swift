@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension StatsViewController {
+extension StatsContentViewController {
     func configureDataSource() {
         // Cell registrations
         let menuReg = UICollectionView.CellRegistration<StatsMenuBarCell, UUID> { [weak self] cell, _, _ in

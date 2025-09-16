@@ -45,11 +45,21 @@ final class StatsReactor: BaseReactor {
         var heatmap: HeatmapModel = .init(rows: [])
     }
 
-    let initialState: State = .init()
+    let initialState: State
 
     // MARK: - Dependencies (UI 무관)
 
-    init() {}
+    init(fixedScope: Scope) {
+        self.initialState = .init(scope: fixedScope,
+                                  selectedYear: nil,
+                                  selectedMonth: fixedScope == .month ? 1 : nil,
+                                  activeYears: [],
+                                  heatmap: .init(rows: []))
+    }
+
+    convenience init() {
+        self.init(fixedScope: .year)
+    }
 
     // MARK: - Private helper
 
