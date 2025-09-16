@@ -43,6 +43,7 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
     private let addButton = UIButton.makeAddButton()
 
     private let segmented = PillSegmentedControl(items: ["전체", "참여예정", "참여완료"]).then {
+        $0.backgroundColor = .appBackground
         $0.selectedIndex = 0
     }
 
