@@ -37,8 +37,7 @@ final class ScheduleReactor: BaseReactor {
         let mode: Mode
     }
 
-    // TODO: 리팩토링 고려요소 원칙적으로 리액터는 뷰를 몰라야되니까 여기에 버튼타이틀은 어색하다!
-    enum Mode {
+    enum Mode: Equatable {
         case create
         case update(EventItem)
 
@@ -187,7 +186,6 @@ final class ScheduleReactor: BaseReactor {
 // MARK: - Private helpers
 
 private extension ScheduleReactor {
-    // TODO: 순서 효율적으로 리팩토링 -> 달력에 추가 우선 2번 DB쓰지 않게
     func autoSaveToCalendarIfNeeded(_ item: EventItem) {
         guard settingsService.autoSaveToCalendar else { return }
 

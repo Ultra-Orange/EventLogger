@@ -83,7 +83,7 @@ final class CategoryDetailReactor: BaseReactor {
         switch action {
         case let .tapBottomButton(name, colorId):
             guard let name, !name.trimmingCharacters(in: .whitespaces).isEmpty else {
-                return .just(.setAlertMessage("카테고리 이름을 적어주세요."))
+                return .just(.setAlertMessage("카테고리 이름을 입력하세요"))
             }
             switch mode {
             case .create:

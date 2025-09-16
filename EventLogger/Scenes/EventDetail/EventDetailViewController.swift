@@ -148,10 +148,16 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         // 1회성 데이터 바인딩
         let eventItem = reactor.currentState.eventItem
         titleLabel.text = eventItem.title
-        imageView.image = eventItem.image
+        imageView.image = eventItem.image ?? UIImage(named: "DefaultImage")
         infoItemView.configureView(eventItem: eventItem)
         memoView.configureView(eventItem.memo)
 
+        // 메모가 없으면 숨김 처리
+        let isMemoEmpty = eventItem.memo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        memoLabel.isHidden = isMemoEmpty
+        memoView.isHidden = isMemoEmpty
+
+        // 바인딩
         editActionRelay.map { .moveToEdit(eventItem) }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)

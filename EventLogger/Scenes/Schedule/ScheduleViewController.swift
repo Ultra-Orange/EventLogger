@@ -67,15 +67,19 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
     override func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // 스크롤 뷰
+        // 뷰 주입
         view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        view.addSubview(bottomButton)
 
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top)
+            $0.bottom.lessThanOrEqualTo(bottomButton.snp.top)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).priority(.low)
         }
 
-        scrollView.addSubview(contentView)
+        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
+
 
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
@@ -94,10 +98,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expenseFieldView)
         contentView.addSubview(memoFieldView)
-        contentView.addSubview(bottomButton)
-
-        // 삭제 라벨 히든/사용불가 처리
-        removeImageButton.isHidden = true
 
         // 오토 레이아웃
         removeImageButton.snp.makeConstraints {
@@ -146,16 +146,18 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
+        // TODO: 텍스트필드뷰는 자동으로 스크롤 안올려줌
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(memoFieldView.snp.bottom).offset(30)
-            $0.leading.trailing.equalToSuperview()
+//            $0.top.equalTo(scrollView.snp.bottom)
+            $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
-            $0.bottom.equalToSuperview().inset(10)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
+
         }
     }
 
@@ -171,6 +173,16 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.configureInitialState(state: state)
             }
             .disposed(by: disposeBag)
+        
+// TODO: didEditEnd랑 묶기
+//        rx.viewWillAppear.map { _ in }
+//            .withLatestFrom(reactor.state.map(\.mode))
+//            .filter { $0 == .create }
+//            .take(1)
+//            .bind{ [inputTitleView] _ in
+//                inputTitleView.textField.becomeFirstResponder()
+//            }
+//            .disposed(by: disposeBag)
 
         // 제목 입력에 따라 버튼 활성/비활성
         let isTitleValid = inputTitleView.textField.rx.text
@@ -181,6 +193,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         let hasCategory = reactor.state
             .map(\.categories)
             .map { !$0.isEmpty }
+
+        // 사용자에게 알려줄 경고라벨 hidden 처리
+        isTitleValid
+            .skip(1)
+            .startWith(true)
+            .bind(to: inputTitleView.alertlabel.rx.isHidden)
+            .disposed(by: disposeBag)
+
+
+        hasCategory.bind(to: categoryFieldView.alertlabel.rx.isHidden)
+            .disposed(by: disposeBag)
 
         // 버튼 활성 바인딩 (제목 적었고, 카테고리 0개 아닐 때) (UIButton은 isEnabled=false면 탭 이벤트도 막힘)
         Observable
@@ -222,7 +245,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-        // 이미지 삭제 라벨
+        // 이미지 삭제 버튼
         removeImageButton.rx.tap
             .bind { [weak self] _ in
                 self?.imageView.image = nil
@@ -266,11 +289,20 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         characterSets.insert(".")
 
         let expenseRelay = BehaviorRelay<Double>(value: 0)
-        expenseFieldView.textField.rx.text.orEmpty
+        let expensText = expenseFieldView.textField.rx.text.orEmpty
             .map { $0.components(separatedBy: characterSets.inverted).joined() }
+            .share()
+
+        expensText
             .map { String($0.prefix(15)) } // 최대 15자리까지 입력되도록 제한
             .map { Double($0) ?? 0 }
             .bind(to: expenseRelay)
+            .disposed(by: disposeBag)
+
+        expensText
+            .map { $0.count <= 15 } // 15자 이하이면 경고라벨 히든
+            .startWith(true)
+            .bind(to: expenseFieldView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
 
         expenseRelay
@@ -332,9 +364,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         case .create:
             // 신규등록은 카테고리 목록만 세팅
             categoryFieldView.configure(categories: categories)
+            removeImageButton.isHidden = true
         case let .update(item):
             // 이미지
             imageView.image = item.image
+            removeImageButton.isHidden = (item.image == nil)
+
             // 제목
             inputTitleView.textField.text = item.title
 

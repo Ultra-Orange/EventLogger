@@ -65,7 +65,7 @@ struct EventCell: View { // EventItem 통으로 받자
                     .cornerRadius(10)
                     .clipped()
             } else {
-                Image("DefaultImage")
+                Image("DefaultThumbnail")
                     .resizable()
                     .aspectRatio(contentMode: .fit) // placeholder는 보통 fit
                     .frame(width: 60, height: 60)

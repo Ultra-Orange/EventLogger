@@ -19,6 +19,12 @@ final class TitleFieldContainerView: UIView {
         $0.placeholder = "이벤트 제목을 입력하세요"
     }
 
+    let alertlabel = UILabel().then {
+        $0.text = "제목을 입력해 주세요"
+        $0.textColor = .appRed
+        $0.font = .font12Regular
+    }
+
     init() {
         super.init(frame: .zero)
 
@@ -26,6 +32,7 @@ final class TitleFieldContainerView: UIView {
 
         addSubview(nameLabel)
         addSubview(textField)
+        addSubview(alertlabel)
 
         nameLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -37,6 +44,12 @@ final class TitleFieldContainerView: UIView {
             $0.leading.bottom.trailing.equalToSuperview()
             $0.height.equalTo(44)
         }
+
+        alertlabel.snp.makeConstraints {
+            $0.top.equalTo(textField.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+
     }
 
     func configureUI(text: String) {
