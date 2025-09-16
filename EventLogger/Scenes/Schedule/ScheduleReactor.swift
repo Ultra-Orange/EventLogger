@@ -37,7 +37,7 @@ final class ScheduleReactor: BaseReactor {
         let mode: Mode
     }
 
-    enum Mode {
+    enum Mode: Equatable {
         case create
         case update(EventItem)
 

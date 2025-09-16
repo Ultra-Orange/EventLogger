@@ -171,6 +171,15 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+//        rx.viewWillAppear.map { _ in }
+//            .withLatestFrom(reactor.state.map(\.mode))
+//            .filter { $0 == .create }
+//            .take(1)
+//            .bind{ [inputTitleView] _ in
+//                inputTitleView.textField.becomeFirstResponder()
+//            }
+//            .disposed(by: disposeBag)
+
         // 제목 입력에 따라 버튼 활성/비활성
         let isTitleValid = inputTitleView.textField.rx.text
             .orEmpty
@@ -182,8 +191,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .map { !$0.isEmpty }
 
         // 사용자에게 알려줄 경고라벨 hidden 처리
-        isTitleValid.bind(to: inputTitleView.alertlabel.rx.isHidden)
+        isTitleValid
+            .skip(1)
+            .startWith(true)
+            .bind(to: inputTitleView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
+
 
         hasCategory.bind(to: categoryFieldView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
