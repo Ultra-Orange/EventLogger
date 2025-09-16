@@ -146,14 +146,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        // TODO: 텍스트필드뷰는 자동으로 스크롤 안올려줌
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-//            $0.top.equalTo(scrollView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
@@ -197,8 +195,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-// TODO: didEditEnd랑 묶기
-        rx.viewWillAppear.map { _ in }
+
+        rx.viewDidAppear.map { _ in }
             .withLatestFrom(reactor.state.map(\.mode))
             .filter { $0 == .create }
             .take(1)
@@ -207,10 +205,19 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+
+        let editingDidEnd = inputTitleView.textField.rx
+            .controlEvent(.editingDidEnd)
+            .withLatestFrom(inputTitleView.textField.rx.text.orEmpty)
+            .share()
+
         // 제목 입력에 따라 버튼 활성/비활성
-        let isTitleValid = inputTitleView.textField.rx.text
-            .orEmpty
+        let isTitleValid = Observable.merge(
+            inputTitleView.textField.rx.text.orEmpty.asObservable(),
+            editingDidEnd
+            )
             .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .share(replay: 1)
 
         // 카테고리 존재 여부
         let hasCategory = reactor.state
@@ -219,7 +226,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         // 사용자에게 알려줄 경고라벨 hidden 처리
         isTitleValid
-            .skip(1)
+            .skip(until: inputTitleView.textField.rx.controlEvent(.editingDidBegin))
             .startWith(true)
             .bind(to: inputTitleView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
