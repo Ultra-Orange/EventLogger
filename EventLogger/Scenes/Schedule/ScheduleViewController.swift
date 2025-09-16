@@ -146,6 +146,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
+        // TODO: 텍스트필드뷰는 자동으로 스크롤 안올려줌
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
             $0.leading.trailing.bottom.equalToSuperview()
@@ -172,7 +173,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.configureInitialState(state: state)
             }
             .disposed(by: disposeBag)
-
+        
+// TODO: didEditEnd랑 묶기
 //        rx.viewWillAppear.map { _ in }
 //            .withLatestFrom(reactor.state.map(\.mode))
 //            .filter { $0 == .create }
