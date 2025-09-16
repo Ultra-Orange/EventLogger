@@ -109,7 +109,6 @@ final class StatsPageContainerViewController: UIViewController {
         let seg = segmented.selectedIndex
         let relay = selectedIndexRelay.value
         let page = pageVC.viewControllers?.first.flatMap { pages.firstIndex(of: $0) } ?? -1
-        print("🔎[\(event)] idx=\(idx) seg=\(seg) relay=\(relay) page=\(page)")
     }
 }
 
