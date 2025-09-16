@@ -71,11 +71,11 @@ final class StatsPageContainerViewController: UIViewController {
     private func bind() {
         // 1) 입력: 세그 탭
         let segmentTap = segmented.rx.indexChangedByUser
-            .do(onNext: { [weak self] i in self?.log("segmentTap", idx: i) })
+            .asObservable()
 
         // 2) 입력: 스와이프 종료
         let swipeEnd = pageVC.rx.currentIndex(pages: pages)
-            .do(onNext: { [weak self] i in self?.log("swipeEnd", idx: i) })
+            .asObservable()
 
         // 3) 병합 → 릴레이
         Observable.merge(segmentTap, swipeEnd)
@@ -85,7 +85,6 @@ final class StatsPageContainerViewController: UIViewController {
         // 4) 릴레이 변경 로그
         selectedIndexRelay
             .distinctUntilChanged()
-            .do(onNext: { [weak self] v in self?.log("relay", idx: v) })
             .subscribe()
             .disposed(by: disposeBag)
 
@@ -103,13 +102,6 @@ final class StatsPageContainerViewController: UIViewController {
 
         // 7) 초기 주입
         selectedIndexRelay.accept(0)
-    }
-
-    private func log(_ event: String, idx: Int) {
-        let seg = segmented.selectedIndex
-        let relay = selectedIndexRelay.value
-        let page = pageVC.viewControllers?.first.flatMap { pages.firstIndex(of: $0) } ?? -1
-        print("🔎[\(event)] idx=\(idx) seg=\(seg) relay=\(relay) page=\(page)")
     }
 }
 
