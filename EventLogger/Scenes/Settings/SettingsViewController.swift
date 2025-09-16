@@ -208,6 +208,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
 
         // 권한 요청 Alert
         reactor.pulse(\.$alertMessage)
+            .compactMap{ $0 }
             .withUnretained(self)
             .flatMap { `self`, message in
                 UIAlertController.rx.alert(on: self, title: "권한 필요", message: message, actions: [

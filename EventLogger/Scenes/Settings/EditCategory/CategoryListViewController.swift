@@ -108,6 +108,7 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
             .disposed(by: disposeBag)
 
         reactor.pulse(\.$alertMessage)
+            .compactMap{ $0 }
             .withUnretained(self)
             .flatMap { `self`, message in
                 UIAlertController.rx.alert(on: self, title: "삭제 실패", message: message, actions: [

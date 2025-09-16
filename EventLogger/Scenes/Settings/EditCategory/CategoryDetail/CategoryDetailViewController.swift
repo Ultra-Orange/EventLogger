@@ -90,6 +90,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
             .disposed(by: disposeBag)
 
         reactor.pulse(\.$alertMessage)
+            .compactMap{ $0 }
             .withUnretained(self)
             .flatMap { `self`, message in
                 UIAlertController.rx.alert(on: self, message: message, actions: [
