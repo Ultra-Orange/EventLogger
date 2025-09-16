@@ -17,6 +17,10 @@ struct EventCell: View { // EventItem 통으로 받자
     let item: EventItem
     let category: CategoryItem
 
+    private var strokeColor: Color {
+        Color(UIColor.neutral50).opacity(0.40)
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             VStack(alignment: .leading, spacing: 0) {
@@ -76,7 +80,7 @@ struct EventCell: View { // EventItem 통으로 받자
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(UIColor.neutral50).opacity(0.40), lineWidth: 1)
+                .stroke(strokeColor, lineWidth: 1)
         )
     }
 }

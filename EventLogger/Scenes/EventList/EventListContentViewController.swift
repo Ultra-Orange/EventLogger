@@ -112,14 +112,21 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
         view.backgroundColor = .clear
 
         view.addSubview(collectionView)
-        collectionView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        collectionView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
 
-        collectionView.backgroundView = emptyView
+//        collectionView.backgroundView = emptyView
+        view.addSubview(emptyView)
+        emptyView.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
         emptyView.addSubview(emptyStackView)
         emptyStackView.addArrangedSubview(emptyTitleLabel)
         emptyStackView.addArrangedSubview(emptyValueLabel)
         emptyStackView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.directionalEdges.equalToSuperview()
         }
         emptyView.isHidden = true
     }
@@ -227,7 +234,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
             let snapshot = self.dataSource.snapshot()
             let section = snapshot.sectionIdentifiers[indexPath.section]
             switch section {
-            case .nextUp: label.text = "다음 일정"
+            case .nextUp: label.text = "가장 가까운 일정"
             case let .month(ym): label.text = "\(ym.year)년 \(ym.month)월"
             }
         }
@@ -270,7 +277,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
 
         let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0) })
 
-        // 3) 다음 일정
+        // 3) 가장 가까운 일정
         let nextUp: EventItem? = filtered
             .filter { $0.startTime >= today }
             .min(by: { $0.startTime < $1.startTime })
@@ -317,7 +324,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
     ) {
         currentItemsByID = itemsByID
         dataSource.apply(snapshot, animatingDifferences: animated)
-        collectionView.backgroundView?.isHidden = !snapshot.itemIdentifiers.isEmpty
+        emptyView.isHidden = !snapshot.itemIdentifiers.isEmpty
     }
 
     // MARK: Helpers

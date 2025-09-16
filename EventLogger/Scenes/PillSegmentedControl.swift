@@ -36,7 +36,6 @@ public final class PillSegmentedControl: UIControl {
         static let buttonContentInsets = NSDirectionalEdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12)
         static let minHeight: CGFloat = 50
         static let attachInset: CGFloat = 2
-        static let textShadowOpacity: Float = 1
         static let textShadowRadius: CGFloat = 7
         static let textShadowOffset: CGSize = .zero
     }
@@ -198,12 +197,9 @@ public final class PillSegmentedControl: UIControl {
 
     private func applyTextShadow(to label: UILabel, selected: Bool) {
         label.layer.masksToBounds = false
-        label.layer.shadowColor = Theme.shadowColor.cgColor
-        label.layer.shadowOpacity = selected ? Theme.textShadowOpacity : 0
+        label.shadowColor = selected ? Theme.shadowColor : nil
         label.layer.shadowRadius = Theme.textShadowRadius
-        label.layer.shadowOffset = Theme.textShadowOffset
-        label.layer.shouldRasterize = true
-        label.layer.rasterizationScale = UIScreen.main.scale
+        label.shadowOffset = Theme.textShadowOffset
     }
 }
 
