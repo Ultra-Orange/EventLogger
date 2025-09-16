@@ -210,6 +210,16 @@ extension StatisticsService {
         let sorted = descending ? years.sorted(by: >) : years.sorted()
         return sorted.map(String.init)
     }
+
+    /// 해당 연도에 이벤트가 존재하는 월(1~12)을 오름차순으로 반환
+    func activeMonths(in year: Int) -> [Int] {
+        let events = manager.fetchAllEvents()
+        let months = events.compactMap { e -> Int? in
+            let comps = calendar.dateComponents([.year, .month], from: e.startTime)
+            return comps.year == year ? comps.month : nil
+        }
+        return Array(Set(months)).sorted() // [1, 3, 9] ...
+    }
 }
 
 // MARK: - 잔디용 모델 생성

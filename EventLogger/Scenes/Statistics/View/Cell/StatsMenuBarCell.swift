@@ -71,8 +71,9 @@ final class StatsMenuBarCell: UICollectionViewCell {
         yearProvider: () -> [String],
         selectedYear: Int?,
         selectedMonth: Int?,
+        isMonthEnabled: (Int) -> Bool = { _ in true },
         onYearPicked: @escaping (Int) -> Void,
-        onMonthPicked: @escaping (Int) -> Void
+        onMonthPicked: @escaping (Int) -> Void,
     ) {
         let years = yearProvider()
         let yearActions = years.compactMap { Int($0) }.map { y in
@@ -94,14 +95,25 @@ final class StatsMenuBarCell: UICollectionViewCell {
         case .month:
             monthButton.isHidden = false
 
-            let month = selectedMonth ?? 1
+            let monthTitle: String = {
+                if let m = selectedMonth { return "\(m)월" }
+                else { return "월 선택" }
+            }()
             monthButton.configuration?.attributedTitle = AttributedString(
-                "\(month)월",
+                monthTitle,
                 attributes: AttributeContainer([.font: UIFont.font13Regular])
             )
 
-            let months = (1 ... 12).map { month in
-                UIAction(title: "\(month)월") { _ in onMonthPicked(month) }
+            let months = (1 ... 12).map { month -> UIAction in
+                let action = UIAction(title: "\(month)월") { _ in onMonthPicked(month) }
+                if !isMonthEnabled(month) {
+                    action.attributes.insert(.disabled) // 회색 처리 & 탭 비활성화
+                }
+                // 선택 상태 표시(optional)
+                if selectedMonth == month {
+                    action.state = .on
+                }
+                return action
             }
 
             monthButton.menu = UIMenu(children: months)
