@@ -27,6 +27,10 @@ public extension Reactive where Base: UIPageViewController {
                     let vc = pageVC.viewControllers?.first,
                     let idx = pages.firstIndex(of: vc)
                 else { return nil }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/develop
                 return idx
             }
             .observe(on: MainScheduler.asyncInstance)
@@ -46,7 +50,7 @@ public extension Reactive where Base: UIPageViewController {
             let direction: UIPageViewController.NavigationDirection =
                 (newIndex >= currentIndex) ? .forward : .reverse
 
-            pageVC.setViewControllers([pages[newIndex]], direction: direction, animated: animated) 
+            pageVC.setViewControllers([pages[newIndex]], direction: direction, animated: animated)
         }
     }
 }
