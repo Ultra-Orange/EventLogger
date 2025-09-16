@@ -83,6 +83,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
+            // 의도적으로 모호하게 만들어서 시스템이 자동으로 offset 올려주는거 막기 위해 width 주석
 //            $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
@@ -197,14 +198,14 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .disposed(by: disposeBag)
 
 // TODO: didEditEnd랑 묶기
-//        rx.viewWillAppear.map { _ in }
-//            .withLatestFrom(reactor.state.map(\.mode))
-//            .filter { $0 == .create }
-//            .take(1)
-//            .bind{ [inputTitleView] _ in
-//                inputTitleView.textField.becomeFirstResponder()
-//            }
-//            .disposed(by: disposeBag)
+        rx.viewWillAppear.map { _ in }
+            .withLatestFrom(reactor.state.map(\.mode))
+            .filter { $0 == .create }
+            .take(1)
+            .bind{ [inputTitleView] _ in
+                inputTitleView.textField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
 
         // 제목 입력에 따라 버튼 활성/비활성
         let isTitleValid = inputTitleView.textField.rx.text

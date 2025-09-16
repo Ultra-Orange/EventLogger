@@ -70,7 +70,8 @@ class CategoryListViewController: BaseViewController<CategoryListReactor> {
         view.addSubview(addButton)
 
         collectionView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(addButton.snp.top)
         }
 
