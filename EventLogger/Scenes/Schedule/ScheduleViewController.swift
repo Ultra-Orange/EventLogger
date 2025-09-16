@@ -23,6 +23,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
+        $0.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
     }
 
     private let contentView = UIView()
@@ -73,18 +74,16 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         view.addSubview(bottomButton)
 
         scrollView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.lessThanOrEqualTo(bottomButton.snp.top)
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).priority(.low)
         }
 
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
-
-
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalTo(scrollView.contentLayoutGuide)
+//            $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
 
@@ -173,7 +172,30 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.configureInitialState(state: state)
             }
             .disposed(by: disposeBag)
-        
+
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillShowNotification)
+            .compactMap(\.userInfo)
+            .bind { [weak self] userInfo in
+                guard let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+                    return
+                }
+                guard let self, let responder = view.findFirstResponder() as? UIView else {
+                    return
+                }
+
+                let frame = responder.convert(responder.bounds, to: view)
+                let offset = CGPoint(
+                    x: scrollView.contentOffset.x,
+                    y: max(scrollView.contentOffset.y, max(0, frame.maxY + scrollView.contentOffset.y - keyboardFrame.minY + 30))
+                )
+                scrollView.setContentOffset(offset, animated: true)
+
+                let intersection = keyboardFrame.intersection(scrollView.frame)
+                scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: intersection.height + 40, right: 0)
+            }
+            .disposed(by: disposeBag)
+
 // TODO: didEditEnd랑 묶기
 //        rx.viewWillAppear.map { _ in }
 //            .withLatestFrom(reactor.state.map(\.mode))
