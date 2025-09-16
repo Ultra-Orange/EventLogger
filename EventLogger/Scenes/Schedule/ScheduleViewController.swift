@@ -96,9 +96,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         contentView.addSubview(artistsFieldView)
         contentView.addSubview(expenseFieldView)
         contentView.addSubview(memoFieldView)
-//        contentView.addSubview(bottomButton)
-
-
 
         // 오토 레이아웃
         removeImageButton.snp.makeConstraints {
@@ -183,6 +180,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         let hasCategory = reactor.state
             .map(\.categories)
             .map { !$0.isEmpty }
+
+        // 사용자에게 알려줄 경고라벨 hidden 처리
+        isTitleValid.bind(to: inputTitleView.alertlabel.rx.isHidden)
+            .disposed(by: disposeBag)
+
+        hasCategory.bind(to: categoryFieldView.alertlabel.rx.isHidden)
+            .disposed(by: disposeBag)
 
         // 버튼 활성 바인딩 (제목 적었고, 카테고리 0개 아닐 때) (UIButton은 isEnabled=false면 탭 이벤트도 막힘)
         Observable

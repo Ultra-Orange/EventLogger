@@ -28,6 +28,12 @@ final class CategoryFieldContainerView: UIView {
         $0.layer.masksToBounds = true
     }
 
+    let alertlabel = UILabel().then {
+        $0.text = "카테고리를 선택해 주세요"
+        $0.textColor = .appRed
+        $0.font = .font12Regular
+    }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -41,6 +47,7 @@ final class CategoryFieldContainerView: UIView {
     private func setupUI() {
         addSubview(sectionHeader)
         addSubview(categoryMenuButton)
+        addSubview(alertlabel)
 
         sectionHeader.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -52,6 +59,12 @@ final class CategoryFieldContainerView: UIView {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.height.equalTo(44)
         }
+
+        alertlabel.snp.makeConstraints {
+            $0.top.equalTo(categoryMenuButton.snp.bottom).offset(8)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+
     }
 
     func configure(categories: [CategoryItem], initial: CategoryItem? = nil) {
