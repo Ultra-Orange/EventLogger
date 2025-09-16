@@ -74,6 +74,8 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         scrollView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.lessThanOrEqualTo(bottomButton.snp.top)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).priority(.low)
         }
 
         scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
@@ -150,7 +152,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         }
 
         bottomButton.snp.makeConstraints {
-            $0.top.equalTo(scrollView.snp.bottom)
+//            $0.top.equalTo(scrollView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)

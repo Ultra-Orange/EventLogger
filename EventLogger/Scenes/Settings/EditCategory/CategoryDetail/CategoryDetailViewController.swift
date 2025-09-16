@@ -35,6 +35,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
         collectionViewLayout: makeLayout()
     ).then {
         $0.backgroundColor = .clear
+        $0.alwaysBounceVertical = false
     }
 
     lazy var dataSource = makeDataSource(collectionView)
@@ -66,7 +67,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
 
         bottomButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
             $0.height.equalTo(54)
         }
     }
