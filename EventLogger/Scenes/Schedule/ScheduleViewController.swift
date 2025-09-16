@@ -195,7 +195,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-
+        // 뷰 등장시점 포커싱
         rx.viewDidAppear.map { _ in }
             .withLatestFrom(reactor.state.map(\.mode))
             .filter { $0 == .create }
@@ -205,13 +205,13 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
-
+        // 에디팅 끝나는지 구독
         let editingDidEnd = inputTitleView.textField.rx
             .controlEvent(.editingDidEnd)
             .withLatestFrom(inputTitleView.textField.rx.text.orEmpty)
             .share()
 
-        // 제목 입력에 따라 버튼 활성/비활성
+        // 제목란이 유효한지 구독
         let isTitleValid = Observable.merge(
             inputTitleView.textField.rx.text.orEmpty.asObservable(),
             editingDidEnd
@@ -230,7 +230,6 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             .startWith(true)
             .bind(to: inputTitleView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
-
 
         hasCategory.bind(to: categoryFieldView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
