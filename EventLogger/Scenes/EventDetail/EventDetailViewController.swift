@@ -95,7 +95,8 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         view.addSubview(scrollView)
 
         scrollView.snp.makeConstraints {
-            $0.directionalEdges.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
 
         scrollView.addSubview(contentView)

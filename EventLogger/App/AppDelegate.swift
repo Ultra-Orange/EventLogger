@@ -20,6 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
+        let apperance = UINavigationBarAppearance().then {
+            $0.configureWithTransparentBackground()
+        }
+        UINavigationBar.appearance().standardAppearance = apperance
+        UINavigationBar.appearance().scrollEdgeAppearance = apperance
+
         return true
     }
 

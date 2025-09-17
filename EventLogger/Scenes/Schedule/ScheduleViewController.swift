@@ -23,6 +23,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
     private let scrollView = UIScrollView().then {
         $0.keyboardDismissMode = .interactive // 키보드 드래그로 내릴 수 있게 함
+        $0.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
     }
 
     private let contentView = UIView()
@@ -73,18 +74,17 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         view.addSubview(bottomButton)
 
         scrollView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
             $0.bottom.lessThanOrEqualTo(bottomButton.snp.top)
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).priority(.low)
         }
 
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 40, right: 0)
-
-
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalTo(scrollView.contentLayoutGuide)
+            // 의도적으로 모호하게 만들어서 시스템이 자동으로 offset 올려주는거 막기 위해 width 주석
+//            $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
 
@@ -146,18 +146,15 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             $0.leading.trailing.equalToSuperview()
         }
 
-        // TODO: 텍스트필드뷰는 자동으로 스크롤 안올려줌
         memoFieldView.snp.makeConstraints {
             $0.top.equalTo(expenseFieldView.snp.bottom).offset(30)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
         bottomButton.snp.makeConstraints {
-//            $0.top.equalTo(scrollView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.height.equalTo(54)
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
-
         }
     }
 
@@ -173,21 +170,53 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
                 self?.configureInitialState(state: state)
             }
             .disposed(by: disposeBag)
-        
-// TODO: didEditEnd랑 묶기
-//        rx.viewWillAppear.map { _ in }
-//            .withLatestFrom(reactor.state.map(\.mode))
-//            .filter { $0 == .create }
-//            .take(1)
-//            .bind{ [inputTitleView] _ in
-//                inputTitleView.textField.becomeFirstResponder()
-//            }
-//            .disposed(by: disposeBag)
 
-        // 제목 입력에 따라 버튼 활성/비활성
-        let isTitleValid = inputTitleView.textField.rx.text
-            .orEmpty
-            .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        NotificationCenter.default.rx
+            .notification(UIResponder.keyboardWillShowNotification)
+            .compactMap(\.userInfo)
+            .bind { [weak self] userInfo in
+                guard let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+                    return
+                }
+                guard let self, let responder = view.findFirstResponder() as? UIView else {
+                    return
+                }
+
+                let frame = responder.convert(responder.bounds, to: view)
+                let offset = CGPoint(
+                    x: scrollView.contentOffset.x,
+                    y: max(scrollView.contentOffset.y, max(0, frame.maxY + scrollView.contentOffset.y - keyboardFrame.minY + 30))
+                )
+                scrollView.setContentOffset(offset, animated: true)
+
+                let intersection = keyboardFrame.intersection(scrollView.frame)
+                scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: intersection.height + 40, right: 0)
+            }
+            .disposed(by: disposeBag)
+
+        // 뷰 등장시점 포커싱
+        rx.viewDidAppear.map { _ in }
+            .withLatestFrom(reactor.state.map(\.mode))
+            .filter { $0 == .create }
+            .take(1)
+            .bind { [inputTitleView] _ in
+                inputTitleView.textField.becomeFirstResponder()
+            }
+            .disposed(by: disposeBag)
+
+        // 에디팅 끝나는지 구독
+        let editingDidEnd = inputTitleView.textField.rx
+            .controlEvent(.editingDidEnd)
+            .withLatestFrom(inputTitleView.textField.rx.text.orEmpty)
+            .share()
+
+        // 제목란이 유효한지 구독
+        let isTitleValid = Observable.merge(
+            inputTitleView.textField.rx.text.orEmpty.asObservable(),
+            editingDidEnd
+        )
+        .map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        .share(replay: 1)
 
         // 카테고리 존재 여부
         let hasCategory = reactor.state
@@ -196,11 +225,10 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
 
         // 사용자에게 알려줄 경고라벨 hidden 처리
         isTitleValid
-            .skip(1)
+            .skip(until: inputTitleView.textField.rx.controlEvent(.editingDidBegin))
             .startWith(true)
             .bind(to: inputTitleView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)
-
 
         hasCategory.bind(to: categoryFieldView.alertlabel.rx.isHidden)
             .disposed(by: disposeBag)

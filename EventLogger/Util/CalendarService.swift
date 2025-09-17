@@ -208,7 +208,6 @@ final class CalendarService: CalendarServicing {
     }
 
     // 캘린더에서 이벤트 고유식별 태그 생성
-    // TODO: 사용자가 지우지 않게끔 유도
     private func makeIdentifierTag(for item: EventItem) -> String {
         // UUID 앞 8자리
         let shortUUID = item.id.uuidString.replacingOccurrences(of: "-", with: "").prefix(8)
@@ -218,36 +217,27 @@ final class CalendarService: CalendarServicing {
         df.dateFormat = "yyMMdd_HHmm"
         let ts = df.string(from: item.startTime)
 
-        // 제목 앞 10자 (개행/공백 제거)
-//        let title10 = item.title
-//            .replacingOccurrences(of: "\n", with: " ")
-//            .replacingOccurrences(of: "\r", with: " ")
-//            .trimmingCharacters(in: .whitespaces)
-//            .prefix(10)
-
-        // 두 줄 구성
-//        return "EL:\(shortUUID)_\(ts)\n\(title10)"
-        return "Event Id:\(shortUUID)_\(ts)"
+        return "\(shortUUID)_\(ts)"
     }
 
     // 노트 조립 태그
     private func buildNotes(for item: EventItem, with tag: String) -> String {
-        var notes = tag
+        var notes = "이벤트 연동용 코드 : \(tag) - 변경 및 삭제 시 일정이 정상적으로 동기화되지 않을 수 있습니다"
         let memo = (item.memo).trimmingCharacters(in: .whitespacesAndNewlines)
         if !memo.isEmpty { notes += "\n\n" + memo }
         if !item.artists.isEmpty {
-            notes += "\n\n[출연자] " + item.artists.joined(separator: ", ")
+            notes += "\n\n[아티스트] " + item.artists.joined(separator: ", ")
         }
         if item.expense > 0 {
             let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
+            formatter.numberStyle = .currency        // 통화 형식
             formatter.locale = Locale(identifier: "ko_KR")
-            formatter.maximumFractionDigits = 0 //  소수점 제거
+            formatter.maximumFractionDigits = 0      // 소수점 제거
 
             let expenseText = formatter.string(from: NSNumber(value: item.expense))
                 ?? "\(item.expense)" // 포맷 실패 시 fallback
 
-            notes += "\n[비용] \(item.currency.rawValue) \(expenseText)"
+            notes += "\n[비용] \(expenseText)"
         }
         return notes
     }
