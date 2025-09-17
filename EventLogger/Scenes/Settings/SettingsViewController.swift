@@ -67,7 +67,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let calendarAutoLinkLabel = UILabel().then {
-        $0.text = "캘린더 자동 등록"
+        $0.text = "캘린더 이벤트 연결"
         $0.font = .font17Regular
         $0.textColor = .label
     }
@@ -77,7 +77,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let calendarNoticeLabel = UILabel().then {
-        $0.text = "동기화가 꺼져 있을 때 만든 일정은 iCloud를 다시 켜도 연결되지 않을 수 있습니다."
+        $0.text = "iCloud 동기화를 끄고 등록한 일정은 동기화를 켜도 연동되지 않습니다"
         $0.font = .font12Regular
         $0.textColor = .label
         $0.numberOfLines = 0
