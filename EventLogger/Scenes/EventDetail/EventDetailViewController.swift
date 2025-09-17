@@ -193,8 +193,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
             .bind { `self`, _ in
                 guard let eventItem = self.reactor?.currentState.eventItem else { return }
 
-                // TODO: 공유 기본 메시지 UX 정하기
-                let text = "[\(eventItem.title)] 참가예정!"
+                let text = "[\(eventItem.title)] 참여 예정!✨"
 
                 var activityItems: [Any] = [text]
 
