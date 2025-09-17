@@ -19,6 +19,14 @@
   
 ## 기술적 의사결정
 
+### 개발환경
+```
+macOS Sequia 15.5
+Xcode 16.4
+Swift 5 
+Swift Package Manager
+```
+
 ### 사용 아키텍쳐 및 라이브러리
 ```
 iOS: 17.0+
@@ -29,20 +37,13 @@ Data: SwiftData, CloudKit
 Etc: swift-dependencies
 ```
 
-- SwiftData 는 iOS 17이상만 지원하는데 25년 6월 기준 iOS 점유율 조사 결과 iOS 17 이상 점유율이 96%이므로 iOS17+ 빌드타겟이 문제가 없다고 판단 (출처 - https://developer.apple.com/support/app-store/)
+- 내부에 데이터를 보관하기 위해 SwiftData사용(CloudKit과 결합도 높음)
 - 단방향 데이터 통신 보장하고 화면 이동관리에 용이한 `MVVM-C` 패턴 채택
 - 리액티브 프로그래밍을 돕는 `Rx`관련 라이브러리 도입
 - `UIKit` 을 메인으로 일부 요소에 `SwiftUI` 를 혼용
 - `CloudKit` 으로 데이터 동기화 **보장**
 - `swift-dependencies` 로 의존성 주입관리
 
-### 개발환경
-```
-macOS Sequia 15.5
-Xcode 16.4
-Swift 5 
-Swift Package Manager
-```
 
 ### 사용한 오픈소스 라이브러리
 
@@ -66,7 +67,7 @@ TODO
 
 ## 프로젝트 구조
 ```
-📁 PuppyBox
+📁 EventLogger
 ├── 📁 App                  // 앱, 화면 진입점
 ├── 📁 Base                 // 베이스 리액터, VC
 ├── 📁 Extensions           // 각종 확장
