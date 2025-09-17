@@ -27,10 +27,6 @@ public extension Reactive where Base: UIPageViewController {
                     let vc = pageVC.viewControllers?.first,
                     let idx = pages.firstIndex(of: vc)
                 else { return nil }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/develop
                 return idx
             }
             .observe(on: MainScheduler.asyncInstance)
