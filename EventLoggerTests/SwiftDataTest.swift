@@ -78,9 +78,9 @@ struct CategoryMappingTests {
         )
         
         // CREATE
-        swiftDataManager.insertCategory(title: "테스트1", colorId: 0)
-        swiftDataManager.insertCategory(title: "테스트2", colorId: 1)
-        
+        swiftDataManager.insertCategory(name: "테스트1", colorId: 0)
+        swiftDataManager.insertCategory(name: "테스트2", colorId: 1)
+
         // READ
         let fetchAll = swiftDataManager.fetchAllCategories()
         
@@ -92,15 +92,8 @@ struct CategoryMappingTests {
         #expect(data1.colorId == 0)
         
         //UPDATE
-        
-        let modify = CategoryItem(
-            id: data1.id,
-            name: "변경",
-            position: 2,
-            colorId: 2)
-        
-        swiftDataManager.updateCategory(id: data1.id, category: modify)
-        
+        swiftDataManager.updateCategory(id: data1.id, name: "변경", colorId: 2)
+
         let check = swiftDataManager.fetchOneCategory(id: data1.id)
         #expect(check?.name == "변경")
         #expect(check?.position == 2)
