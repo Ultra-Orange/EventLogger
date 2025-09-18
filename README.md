@@ -10,8 +10,8 @@
 ![SnapKit](https://img.shields.io/badge/SnapKit-brightgreen)
 
 ## 프로젝트 개요
-  - 나만의 이벤트 일정을 아카이빙 & 스케쥴링하는 앱
-
+  - 나만의 이벤트 일정을 아카이빙 & 스케쥴링하는 앱   
+  - 🔗 [앱스토어 링크](https://apps.apple.com/kr/app/event-logger/id6751944076?l=ko)
 ## 주요 기능
  - 이벤트 일정 등록/편집
  - 이벤트 일정 확인(목록, 푸시알림)
@@ -21,7 +21,6 @@
 
 ### 개발환경
 ```
-macOS Sequia 15.5
 Xcode 16.4
 Swift 5 
 Swift Package Manager
@@ -71,7 +70,6 @@ Etc: swift-dependencies
 
 ![demo4](https://github.com/user-attachments/assets/a1705a9f-365f-4697-a6f2-a716f0a7b782)![demo5](https://github.com/user-attachments/assets/e200217c-b5f1-4027-9a48-f04beaf83226)![demo6](https://github.com/user-attachments/assets/6bffb1ae-7512-4070-9397-5f5400c6ea7e)
 
-Sample event image from [Unsplash](https://unsplash.com)
 
 ## 프로젝트 구조
 ```
@@ -110,6 +108,5 @@ Sample event image from [Unsplash](https://unsplash.com)
 
 외부 오픈소스 또는 디자인 참고 요소가 포함된 경우, 해당 출처를 함께 명시하였습니다.
 
-본 프로젝트가 궁금하시거나 활용을 원하시는 경우, 아래 연락처 중 하나로 문의해주세요.
+본 프로젝트가 궁금하시거나 활용을 원하시는 경우, Issues에 문의 부탁드립니다.
 
-> 이메일: 
