@@ -102,8 +102,17 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
 
     }
 
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        Task {
+            let pushEnable = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            UIApplication.shared.registerForRemoteNotifications()
+            // pushNotificationEnabled가 nil일 때 푸시알람 허용 물어봄 -> 클라우드킷 사일런트 푸시 받기 위해
+            if UserDefaults.standard.object(forKey: UDKey.pushNotificationEnabled) == nil {
+                UserDefaults.standard.set(pushEnable ?? false, forKey: UDKey.pushNotificationEnabled)
+            }
+        }
         setupPageVC()
     }
 
