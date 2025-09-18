@@ -158,7 +158,7 @@ extension SettingsReactor {
             notificationService.cancelNotification(id: event.id.uuidString)
             notificationService.scheduleNotification(
                 id: event.id.uuidString,
-                title: "\(event.title)+✨",
+                title: "\(event.title)✨",
                 body: "내일은 기다리고 기다리던 이벤트 D-DAY 🎉",
                 date: event.startTime
             )

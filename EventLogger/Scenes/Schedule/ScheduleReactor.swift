@@ -210,7 +210,7 @@ private extension ScheduleReactor {
 
         notificationService.scheduleNotification(
             id: item.id.uuidString,
-            title: "\(item.title)+✨",
+            title: "\(item.title)✨",
             body: "내일은 기다리고 기다리던 이벤트 D-DAY 🎉",
             date: item.startTime
         )
