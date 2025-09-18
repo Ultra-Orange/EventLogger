@@ -80,6 +80,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
         // 초기값 세팅
         configureInitialState(reactor: reactor)
 
+        // 바텀 버튼 탭
         bottomButton.rx.tap
             .bind { [weak self] _ in
                 guard let self, let reactor = self.reactor else { return }
@@ -89,6 +90,7 @@ class CategoryDetailViewController: BaseViewController<CategoryDetailReactor> {
             }
             .disposed(by: disposeBag)
 
+        // Alert 메시지 생성 감지
         reactor.pulse(\.$alertMessage)
             .compactMap{ $0 }
             .withUnretained(self)

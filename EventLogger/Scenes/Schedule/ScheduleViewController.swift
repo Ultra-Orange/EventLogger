@@ -83,7 +83,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         // 컨텐츠 뷰
         contentView.snp.makeConstraints {
             $0.top.bottom.equalTo(scrollView.contentLayoutGuide)
-            // 의도적으로 모호하게 만들어서 시스템이 자동으로 offset 올려주는거 막기 위해 width 주석
+            // 의도적으로 모호하게 만들어서 시스템이 자동으로 offset 올려주는거 막기 위해 width 주석처리
 //            $0.width.equalTo(scrollView.contentLayoutGuide)
             $0.leading.trailing.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
@@ -313,6 +313,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             })
             .disposed(by: disposeBag)
 
+        // 비용 텍스트필드 관련 처리
         var characterSets = CharacterSet.decimalDigits
         characterSets.insert(".")
 
@@ -363,6 +364,7 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+        // 카테고리 바인딩
         reactor.state.map(\.categories)
             .distinctUntilChanged()
             .bind { [categoryFieldView] categories in
@@ -370,6 +372,12 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
             }
             .disposed(by: disposeBag)
 
+        categoryFieldView.categoryMenuButton.newCategoryRelay
+            .map { .newCategory }
+            .bind(to: reactor.action)
+            .disposed(by: disposeBag)
+
+        // notification 수신(클라우드킷 연동위해 필요)
         Observable.merge(
             rx.viewWillAppear.map { _ in },
             NotificationCenter.default.rx.notification(notification).map { _ in }
@@ -377,13 +385,9 @@ class ScheduleViewController: BaseViewController<ScheduleReactor> {
         .map { _ in .reloadCategories }
         .bind(to: reactor.action)
         .disposed(by: disposeBag)
-
-        categoryFieldView.categoryMenuButton.newCategoryRelay
-            .map { .newCategory }
-            .bind(to: reactor.action)
-            .disposed(by: disposeBag)
     }
 
+    // 최초값 바인딩용 함수
     private func configureInitialState(state: ScheduleReactor.State) {
         // 공통 카테고리 & 아이템
         let categories = state.categories
@@ -440,6 +444,7 @@ extension ScheduleViewController {
     }
 }
 
+// 이벤트 등록/수정 데이터 전달용 객체
 struct EventPayload {
     var title: String
     var categoryId: UUID
