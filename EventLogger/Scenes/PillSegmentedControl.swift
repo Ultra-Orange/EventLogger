@@ -12,7 +12,6 @@ import Then
 import UIKit
 
 public final class PillSegmentedControl: UIControl {
-    // MARK: Public API
     public var items: [String] { didSet { rebuildButtons() } }
 
     public var selectedIndex: Int {
@@ -20,7 +19,6 @@ public final class PillSegmentedControl: UIControl {
         set { setSelectedIndex(newValue, animated: false) }
     }
 
-    // MARK: Theme/Subviews/State (동일)
     private enum Theme {
         static var capsuleBackground: UIColor { .appBackground }
         static var capsuleBorder: UIColor { .primary500 }
@@ -64,7 +62,6 @@ public final class PillSegmentedControl: UIControl {
     private var isSettingUp = false
     private var needsInitialAttach = false
 
-    // MARK: Init/Setup (동일)
     public init(items: [String], selectedIndex: Int = 0) {
         self.items = items
         _selectedIndex = max(0, min(selectedIndex, max(0, items.count - 1)))
@@ -188,7 +185,6 @@ public final class PillSegmentedControl: UIControl {
         }
     }
 
-    // Helpers
     private func attributed(title: String, selected: Bool) -> AttributedString {
         let font = selected ? Theme.fontSelected : Theme.fontNormal
         let ns = NSMutableAttributedString(string: title, attributes: [.font: font])
@@ -204,13 +200,14 @@ public final class PillSegmentedControl: UIControl {
 }
 
 // MARK: - Rx
+
 public extension Reactive where Base: PillSegmentedControl {
-    /// 유저 상호작용(.valueChanged)만 방출
+    // .valueChanged만 방출
     var indexChangedByUser: ControlEvent<Int> {
         ControlEvent(events: controlEvent(.valueChanged).map { base.selectedIndex })
     }
 
-    /// 양방향 바인딩용 (values는 valueChanged만, sink는 programmatic set)
+    // 양방향 바인딩용 (values는 valueChanged만, sink는 programmatic set)
     var selectedSegmentIndex: ControlProperty<Int> {
         let values = controlEvent(.valueChanged).map { base.selectedIndex }
         let sink = Binder(base) { ctrl, newIndex in ctrl.selectedIndex = newIndex }.asObserver()

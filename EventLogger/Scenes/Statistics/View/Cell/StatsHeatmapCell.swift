@@ -53,15 +53,15 @@ final class StatsHeatmapCell: UICollectionViewCell {
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
         guard let model = currentModel else { return super.preferredLayoutAttributesFitting(layoutAttributes) }
 
-        let attrs = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
-        let targetWidth = attrs.size.width
+        let attributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
+        let targetWidth = attributes.size.width
 
         // HeatmapView의 계산식 활용
         let neededHeight = HeatmapView.requiredHeight(for: targetWidth, model: model)
 
         // 카드 모서리 그림자/보정 등을 고려해 약간의 여유를 줘도 OK
-        attrs.size.height = ceil(neededHeight)
+        attributes.size.height = ceil(neededHeight)
 
-        return attrs
+        return attributes
     }
 }

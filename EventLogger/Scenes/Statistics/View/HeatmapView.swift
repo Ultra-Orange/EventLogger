@@ -11,28 +11,26 @@ import UIKit
 
 struct HeatmapModel: Hashable {
     struct Row: Hashable {
-        let yearLabel: String // "`25" 또는 "2025" 등 넣기
-        let monthCounts: [Int] // 12개짜리 Int 배열 넣기
+        let yearLabel: String
+        let monthCounts: [Int]
     }
 
     let rows: [Row]
 }
 
 // 깃허브 잔디같은 그리드 그리는 뷰
-// + 최상단에 1~12 월 헤더 추가
 final class HeatmapView: UIView {
-    // 레이아웃 상수 한 곳에서 관리
     enum Metrics {
-        static let topPadding: CGFloat = 10 // 최상단 여백 (헤더 위)
-        static let headerHeight: CGFloat = 16 // "1~12" 헤더 라벨 높이
-        static let headerBottomSpacing: CGFloat = 7 // 헤더와 첫 행 사이 간격
+        static let topPadding: CGFloat = 10
+        static let headerHeight: CGFloat = 16
+        static let headerBottomSpacing: CGFloat = 7
         static let bottomPadding: CGFloat = 10
 
         static let leftYearWidth: CGFloat = 25
-        static let hSpacing: CGFloat = 8.5 // 월 칸 사이 간격 (12개)
-        static let vSpacing: CGFloat = 8.5 // 행 간격
+        static let hSpacing: CGFloat = 8.5
+        static let vSpacing: CGFloat = 8.5
         static let minCellHeight: CGFloat = 16
-        static let horizontalContentInset: CGFloat = 20 // 좌우 총 여백(= 10 + 10)
+        static let horizontalContentInset: CGFloat = 20
         static let monthCount = 12
         static let cornerRadius: CGFloat = 4
     }

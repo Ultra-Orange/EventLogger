@@ -73,8 +73,6 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
 
         view.addSubview(containerView)
         containerView.snp.makeConstraints {
-//            $0.top.equalTo(segmented.snp.bottom).offset(12)
-//            $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.top.equalToSuperview()
             $0.leading.trailing.bottom.equalToSuperview()
         }
@@ -162,6 +160,7 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self, weak reactor] payload in
                 guard let self, let reactor else { return }
+
                 // UIBarButtonItem는 showsMenuAsPrimaryAction 없음. menu만 세팅하면 탭 시 표시됨(iOS 14+)
                 self.menuButton.menu = Self.makeMenu(
                     items: payload.items,

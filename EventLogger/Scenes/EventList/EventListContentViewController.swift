@@ -37,6 +37,7 @@ struct EventListYearMonth: Hashable, Comparable {
     let year: Int
     let month: Int
 
+    // Comparable 프로토콜 구현부
     static func < (lhs: EventListYearMonth, rhs: EventListYearMonth) -> Bool {
         if lhs.year != rhs.year { return lhs.year < rhs.year }
         return lhs.month < rhs.month
@@ -117,7 +118,6 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
-//        collectionView.backgroundView = emptyView
         view.addSubview(emptyView)
         emptyView.snp.makeConstraints {
             $0.center.equalToSuperview()

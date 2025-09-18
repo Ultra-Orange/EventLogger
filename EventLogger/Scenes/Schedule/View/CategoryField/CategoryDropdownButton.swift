@@ -10,7 +10,7 @@ import RxSwift
 import UIKit
 
 final class CategoryDropDownButton: UIView {
-    private(set) var categories: [CategoryItem] = [] // private(set) var: 읽기는 퍼블릭, 쓰기는 private
+    private(set) var categories: [CategoryItem] = []
     private(set) var selectedCategory: CategoryItem?
 
     let selectionRelay = PublishRelay<CategoryItem>()
@@ -56,11 +56,10 @@ final class CategoryDropDownButton: UIView {
     // 카테고리/초기값 구성
     func configure(categories: [CategoryItem], initial: CategoryItem? = nil) {
         self.categories = categories
-        // 카테고리 비어있을 경우 방어로직(테스트 때 필요)
         selectedCategory = initial ?? categories.first
 
-        rebuildMenu() // 메뉴 다시 구성
-        applySelectionToButton() // 버튼에 초기 선택사항 반영 (PublishRelay이므로 초기 방출은 X)
+        rebuildMenu()
+        applySelectionToButton()
     }
 
     private func rebuildMenu() {

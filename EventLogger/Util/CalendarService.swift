@@ -9,18 +9,14 @@ import EventKit
 import Foundation
 import RxSwift
 
-// MARK: 인터페이스
-
 protocol CalendarServicing {
-    /// 캘린더 접근 권한 요청 (결정된 상태라면 즉시 리턴)
+    // 캘린더 접근 권한 요청 (결정된 상태라면 즉시 리턴)
     func requestAccess() -> Single<Bool>
-    /// EventItem을 기본 캘린더에 저장
+    // EventItem을 기본 캘린더에 저장
     func save(eventItem: EventItem) -> Single<String>
     func update(eventItem: EventItem) -> Single<String>
     func delete(eventItem: EventItem) -> Single<Void>
 }
-
-// MARK: 구현
 
 final class CalendarService: CalendarServicing {
     private let store = EKEventStore()
@@ -30,7 +26,6 @@ final class CalendarService: CalendarServicing {
     @UserSetting(key: UDKey.appCalendarIdKey, defaultValue: "")
     var appCalendarId: String
 
-    // 권한 요청
     func requestAccess() -> Single<Bool> {
         return Single<Bool>.create { single in
             let status = EKEventStore.authorizationStatus(for: .event)
@@ -184,8 +179,6 @@ final class CalendarService: CalendarServicing {
             return Disposables.create()
         }
     }
-
-    // MARK: Delete
 
     func delete(eventItem: EventItem) -> Single<Void> {
         return Single.create { single in

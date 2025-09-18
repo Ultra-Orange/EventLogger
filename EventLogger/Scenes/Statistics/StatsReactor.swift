@@ -9,23 +9,17 @@ import Dependencies
 import Foundation
 import RxSwift
 
-/// Stats 화면의 단일 진실 소스(Source of Truth)
-/// - UI 구성은 VC에서, 상태/도메인 변화는 Reactor에서 담당
 final class StatsReactor: BaseReactor {
     @Dependency(\.swiftDataManager) private var swiftDataManager
     private lazy var statisticsService = StatisticsService(manager: swiftDataManager)
 
-    // MARK: - Action (사용자 입력)
-
     enum Action {
         case viewDidLoad
-        case setScope(Scope) // 세그먼트 변경
-        case pickYear(Int) // 연도 선택
-        case pickMonth(Int) // 월 선택
-        case refresh // 데이터 갱신 (외부에서 요청 가능)
+        case setScope(Scope)
+        case pickYear(Int)
+        case pickMonth(Int)
+        case refresh
     }
-
-    // MARK: - Mutation (상태 변화)
 
     enum Mutation {
         case setActiveYears([String])
@@ -35,8 +29,6 @@ final class StatsReactor: BaseReactor {
         case setSelectedMonth(Int?)
         case setHeatmap(HeatmapModel)
     }
-
-    // MARK: - State (View가 구독)
 
     struct State {
         var scope: Scope = .year
@@ -48,8 +40,6 @@ final class StatsReactor: BaseReactor {
     }
 
     let initialState: State
-
-    // MARK: - Dependencies (UI 무관)
 
     init(fixedScope: Scope) {
         self.initialState = .init(scope: fixedScope,
@@ -63,9 +53,6 @@ final class StatsReactor: BaseReactor {
         self.init(fixedScope: .year)
     }
 
-    // MARK: - Private helper
-
-    /// 현재 상태에서의 기간 계산 (UI 없이 순수 로직)
     private func currentPeriod(scope: Scope, year: Int?, month: Int?) -> StatsPeriod {
         switch scope {
         case .all: return .all
@@ -75,12 +62,9 @@ final class StatsReactor: BaseReactor {
         }
     }
 
-    // MARK: - mutate
-
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
         case .viewDidLoad, .refresh:
-            // 진입/새로고침 시 연도 목록과 히트맵 초기화
             let years = statisticsService.activeYears()
             // 기본 연도/월 결정: .year, .month 스코프에서는 반드시 연/월을 세팅
             let currentYear = Calendar.current.component(.year, from: Date())
@@ -156,8 +140,6 @@ final class StatsReactor: BaseReactor {
             return .just(.setSelectedMonth(month))
         }
     }
-
-    // MARK: - reduce
 
     func reduce(state: State, mutation: Mutation) -> State {
         var newState = state

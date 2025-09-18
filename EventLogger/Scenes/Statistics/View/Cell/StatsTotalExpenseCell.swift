@@ -9,7 +9,6 @@ import SnapKit
 import Then
 import UIKit
 
-// 3) 총 카운트 셀
 final class StatsTotalExpenseCell: UICollectionViewCell {
     private let expenseBox = StatBoxView(title: "총액").then {
         $0.layer.cornerRadius = 10

@@ -37,7 +37,7 @@ final class GradientBackgroundView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         gradient.colors = nil
-        isUserInteractionEnabled = false // 배경이므로 이벤트 막지 않게
+        isUserInteractionEnabled = false
         updateGradient()
     }
 
@@ -46,9 +46,9 @@ final class GradientBackgroundView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        // layerClass를 썼으면 frame 세팅 불필요. 하위 레이어일 경우에만 필요.
-        if gradient.superlayer == layer { return } // layerClass 사용 중
-        gradient.frame = bounds.insetBy(dx: -bounds.width * 0.5, dy: -bounds.height * 0.5) // 피그마식 확장 필요 시
+        // layerClass를 썼으면 frame 세팅 불필요 (하위 레이어일 때만 필요)
+        if gradient.superlayer == layer { return }
+        gradient.frame = bounds.insetBy(dx: -bounds.width * 0.5, dy: -bounds.height * 0.5)
         gradient.position = CGPoint(x: bounds.midX, y: bounds.midY)
     }
 
@@ -65,7 +65,6 @@ final class GradientBackgroundView: UIView {
             gradient.startPoint = direction.start
             gradient.endPoint = direction.end
         }
-        // 다크/라이트 전환에 대비
         setNeedsDisplay()
     }
 }

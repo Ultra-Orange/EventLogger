@@ -15,9 +15,6 @@ enum Scope: Int {
     case all // 전체
 }
 
-// 1) UIMenu 버튼 섹션 셀
-/// - 이 셀은 "연도/월 선택 UI"만 담당.
-/// - 실제 상태 변경은 VC → Reactor로 흘러감(onYearPicked/onMonthPicked 클로저)
 final class StatsMenuBarCell: UICollectionViewCell {
     private let container = UIStackView().then {
         $0.axis = .horizontal
