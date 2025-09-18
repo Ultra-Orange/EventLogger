@@ -67,7 +67,11 @@ Etc: swift-dependencies
 <img width="1481" height="1939" alt="Group 2" src="https://github.com/user-attachments/assets/57b701a1-66e9-470c-a42e-9f76325f8a8e" />
 
 ## 데모 자료
-TODO
+![demo1](https://github.com/user-attachments/assets/6587e539-8704-4846-a053-b8a4a3b4a834)![demo2](https://github.com/user-attachments/assets/f9166c72-328b-4b18-b84f-214d19cf38e5)![demo3](https://github.com/user-attachments/assets/e24618df-120e-40e5-807f-9f3895278f07)
+
+![demo4](https://github.com/user-attachments/assets/a1705a9f-365f-4697-a6f2-a716f0a7b782)![demo5](https://github.com/user-attachments/assets/e200217c-b5f1-4027-9a48-f04beaf83226)![demo6](https://github.com/user-attachments/assets/6bffb1ae-7512-4070-9397-5f5400c6ea7e)
+
+Sample event image from [Unsplash](https://unsplash.com)
 
 ## 프로젝트 구조
 ```
