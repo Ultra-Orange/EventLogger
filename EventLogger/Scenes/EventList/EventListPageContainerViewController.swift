@@ -102,7 +102,6 @@ final class EventListPageContainerViewController: BaseViewController<EventListPa
 
     }
 
-
     override func viewDidLoad() {
         super.viewDidLoad()
         Task {
