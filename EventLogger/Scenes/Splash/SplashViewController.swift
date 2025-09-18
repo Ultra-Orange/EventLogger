@@ -12,7 +12,6 @@ import RxFlow
 import RxRelay
 
 final class SplashViewController: UIViewController, Stepper {
-
     let steps = PublishRelay<any Step>()
 
     let splashLogo = UIImageView(image: .splashLogo).then{

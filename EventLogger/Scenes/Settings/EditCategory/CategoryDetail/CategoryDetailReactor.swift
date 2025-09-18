@@ -107,7 +107,6 @@ final class CategoryDetailReactor: BaseReactor {
         case let .setAlertMessage(message):
             newState.alertMessage = message
         }
-
         return newState
     }
 }

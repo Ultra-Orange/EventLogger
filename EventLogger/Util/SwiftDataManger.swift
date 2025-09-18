@@ -270,5 +270,5 @@ extension SwiftDataManager {
 }
 
 enum SwiftDataMangerError: Error {
-    case cannotDeleteUsedCategory
+    case cannotDeleteUsedCategory // 사용중인 카테고리 삭제 에러
 }

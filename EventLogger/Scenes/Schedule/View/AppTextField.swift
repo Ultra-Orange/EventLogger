@@ -7,6 +7,7 @@
 
 import UIKit
 
+// 앱 공용 텍스트필드 정의
 final class AppTextField: UITextField {
     // 기본 패딩
     private let padding = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)

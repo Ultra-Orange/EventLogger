@@ -25,8 +25,7 @@ enum Persistence {
         } catch {
             let pretty = "\(error) | \(String(reflecting: error))"
             assertionFailure("❌ ModelContainer init failed: \(pretty)")
-            fatalError(pretty) // 임시
-//            fatalError(error.localizedDescription)
+            fatalError(pretty)
         }
     }()
 }

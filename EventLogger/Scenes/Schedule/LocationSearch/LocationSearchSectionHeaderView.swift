@@ -9,6 +9,7 @@ import SnapKit
 import Then
 import UIKit
 
+// 장소검색 섹션 헤더
 final class LocationSearchSectionHeaderView: UICollectionReusableView {
     let titleLabel = UILabel().then {
         $0.font = .font13Regular

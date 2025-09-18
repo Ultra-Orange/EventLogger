@@ -36,7 +36,7 @@ class CategoryListCell: UICollectionViewListCell {
             $0.top.bottom.equalToSuperview().inset(11)
         }
 
-        // 눌렀을 때 색을 바꾸고 싶다면
+        // 눌렀을 때 셀 색을 바꾸고 싶다면 이하 코드 활성화
 //        selectedBackgroundView = UIView().then {
 //            $0.backgroundColor = .black.withAlphaComponent(0.5)
 //        }

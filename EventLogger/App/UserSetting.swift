@@ -35,8 +35,8 @@ enum UDKey {
     static let didSetupDefaultCategories = "didSetupDefaultCategories" // 최초 실행 체크
     static let pushNotificationEnabled = "pushNotificationEnabled" // 푸쉬알림 허용 체크
     static let autoSaveToCalendar = "settings.autoSaveToCalendar" // 캘린더 오토세이브
-    static let appCalendarName = "appCalendarName"
-    static let appCalendarIdKey = "ELCalendarIdentifier"
+    static let appCalendarName = "appCalendarName"  // 캘린더 이름
+    static let appCalendarIdKey = "ELCalendarIdentifier" // 캘린더 구분 키
 }
 
 /*
