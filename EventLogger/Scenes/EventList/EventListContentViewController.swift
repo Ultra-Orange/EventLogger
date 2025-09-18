@@ -86,7 +86,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
         $0.numberOfLines = 0
     }
     private let emptyValueLabel = UILabel().then {
-        $0.text = "일정을 등록하면 전체 일정을 한눈에 확인할 수 있어요\n참여 하루 전, 놓치지 않도록 알림도 챙겨드려요"
+        $0.text = "이벤트를 등록하면 전체 이벤트를 한눈에 확인할 수 있어요\n참여 하루 전, 놓치지 않도록 알림도 챙겨드려요"
         $0.textColor = .neutral50
         $0.font = .font14Regular
         $0.textAlignment = .center
@@ -234,7 +234,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
             let snapshot = self.dataSource.snapshot()
             let section = snapshot.sectionIdentifiers[indexPath.section]
             switch section {
-            case .nextUp: label.text = "가장 가까운 일정"
+            case .nextUp: label.text = "가장 가까운 이벤트"
             case let .month(ym): label.text = "\(ym.year)년 \(ym.month)월"
             }
         }
@@ -277,7 +277,7 @@ final class EventListContentViewController: BaseViewController<EventListReactor>
 
         let itemsByID = Dictionary(uniqueKeysWithValues: filtered.map { ($0.id, $0) })
 
-        // 3) 가장 가까운 일정
+        // 3) 가장 가까운 이벤트
         let nextUp: EventItem? = filtered
             .filter { $0.startTime >= today }
             .min(by: { $0.startTime < $1.startTime })

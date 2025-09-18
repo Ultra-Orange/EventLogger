@@ -77,7 +77,7 @@ class SettingsViewController: BaseViewController<SettingsReactor> {
     }
 
     let calendarNoticeLabel = UILabel().then {
-        $0.text = "iCloud 동기화를 끄고 등록한 일정은 동기화를 켜도 연동되지 않습니다"
+        $0.text = "iCloud 동기화를 끄고 등록한 이벤트는 동기화를 켜도 연동되지 않습니다"
         $0.font = .font12Regular
         $0.textColor = .label
         $0.numberOfLines = 0

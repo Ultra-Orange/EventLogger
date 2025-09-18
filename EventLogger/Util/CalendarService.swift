@@ -222,7 +222,7 @@ final class CalendarService: CalendarServicing {
 
     // 노트 조립 태그
     private func buildNotes(for item: EventItem, with tag: String) -> String {
-        var notes = "이벤트 연동용 코드 : \(tag) - 변경 및 삭제 시 일정이 정상적으로 동기화되지 않을 수 있습니다"
+        var notes = "이벤트 연동용 코드 : \(tag) - 변경 및 삭제 시 이벤트가 정상적으로 동기화되지 않을 수 있습니다"
         let memo = (item.memo).trimmingCharacters(in: .whitespacesAndNewlines)
         if !memo.isEmpty { notes += "\n\n" + memo }
         if !item.artists.isEmpty {

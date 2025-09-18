@@ -32,7 +32,7 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
         $0.textAlignment = .center; $0.numberOfLines = 0
     }
     private let emptyValueLabel = UILabel().then {
-        $0.text = "일정을 등록하면 통계를 보여드릴 수 있어요"; $0.textColor = .neutral50; $0.font = .font17Regular
+        $0.text = "이벤트를 등록하면 통계를 보여드릴 수 있어요"; $0.textColor = .neutral50; $0.font = .font17Regular
         $0.textAlignment = .center; $0.numberOfLines = 0
     }
 
