@@ -27,9 +27,9 @@ enum EventListSortOrder: Equatable {
 }
 
 enum EventListFilter: Equatable {
-    case all
-    case upcoming
-    case completed
+    case all // 전체
+    case upcoming // 참여예정
+    case completed // 참여완료
 }
 
 // 섹션 정렬용 (yyyy, MM)
