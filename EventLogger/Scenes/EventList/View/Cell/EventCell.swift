@@ -13,7 +13,7 @@ struct EventCategory {
     let color: Color
 }
 
-struct EventCell: View { // EventItem 통으로 받자
+struct EventCell: View {
     let item: EventItem
     let category: CategoryItem
 
@@ -67,7 +67,7 @@ struct EventCell: View { // EventItem 통으로 받자
             } else {
                 Image("DefaultThumbnail")
                     .resizable()
-                    .aspectRatio(contentMode: .fit) // placeholder는 보통 fit
+                    .aspectRatio(contentMode: .fit)
                     .frame(width: 60, height: 60)
                     .foregroundStyle(.gray)
                     .cornerRadius(10)
@@ -76,7 +76,6 @@ struct EventCell: View { // EventItem 통으로 받자
         .padding(.horizontal, 12)
         .padding(.vertical, 16)
         .background(Color.clear)
-//        .background(Color(UIColor.primary100).opacity(0.08))
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)

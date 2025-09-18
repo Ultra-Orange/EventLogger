@@ -24,7 +24,7 @@ extension StatsContentViewController {
             let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: "decoration")
 
             switch section {
-            case .menuBar: // 완료
+            case .menuBar:
                 let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
                                       heightDimension: .absolute(26))
@@ -81,7 +81,7 @@ extension StatsContentViewController {
                 section.contentInsets = .init(top: -10, leading: 0, bottom: 10, trailing: 0)
                 return section
 
-            case .totalCount: // 완료
+            case .totalCount:
                 let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
                                       heightDimension: .estimated(50))
@@ -98,7 +98,7 @@ extension StatsContentViewController {
 
                 return section
 
-            case .totalExpense: // 완료
+            case .totalExpense:
                 let item = NSCollectionLayoutItem(
                     layoutSize: .init(widthDimension: .fractionalWidth(1.0),
                                       heightDimension: .estimated(50))

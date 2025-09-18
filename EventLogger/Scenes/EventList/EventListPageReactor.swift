@@ -6,12 +6,11 @@
 //
 
 import ReactorKit
-import RxSwift
-import RxRelay
 import RxFlow
+import RxRelay
+import RxSwift
 
 final class EventListPageReactor: BaseReactor {
-    // 입력
     enum Action {
         case setIndex(Int)
         case tapAdd
@@ -19,12 +18,10 @@ final class EventListPageReactor: BaseReactor {
         case tapSettings
     }
 
-    // 변이
     enum Mutation {
         case setIndex(Int)
     }
 
-    // 상태
     struct State {
         var selectedIndex: Int = 0
     }
@@ -51,11 +48,11 @@ final class EventListPageReactor: BaseReactor {
     }
 
     func reduce(state: State, mutation: Mutation) -> State {
-        var s = state
+        var state = state
         switch mutation {
         case let .setIndex(i):
-            s.selectedIndex = i
+            state.selectedIndex = i
         }
-        return s
+        return state
     }
 }

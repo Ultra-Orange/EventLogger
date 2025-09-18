@@ -9,7 +9,7 @@ import SnapKit
 import UIKit
 
 final class StatsRollupChildCell: UICollectionViewListCell {
-    private let dotView = UIView().then { // 일단 가려놓자
+    private let dotView = UIView().then {
         $0.layer.cornerRadius = 4
     }
 
@@ -58,8 +58,6 @@ final class StatsRollupChildCell: UICollectionViewListCell {
             $0.leading.equalToSuperview().inset(40)
             $0.trailing.equalToSuperview().inset(16)
         }
-
-//        backgroundConfiguration = UIBackgroundConfiguration.listGroupedCell()
     }
 
     func configure(title: String, valueText: String, leftDotColor: UIColor?) {
@@ -67,12 +65,6 @@ final class StatsRollupChildCell: UICollectionViewListCell {
         valueLabel.text = valueText
 
         dotView.isHidden = true
-//        if let color = leftDotColor {
-//            dotView.isHidden = false
-//            dotView.backgroundColor = color
-//        } else {
-//            dotView.isHidden = true
-//        }
     }
 }
 

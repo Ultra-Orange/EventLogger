@@ -7,7 +7,6 @@
 
 import UIKit
 
-/// Figma 스타일의 글로우 버튼 (cornerRadius 12, 다크배경, 오렌지 보더 + 글로우)
 final class GlowButton: UIButton {
     // MARK: - Color Palette (Figma 값 그대로)
 

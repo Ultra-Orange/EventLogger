@@ -97,7 +97,7 @@ final class StatsRollupParentCell: UICollectionViewListCell {
         isExpanded = false
     }
 
-    /// 회전 애니메이션 기반 전환
+    /// 펼쳐지고 접힐 때 회전 애니메이션 기반 전환
     func setChevron(expanded: Bool, animated: Bool) {
         isExpanded = expanded
         let targetAngle: CGFloat = expanded ? .pi : 0

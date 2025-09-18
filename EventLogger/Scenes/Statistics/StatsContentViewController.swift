@@ -27,10 +27,12 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
     private let emptyStackView = UIStackView().then {
         $0.axis = .vertical; $0.alignment = .center; $0.distribution = .fill; $0.spacing = 10
     }
+
     private let emptyTitleLabel = UILabel().then {
         $0.text = "보여드릴 통계가 없어요"; $0.textColor = .neutral50; $0.font = .font20Bold
         $0.textAlignment = .center; $0.numberOfLines = 0
     }
+
     private let emptyValueLabel = UILabel().then {
         $0.text = "이벤트를 등록하면 통계를 보여드릴 수 있어요"; $0.textColor = .neutral50; $0.font = .font17Regular
         $0.textAlignment = .center; $0.numberOfLines = 0
@@ -38,7 +40,6 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
 
     let notification = NSPersistentCloudKitContainer.eventChangedNotification
 
-    // MARK: Diffable (원본 그대로)
     enum StatsSection: Hashable {
         case menuBar
         case heatmapHeader
@@ -72,7 +73,6 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
     var expandedParentIDs = Set<UUID>()
     var childrenCache: [UUID: [RollupChild]] = [:]
 
-    // MARK: - Init (고정 스코프 Reactor 주입용)
     convenience init(reactor: StatsReactor) {
         self.init()
         self.reactor = reactor
@@ -101,7 +101,6 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
     }
 
     override func bind(reactor: StatsReactor) {
-        // 최초 로드 + 외부 변경시 새로고침
         Observable.merge(
             rx.viewDidLoad.map { _ in },
             NotificationCenter.default.rx.notification(notification).map { _ in }
@@ -146,17 +145,13 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
         let parentItem = StatsItem.rollupParent(parent)
 
         if expandedParentIDs.contains(pid) {
-            // 접기: 자식 삭제
             snapshot.deleteItems(childItems)
             expandedParentIDs.remove(pid)
         } else {
-            // 펼치기: 부모 바로 뒤에 자식 삽입
             if snapshot.indexOfItem(parentItem) != nil {
                 snapshot.insertItems(childItems, afterItem: parentItem)
                 expandedParentIDs.insert(pid)
             } else {
-                // 혹시 동일성 문제로 못 찾았을 때(매우 드묾): 섹션 끝에라도 추가
-                // (실무에서는 assert로 잡아도 됨)
                 snapshot.appendItems(childItems, toSection: sectionFor(parent: parent, in: snapshot))
                 expandedParentIDs.insert(pid)
             }
@@ -166,12 +161,12 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
         dataSource?.apply(snapshot, animatingDifferences: true)
     }
 
-    /// 부모가 속한 섹션을 찾는 헬퍼 (fallback용)
+    /// 부모가 속한 섹션을 찾음
     private func sectionFor(parent: RollupParent,
                             in snapshot: NSDiffableDataSourceSnapshot<StatsSection, StatsItem>) -> StatsSection
     {
-        // 타입 -> 섹션 매핑
         let section: StatsSection
+
         switch parent.type {
         case .categoryCount: section = .categoryCount
         case .categoryExpense: section = .categoryExpense
@@ -187,7 +182,6 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
         childrenCache.removeAll()
     }
 
-    // MARK: - Models (원본 그대로)
     struct TotalModel: Hashable {
         let totalCount: Int
         let totalExpense: Double
@@ -216,8 +210,6 @@ final class StatsContentViewController: BaseViewController<StatsReactor> {
         case artistExpense
     }
 }
-
-// MARK: - Utilities
 
 private extension Array {
     subscript(safe index: Index) -> Element? {
