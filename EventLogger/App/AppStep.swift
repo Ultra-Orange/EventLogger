@@ -8,6 +8,7 @@
 import RxFlow
 
 enum AppStep: Step {
+    case splash
     case eventList
     case eventDetail(EventItem)
     case createSchedule

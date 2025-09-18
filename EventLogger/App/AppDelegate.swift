@@ -11,14 +11,6 @@ import UserNotifications
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions : [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        Task {
-            let pushEnable = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
-            application.registerForRemoteNotifications()
-
-            if UserDefaults.standard.object(forKey: UDKey.pushNotificationEnabled) == nil {
-                UserDefaults.standard.set(pushEnable ?? false, forKey: UDKey.pushNotificationEnabled)
-            }
-        }
 
         let apperance = UINavigationBarAppearance().then {
             $0.configureWithTransparentBackground()
