@@ -26,6 +26,8 @@ final class AppFlow: Flow {
     func navigate(to step: any Step) -> FlowContributors {
         guard let step = step as? AppStep else { return .none }
         switch step {
+        case .splash:
+            return navgaiteToSpalsh()
         case .eventList:
             return navigateToEventList()
         case let .eventDetail(item):
@@ -53,11 +55,22 @@ final class AppFlow: Flow {
         }
     }
 
-    func navigateToEventList() -> FlowContributors {
+    private func navgaiteToSpalsh() -> FlowContributors {
+        let vc = SplashViewController()
+        rootNav.setViewControllers([vc], animated: false)
+        return .one(
+            flowContributor: .contribute(
+                withNextPresentable: vc,
+                withNextStepper: vc
+            )
+        )
+    }
+
+    private func navigateToEventList() -> FlowContributors {
         let vc = EventListPageContainerViewController()
         let reactor = EventListPageReactor()
         vc.reactor = reactor
-        rootNav.pushViewController(vc, animated: false)
+        rootNav.setViewControllers([vc], animated: false)
         return .one(
             flowContributor: .contribute(
                 withNextPresentable: vc,
@@ -66,7 +79,7 @@ final class AppFlow: Flow {
         )
     }
 
-    func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
+    private func navigateToEventDetail(_ eventItem: EventItem) -> FlowContributors {
         let vc = EventDetailViewController()
         let reactor = EventDetailReactor(eventItem: eventItem)
         vc.reactor = reactor
@@ -79,7 +92,7 @@ final class AppFlow: Flow {
         )
     }
 
-    func navigateToSchedule(mode: ScheduleReactor.Mode) -> FlowContributors {
+    private func navigateToSchedule(mode: ScheduleReactor.Mode) -> FlowContributors {
         let reactor = ScheduleReactor(mode: mode)
         let vc = ScheduleViewController(selectedLocationRelay: selectedLocationRelay)
         vc.reactor = reactor
@@ -156,7 +169,6 @@ final class AppFlow: Flow {
     private func navigateToStatistics() -> FlowContributors {
         let vc = StatsPageContainerViewController()
         let reactor = StatsReactor()
-//        vc.reactor = reactor
         rootNav.pushViewController(vc, animated: true)
         return .one(
             flowContributor: .contribute(
