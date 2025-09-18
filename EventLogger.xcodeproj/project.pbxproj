@@ -15,8 +15,6 @@
 		36BF70CD2E55A8DC007AD5BE /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70CC2E55A8DC007AD5BE /* RxSwift */; };
 		36BF70D02E55A8FA007AD5BE /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70CF2E55A8FA007AD5BE /* SnapKit */; };
 		36BF70D32E55A90E007AD5BE /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D22E55A90E007AD5BE /* Then */; };
-		36BF70D62E55A920007AD5BE /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D52E55A920007AD5BE /* Alamofire */; };
-		36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70D82E55A936007AD5BE /* Algorithms */; };
 		36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */ = {isa = PBXBuildFile; productRef = 36BF70DB2E55A94E007AD5BE /* HostingView */; };
 		FED82BD72E55E44400604202 /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = FED82BD62E55E44400604202 /* Dependencies */; };
 /* End PBXBuildFile section */
@@ -68,13 +66,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				36BF70CB2E55A8DC007AD5BE /* RxCocoa in Frameworks */,
-				36BF70D62E55A920007AD5BE /* Alamofire in Frameworks */,
 				36BF70D32E55A90E007AD5BE /* Then in Frameworks */,
 				36BF70C82E55A8C6007AD5BE /* RxFlow in Frameworks */,
 				36B1389C2E5C576C0057215D /* WSTagsField in Frameworks */,
 				36BF70DC2E55A94E007AD5BE /* HostingView in Frameworks */,
 				FED82BD72E55E44400604202 /* Dependencies in Frameworks */,
-				36BF70D92E55A936007AD5BE /* Algorithms in Frameworks */,
 				36BF70CD2E55A8DC007AD5BE /* RxSwift in Frameworks */,
 				36B138992E5C57570057215D /* RxGesture in Frameworks */,
 				36BF70C52E55A8B6007AD5BE /* ReactorKit in Frameworks */,
@@ -136,8 +132,6 @@
 				36BF70CC2E55A8DC007AD5BE /* RxSwift */,
 				36BF70CF2E55A8FA007AD5BE /* SnapKit */,
 				36BF70D22E55A90E007AD5BE /* Then */,
-				36BF70D52E55A920007AD5BE /* Alamofire */,
-				36BF70D82E55A936007AD5BE /* Algorithms */,
 				36BF70DB2E55A94E007AD5BE /* HostingView */,
 				FED82BD62E55E44400604202 /* Dependencies */,
 				36B138982E5C57570057215D /* RxGesture */,
@@ -204,8 +198,6 @@
 				36BF70C92E55A8DC007AD5BE /* XCRemoteSwiftPackageReference "RxSwift" */,
 				36BF70CE2E55A8FA007AD5BE /* XCRemoteSwiftPackageReference "SnapKit" */,
 				36BF70D12E55A90E007AD5BE /* XCRemoteSwiftPackageReference "Then" */,
-				36BF70D42E55A920007AD5BE /* XCRemoteSwiftPackageReference "Alamofire" */,
-				36BF70D72E55A936007AD5BE /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */,
 				FED82BD52E55E44400604202 /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 				36B138972E5C57570057215D /* XCRemoteSwiftPackageReference "RxGesture" */,
@@ -589,22 +581,6 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		36BF70D42E55A920007AD5BE /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.2;
-			};
-		};
-		36BF70D72E55A936007AD5BE /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-algorithms.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.1;
-			};
-		};
 		36BF70DA2E55A94E007AD5BE /* XCRemoteSwiftPackageReference "HostingView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Jaesung-Jung/HostingView";
@@ -663,16 +639,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 36BF70D12E55A90E007AD5BE /* XCRemoteSwiftPackageReference "Then" */;
 			productName = Then;
-		};
-		36BF70D52E55A920007AD5BE /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 36BF70D42E55A920007AD5BE /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
-		};
-		36BF70D82E55A936007AD5BE /* Algorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 36BF70D72E55A936007AD5BE /* XCRemoteSwiftPackageReference "swift-algorithms" */;
-			productName = Algorithms;
 		};
 		36BF70DB2E55A94E007AD5BE /* HostingView */ = {
 			isa = XCSwiftPackageProductDependency;
