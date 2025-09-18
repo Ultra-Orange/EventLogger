@@ -60,10 +60,18 @@ Etc: swift-dependencies
 - swift-dependencies
 
 ## 화면 설계/흐름
-TODO
+### 플로우 차트
+<img width="1041" height="692" alt="이벤트 로거 플로우차트" src="https://github.com/user-attachments/assets/04cc9f3e-4980-410b-be38-396f0a3f0454" />
+
+### 핵심화면 설계
+<img width="1481" height="1939" alt="Group 2" src="https://github.com/user-attachments/assets/57b701a1-66e9-470c-a42e-9f76325f8a8e" />
 
 ## 데모 자료
-TODO
+![demo1](https://github.com/user-attachments/assets/6587e539-8704-4846-a053-b8a4a3b4a834)![demo2](https://github.com/user-attachments/assets/f9166c72-328b-4b18-b84f-214d19cf38e5)![demo3](https://github.com/user-attachments/assets/e24618df-120e-40e5-807f-9f3895278f07)
+
+![demo4](https://github.com/user-attachments/assets/a1705a9f-365f-4697-a6f2-a716f0a7b782)![demo5](https://github.com/user-attachments/assets/e200217c-b5f1-4027-9a48-f04beaf83226)![demo6](https://github.com/user-attachments/assets/6bffb1ae-7512-4070-9397-5f5400c6ea7e)
+
+Sample event image from [Unsplash](https://unsplash.com)
 
 ## 프로젝트 구조
 ```
@@ -72,15 +80,16 @@ TODO
 ├── 📁 Base                 // 베이스 리액터, VC
 ├── 📁 Extensions           // 각종 확장
 ├── 📁 Model                // 데이터 모델
-│   └── 📁 SwiftDataModel            // 스위프트 데이터 모델
+│   └── 📁 SwiftDataModel   // 스위프트 데이터 모델
 ├── 📁 Resources            // 앱 내부 사용 리소스
 ├── 📁 Scenes               // 화면별 폴더 구조
 │   ├── 📁 EventDetail      // 이벤트 상세화면
 │   ├── 📁 EventList        // 이벤트 목록화면
 │   ├── 📁 Schedule         // 이벤트 등록/수정 화면
 │   ├── 📁 Settings         // 설정화면
+│   ├── 📁 Splash           // 스플래쉬 애니메이션
 │   ├── 📁 Statistics       // 통계화면
-└── 📁 Util                // 유틸리티
+└── 📁 Util                 // 유틸리티
 ```
 
 팀원 정보
