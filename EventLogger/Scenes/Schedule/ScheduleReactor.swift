@@ -43,8 +43,8 @@ final class ScheduleReactor: BaseReactor {
 
         var navTitle: String {
             switch self {
-            case .create: return "새 일정 등록"
-            case .update: return "일정 수정"
+            case .create: return "새 이벤트 등록"
+            case .update: return "이벤트 수정"
             }
         }
 

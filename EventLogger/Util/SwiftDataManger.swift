@@ -197,7 +197,7 @@ struct SwiftDataManager {
     // UPDATE
     func updateEvent(id: UUID, event: EventItem) {
         guard let store = fetchOneEventStore(id: id) else {
-            print("해당 id에 일치하는 일정이 존재하지 않습니다.")
+            print("해당 id에 일치하는 이벤트가 존재하지 않습니다.")
             return
         }
 
@@ -241,7 +241,7 @@ struct SwiftDataManager {
             modelContext.delete(target)
             saveContext()
         } else {
-            print("해당 id에 일치하는 일정이 존재하지 않습니다.")
+            print("해당 id에 일치하는 이벤트가 존재하지 않습니다.")
         }
     }
 }

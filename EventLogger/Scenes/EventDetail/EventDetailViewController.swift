@@ -166,7 +166,7 @@ class EventDetailViewController: BaseViewController<EventDetailReactor> {
         deleteActionRelay
             .withUnretained(self)
             .flatMap { `self`, _ in
-                UIAlertController.rx.alert(on: self, title: "일정 삭제", message: "정말로 이 일정을 삭제할까요?", actions: [
+                UIAlertController.rx.alert(on: self, title: "이벤트 삭제", message: "정말로 이 이벤트를 삭제할까요?", actions: [
                     .cancel("취소"),
                     .destructive("삭제", payload: .deleteEvent(eventItem)),
                 ])
